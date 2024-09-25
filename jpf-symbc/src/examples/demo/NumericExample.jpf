@@ -1,9 +1,24 @@
+# Target class and method to be analyzed
 target=demo.NumericExample
-classpath=${jpf-symbc}/build/examples
-sourcepath=${jpf-symbc}/src/examples
-symbolic.method = demo.NumericExample.test(sym#sym)
 
-#symbolic.dp=z3
+# Classpath where your compiled classes are located
+classpath=${jpf-symbc}/build/examples
+
+# Sourcepath where your source code resides (if needed)
+sourcepath=${jpf-symbc}/src/examples
+
+# Specify the method to be symbolically executed
+symbolic.method = demo.NumericExample.test(java.lang.String)
+
+# Optional: Define the decision procedure (Z3, CVC3, etc.)
+# Uncomment the line below if you are using Z3 as the decision procedure
+# symbolic.dp=z3
+
+# Enable SymbolicListener to monitor symbolic execution
 listener = .symbc.SymbolicListener
 
+# Allow for multiple errors in one run, if they exist
 search.multiple_errors=true
+
+# Output the paths generated during symbolic execution (optional for debugging)
+symbolic.debug=true

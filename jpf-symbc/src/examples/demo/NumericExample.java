@@ -22,17 +22,17 @@ import gov.nasa.jpf.symbc.Debug;
 
 public class NumericExample {
 
-	public static void test(int a, int b) {
-		int c = a / (b + a - 2);
-		if (c > 0)
-			System.out.println(">0");
-		else
-			System.out.println("<=0");
-		// System.out.println("c "+Debug.getSymbolicIntegerValue(c));
+	public static void test(String a) {
+	if (a.equals("test")) {
+		System.out.println("a is test");
+	} else {
+		System.out.println("a is not test");
+	}
 	}
 
 	public static void main(String[] args) {
-		test(0, 0);
+		String symbolicA = Debug.makeSymbolicString(null);
+		test(symbolicA);
 
 	}
 

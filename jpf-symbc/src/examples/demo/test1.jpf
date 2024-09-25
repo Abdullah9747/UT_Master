@@ -1,7 +1,7 @@
 target=test1
 classpath=${jpf-symbc}/build/examples
 sourcepath=${jpf-symbc}/src/examples
-symbolic.method = test1.test(sym#sym)
+symbolic.method = test1.test(sym#sym#sym)
 
 #symbolic.dp=z3
 listener = .symbc.SymbolicListener
