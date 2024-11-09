@@ -3,6 +3,8 @@ import json
 import os
 import csv
 import pandas as pd
+import random
+import string
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
@@ -97,5 +99,89 @@ class DataFilter:
                         count += 1
                         print(f"Processed file: {count}")
         print(f"Data extraction and filtering completed!")
-
     
+
+    def check_functionIsBuildable(sef, input_file, output_file):
+        count=0
+        df = pd.read_csv(input_file)
+        buildable_functions = []
+        for index, row in df.iterrows():
+            method_body = row['Function']
+            #excute the java function to check if it is buildable
+            excute = os.system(f"echo '{method_body}' > temp.java")
+            excute = os.system("javac temp.java")
+            if excute == 0:
+                print(f"added {count}Function in output file")
+                count+=1
+                #add crodponding parameter and test case to the buildable_functions list
+                buildable_functions.append({
+                    'Parameter': row['Parameter'],
+                    'Function': row['Function'],
+                    'Test Case': row['Test Case']
+                })
+        # Save the result to a new CSV file
+        result_df = pd.DataFrame(buildable_functions)
+        result_df.to_csv(output_file, index=False)
+        print(f"Buildable functions checked! Selected data saved to {output_file}")
+
+
+    def generate_random_function_name(self,length=8):
+        """Generate a random function name."""
+        return ''.join(random.choices(string.ascii_lowercase, k=length))
+
+    def extract_function_signature(self,function_text):
+        """Extract function signature including parameters."""
+        # Find the function declaration
+        match = re.search(r'public\s+\w+\s+(\w+)\s*\((.*?)\)', function_text)
+        if match:
+            func_name = match.group(1)
+            params = match.group(2)
+            return func_name, params
+        return None, None
+
+    def process_csv(self,input_file):
+        """Process the CSV file using pandas and create three output files."""
+        # Read the input CSV
+        df = pd.read_csv(input_file)
+        
+        # Create lists to store processed data
+        original_data = []
+        random_data = []
+        complete_data = []
+        
+        # Process each row
+        for _, row in df.iterrows():
+            function_text = row['Function']
+            func_name, params = self.extract_function_signature(function_text)
+            
+            if func_name:
+                random_name = self.generate_random_function_name()
+                
+                # Store original function name
+                original_data.append({
+                    'Parameter': row['Parameter'],
+                    'Function': func_name,
+                    'Test Case': row['Test Case']
+
+                })
+                
+                # Store random function name with parameters
+                random_data.append({
+                    'Parameter': row['Parameter'],
+                    'Function': f"{random_name}({params})",
+                    'Test Case': row['Test Case']
+                })
+                
+        
+        # Create DataFrames from processed data
+        df_original = pd.DataFrame(original_data)
+        df_random = pd.DataFrame(random_data)
+                
+        # Save to CSV files
+        df_original.to_csv('Output/original_functions.csv', index=False)
+        df_random.to_csv('Output/random_functions.csv', index=False)
+        
+
+        
+        
+        

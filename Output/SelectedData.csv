@@ -1,529 +1,516 @@
 Parameter,Function,Test Case
-(int number),"class convert {
-String convert(int number) {
-        throw new UnsupportedOperationException(""Delete this statement and write your own implementation."");
-    }
-}","@Test
-    public void soundFor1Is1() {
-        assertEquals(""1"", raindropConverter.convert(1));
-    }"
-(int index),"class getParameter {
-@Override
-    public Class<?> getParameter(int index) {
-        if (index == 0) {
-            return elementType;
-        } else {
-            throw new IndexOutOfBoundsException(String.valueOf(index));
+(int number),"class delete {
+public void delete(int number) {
+        RadixTreeNode node = find(number);
+        if (node == null) {
+            return;
+        }
+        node.setLastBit(false);
+        if (node.isLeaf()) {
+            while (true) {
+                if (node.isLastBit()) {
+                    return;
+                }
+                if (!node.isLeaf()) {
+                    return;
+                }
+                if (node.isRoot()) {
+                    return;
+                }
+                final RadixTreeNode parent = (RadixTreeNode) node.getParent();
+                if (parent.getLeftChild() == node) {
+                    parent.setLeftChild(null);
+                } else {
+                    parent.setRightChild(null);
+                }
+                node = parent;
+            }
         }
     }
-}","@Test
-    public void getParameter() {
-        assertEquals(String.class, stringPath.getParameter(0));
-    }"
-(int index),"class block {
-public byte[] block(int index) {
-
-        if (index >= blockCount()) {
-            throw new ArrayIndexOutOfBoundsException(""Invalid block index "" + index);
-        }
-
-        byte[] theBlock = new byte[FW_BLOCK_SIZE + 2];
-
-        // Copy the UINT16 block index into the array (2 bytes)
-        byte[] rawIndex = intToTwoBytes(index, Constants.CC2540_BYTE_ORDER);
-        System.arraycopy(rawIndex, 0, theBlock, 0, 2);
-
-        // Copy the block data into the array (16 bytes)
-        int blockStart = index * FW_BLOCK_SIZE;
-        int length = FW_BLOCK_SIZE;
-        while (blockStart + length > data().length) { length--; }
-        System.arraycopy(data(), blockStart, theBlock, 2, length);
-
-        return theBlock;
-    }
-}","@Test
-    public void testFirmwareBlocksValid() throws ImageParsingException {
-        FirmwareImage image1 = new FirmwareImage(rawImageData_valid, """");
-
-        assertThat(image1.block(0)).isEqualTo(intArrayToByteArray(new int[]{
-
-                // Block index (0x0000 little endian)
-                0x00, 0x00,
-
-                // Block data
-                0x2B, 0x65,                // CRC
-                0xFF, 0xFF,                // CRC Shadow
-                0x64, 0x00,                // Version
-                0x00, 0x7C,                // Length
-                0x41, 0x41, 0x41, 0x41,    // AAAA
-                0xFF, 0xFF, 0xFF, 0xFF     // Reserved
-        }));
-
-        try {
-            image1.block(1);
-            fail(""Shouldn't have worked"");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            assertThat(e).isNotNull();
-        }
-
+}","@Test(expectedExceptions = UnsupportedOperationException.class)
+    public void testBitDeletion() throws Exception {
+        new RadixTree().delete(Bit.NEUTRAL);
     }"
 (int index),"class get {
-@Override
-    public E get(int index) {
-        return mapped.get(index);
+public float get(int index) {
+        switch (index) {
+            case 0:
+                return x;
+            case 1:
+                return y;
+            case 2:
+                return z;
+        }
+        throw new IllegalArgumentException(""index must be either 0, 1 or 2"");
     }
 }","@Test
-    public void replace() throws Exception {
-        inputs.add(""Mike"");
-        inputs.add(""Dave"");
-        getChange(); getChange();
-        inputs.set(0, ""Bob"");
-        assertEquals(""Hello Bob"", outputs.get(0));
-        ListChangeListener.Change<? extends String> change = getChange();
-        assertTrue(change.wasReplaced());
-        assertEquals(""Hello Mike"", change.getRemoved().get(0));
-        assertEquals(""Hello Bob"", change.getAddedSubList().get(0));
+    public void testGet_illegalArgumentException() {
+        thrown.expect(IllegalArgumentException.class);
+        new Vector3f(0.0f, 0.0f, 0.0f).get(536_870_914);
     }"
-(int index),"class getValue {
+(int index),"class nth {
 @Override
-    public T getValue(int index) {
-        TimeSeries series = getTimeSeries();
-        if (series == null) {
-            // Series is null; the indicator doesn't need cache.
-            // (e.g. simple computation of the value)
-            // --> Calculating the value
-            return calculate(index);
-        }
+    public Object nth(int index) {
+        assertIndexInBounds(index);
 
-        // Series is not null
-        
-        final int removedTicksCount = series.getRemovedTicksCount();
-        final int maximumResultCount = getTimeSeries().getMaximumTickCount();
-        
-        T result;
-        if (index < removedTicksCount) {
-            // Result already removed from cache
-            log.trace(""{}: result from tick {} already removed from cache, use {}-th instead"",
-                    getClass().getSimpleName(), index, removedTicksCount);
-            increaseLengthTo(removedTicksCount, maximumResultCount);
-            highestResultIndex = removedTicksCount;
-            result = results.get(0);
-            if (result == null) {
-                result = calculate(removedTicksCount);
-                results.set(0, result);
-            }
+        assertIndexInBounds(index);
+
+        if (index == 6) {
+            return item7;
         } else {
-            increaseLengthTo(index, maximumResultCount);
-            if (index > highestResultIndex) {
-                // Result not calculated yet
-                highestResultIndex = index;
-                result = calculate(index);
-                results.set(results.size()-1, result);
-            } else {
-                // Result covered by current cache
-                int resultInnerIndex = results.size() - 1 - (highestResultIndex - index);
-                result = results.get(resultInnerIndex);
-                if (result == null) {
-                    result = calculate(index);
-                }
-                results.set(resultInnerIndex, result);
-            }
+            return super.nth(index);
         }
-        return result;
     }
 }","@Test
-    public void ifCacheWorks() {
-        SMAIndicator sma = new SMAIndicator(new ClosePriceIndicator(series), 3);
-        Decimal firstTime = sma.getValue(4);
-        Decimal secondTime = sma.getValue(4);
-        assertEquals(firstTime, secondTime);
+    public void testNth() {
+        assertThat(someTuple.nth(0)).isEqualTo(1);
+        assertThat(someTuple.nth(1)).isEqualTo(2);
+        assertThat(someTuple.nth(2)).isEqualTo(3);
+        assertThat(someTuple.nth(3)).isEqualTo(4);
+        assertThat(someTuple.nth(4)).isEqualTo(5);
+        assertThat(someTuple.nth(5)).isEqualTo(6);
+        assertThat(someTuple.nth(6)).isEqualTo(7);
+        assertThat(someTuple.getItem1()).isEqualTo(1);
+        assertThat(someTuple.getItem2()).isEqualTo(2);
+        assertThat(someTuple.getItem3()).isEqualTo(3);
+        assertThat(someTuple.getItem4()).isEqualTo(4);
+        assertThat(someTuple.getItem5()).isEqualTo(5);
+        assertThat(someTuple.getItem6()).isEqualTo(6);
+        assertThat(someTuple.getItem7()).isEqualTo(7);
+        assertThat(someTuple.size()).isEqualTo(7);
     }"
-(int index),"class getChild {
+(int index),"class getColumnKey {
 @Override
-    public Node getChild(int index) {
-        int i = 0;
-        for (Iterator<Node> itr = iterator(); itr.hasNext();) {
-            if (i == index) {
-                return getFiltered(itr.next());
-            }
-
-            i++;
-            itr.next();
-        }
-
-        throw new IndexOutOfBoundsException();
+    public Comparable getColumnKey(int index) {
+        return this.keys.get(index);
     }
 }","@Test
-    public void getChild_Index() {
-        assertEquals(""child0"", filtered.getChild(0).getName());
-        assertTrue(filtered.getChild(0) instanceof ApiFilteredNode);
-        assertEquals(""child2"", filtered.getChild(1).getName());
+    public void testGetColumnKey() {
+        TaskSeriesCollection c = createCollection1();
+        assertEquals(""Task 1"", c.getColumnKey(0));
+        assertEquals(""Task 2"", c.getColumnKey(1));
+        assertEquals(""Task 3"", c.getColumnKey(2));
     }"
-(int size),"class allocate {
-@SuppressWarnings(""synthetic-access"")
-  public OffHeapStoredObject allocate(int size) {
-    assert size > 0;
-
-    OffHeapStoredObject result = basicAllocate(size, true);
-
-    result.setDataSize(size);
-    this.allocatedSize.addAndGet(result.getSize());
-    result.initializeUseCount();
-
-    return result;
-  }
-}","@Test
-  public void allocateTinyChunkFromFreeListHasCorrectSize() {
-    setUpSingleSlabManager();
-    int tinySize = 10;
-
-    OffHeapStoredObject c = this.freeListManager.allocate(tinySize);
-    OffHeapStoredObject.release(c.getAddress(), this.freeListManager);
-    c = this.freeListManager.allocate(tinySize);
-
-    validateChunkSizes(c, tinySize);
-  }"
-(int i),"class onItemClicked {
+(int index),"class getAttributeValue {
 @Override
-	public void onItemClicked(int i) {
-		ArrayList<OsmObject> intentList = new ArrayList<>();
-		intentList.add(0, this.alternateList.get(i));
-		PoiList.getInstance().setPoiList(intentList);
-		view.startActivity();
+	public String getAttributeValue(int index)
+	{
+		return this.replace(super.getAttributeValue(index));
 	}
 }","@Test
-	public void onClick() {
-		notHerePresenter.onItemClicked(0);
+	public void getAttributeValueByName()
+	{
+		String namespaceURI = ""url"";
+		String localName = ""name"";
+		String expected = ""expected"";
+		
+		when(this.reader.getAttributeValue(namespaceURI, localName)).thenReturn(expected);
 
-		verify(view).startActivity();
+		String result = this.filter.getAttributeValue(namespaceURI, localName);
+		
+		assertSame(expected, result);
+		
+		when(this.reader.getAttributeValue(namespaceURI, localName)).thenReturn(SYSTEM_PROPERTY);
+		
+		result = this.filter.getAttributeValue(namespaceURI, localName);
+		
+		assertEquals(PROPERTY_VALUE, result);
 	}"
-(long id),"class inodeIdExists {
-public boolean inodeIdExists(long id) {
-    return mInodeStore.get(id).isPresent();
+(int index),"class isNull {
+@Override
+  public boolean isNull(int index) {
+    return ac.isNull(index);
   }
 }","@Test
-  public void inodeIdExists() throws Exception {
-    assertTrue(mTree.inodeIdExists(0));
-    assertFalse(mTree.inodeIdExists(1));
-
-    createPath(mTree, TEST_URI, sFileContext);
-    MutableInode<?> inode = getInodeByPath(TEST_URI);
-    assertTrue(mTree.inodeIdExists(inode.getId()));
-
-    deleteInodeByPath(mTree, TEST_URI);
-    assertFalse(mTree.inodeIdExists(inode.getId()));
+  public void testIsNull() throws Exception {
+    assertNotNull(accessor.getObject(0));
+    assertNotNull(accessor.getTime(0, PST_CALENDAR));
+    assertNull(accessor.getObject(1));
+    assertNull(accessor.getTime(1, PST_CALENDAR));
   }"
+(int size),"class emptyCombination {
+public static int[] emptyCombination(int size) {
+        Preconditions.check(size >= 0);
+        
+        final int[] combination = new int[size];
+        Arrays.fill(combination, NO_VALUE);
+        
+        return combination;
+    }
+}","@Test
+    void emptyCombinationCannotHaveNegativeSize() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> CombinationUtil.emptyCombination(-1));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> CombinationUtil.emptyCombination(-312));
+    }"
+(int i),"class generate {
+public static List<Integer> generate(int i) {
+        if (isOne(i)) {
+            return emptyList();
+        } else if (i == 2) {
+            return new ArrayList<Integer>() {{
+                add(2);
+            }};
+
+        } else if (i == 4) {
+            return new ArrayList<Integer>() {{
+                add(2);
+                add(2);
+            }};
+        } else {
+            return new ArrayList<Integer>() {{
+                add(3);
+            }};
+        }
+    }
+}","@Test
+    public void testOneHasNoPrimitives() {
+        assertThat(list(ONE), is(PrimeNumbers.generate(1)));
+    }"
+(long id),"class createCached {
+@SuppressWarnings(""unchecked"")
+    public static <T> Id<T> createCached(long id) {
+        return objectCache.getUnchecked(id);
+    }
+}","@Test
+    public void cachedIdReturnsTheSameInstance() {
+        Assertions.assertSame(Id.createCached(RAW_ID), Id.createCached(RAW_ID));
+    }"
 "(int x, int y)","class onGrid {
 public boolean onGrid(int x, int y) {
         return x >= 0 && x < width && y >= 0 && y < height;
     }
 }","@Test
-    public void onGridOutPointsTest() {
+    public void onGridInPointsTest() {
         Grid grid = new Grid(session, 3, 2);
-        int x = -1;
-        int y = -1;
-
-        while (y < 2) {
-            while (x < 4) {
-                assertThat(grid.onGrid(x, y)).isFalse();
-                x++;
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 2; y++) {
+                assertThat(grid.onGrid(x,y)).isTrue();
             }
-            x = -1;
-            y += 3;
-        }
-
-        x = -1;
-        y = -1;
-
-        while (x < 4) {
-            while (y < 3) {
-                assertThat(grid.onGrid(x, y)).isFalse();
-                y++;
-            }
-            y = -1;
-            x += 4;
         }
     }"
-(int length),"class generateUniqueString {
-public static String generateUniqueString(int length) {
-    int totalChars = alphabet.length;
-    BigDecimal exponent = BigDecimal.valueOf(totalChars);
-    exponent = exponent.pow(length);
-    String code = """";
-    BigDecimal number = new BigDecimal(rand.nextInt(1000000));
-    BigDecimal num = number.multiply(largePrimeNumber).remainder(exponent);
-    code = baseN(num, totalChars);
-    int codeLenght = code.length();
-    if (codeLenght < length) {
-      for (int i = codeLenght; i < length; i++) {
-        code = code + alphabet[rand.nextInt(totalChars - 1)];
-      }
+(int length),"class alphaNumeric {
+public static String alphaNumeric(int length) {
+        StringBuilder builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++)
+            builder.append(ALPHA_NUMERIC.charAt(ThreadLocalRandom.current().nextInt(ALPHA_NUMERIC.length())));
+        return builder.toString();
     }
-    if (NumberUtils.isNumber(code.substring(1, 2)) || NumberUtils.isNumber(code.substring(2, 3))) {
-      return code;
-    } else {
-      code = code.substring(0, 1) + alphabet[rand.nextInt(9)] + code.substring(2);
-      return code;
+}","@Test
+    void randomAlphaNumeric() {
+        assertThat(Randoms.alphaNumeric(3)).hasSize(3);
+        assertThat(Randoms.alphaNumeric(5)).hasSize(5);
+        assertThat(Randoms.alphaNumeric(10)).hasSize(10);
+    }"
+(long value),"class add {
+@Override
+    public void add(long value) {
+        lock.lockWrite();
+        super.add(value);
+        lock.unlockWrite();
     }
-  }
 }","@Test
-  public void generateUniqueStringSuccess() {
-    beforeEachTest();
-    String val = UserUtil.generateUniqueString(4);
-    assertTrue(val.length() == 4);
-  }"
-(long value),"class valueOf {
-public static LogSequenceNumber valueOf(long value) {
-    return new LogSequenceNumber(value);
-  }
-}","@Test
-  public void testNotNullWhenCreateFromStr() throws Exception {
-    LogSequenceNumber result = LogSequenceNumber.valueOf(""0/15D68C50"");
-    assertThat(result, notNullValue());
-  }"
+    public void testAddItems() {
+        ConcurrentLongArray a = new ConcurrentLongArray();
+        CountDownLatch latch = new CountDownLatch(10);
+        createStartAndJoinThreads(new Runnable() {
+            @Override
+            public void run() {
+                latch.countDown();
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                for (int i = 0; i < 1000; i++) {
+                    a.add(i);
+                }
+            }
+        }, 10);
+        assertEquals(a.size, 10*1000);
+    }"
 (int position),"class get {
-public boolean get(int position) {
-        if (position < 0 || position >= this.size) {
-            throw new IndexOutOfBoundsException(String.format(""Index: %s, Size: %s"", position, this.size));
-        }
-
-        int offset = position / 8;
-        int bitoffset = position % 8;
-
-        return (this.bytes[offset] & 0xff & (1 << bitoffset)) != 0;
-    }
+protected abstract E get(int position);
 }","@Test
-    public void exceptionIfGetWithOutOfBoundPosition() {
-        BitSet set = new BitSet(17);
+    public void testFullIteration() {
+        final AbstractIndexedIterator<String> testIterator = new AbstractIndexedIterator<String>(testData.size()) {
 
-        try {
-            set.get(17);
-            Assert.fail();
-        }
-        catch (IndexOutOfBoundsException ex) {
-            Assert.assertEquals(""Index: 17, Size: 17"", ex.getMessage());
-        }
+            @Override
+            protected String get(final int position) {
+                return testData.get(position);
+            }
+
+        };
+        assertTrue(elementsEqual(testData.iterator(), testIterator));
     }"
-(long n),"class skip {
-@Override
-    public long skip(long n) throws IOException {
-        final long skipped = super.skip(n);
-        if (includeSkipped && skipped > 0) {
-            dataLength += skipped;
-            checkLength(false);
-        }
-        return skipped;
+(long n),"class request {
+public void request(long n) {
+    Subscription currentSubscription = subscription;
+    if (currentSubscription != null) {
+      currentSubscription.request(n);
     }
-}","@Test
-    public void testSkipIncludedFailure() throws IOException {
-        byte[] bytes = new byte[100];
-        InputStream is = new LengthCheckInputStream(
-                new ByteArrayInputStream(bytes), 90, INCLUDE_SKIPPED_BYTES);
-        assertTrue(10 == is.skip(10));
-        try {
-            StreamUtils.consumeInputStream(is);
-            fail();
-        } catch (AmazonClientException ex) {
-            // expected
-        }
-        is.close();
-    }"
-(int value),"class intToByteArray {
-protected static byte[] intToByteArray(int value) {
-		return new byte[] { (byte) (value >>> 24), (byte) (value >>> 16),
-				(byte) (value >>> 8), (byte) value };
-	}
-}","@Test
-	public void testIntToByteArray() {
-		// Positive int
-		byte[] posBytes = new byte[] { 0x00, 0x00, 0x00, 0x2a };
-		assertArrayEquals(posBytes, Utils.intToByteArray(42));
-
-		// Zero
-		byte[] zeroBytes = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0x00,
-				(byte) 0x00 };
-		assertArrayEquals(zeroBytes, Utils.intToByteArray(0));
-
-		// Negative int
-		byte[] negBytes = new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff,
-				(byte) 0xf4 };
-		assertArrayEquals(negBytes, Utils.intToByteArray(-12));
-	}"
-(int value),"class get {
-public Selection get(int value) {
-    Selection selection = new BitmapBackedSelection();
-    IntArrayList list = index.get(value);
-    if (list != null) {
-      addAllToSelection(list, selection);
-    }
-    return selection;
   }
 }","@Test
-  public void testGet() {
-    Selection fromCol = table.numberColumn(""approval"").eval(NumberPredicates.isEqualTo(71));
-    Selection fromIdx = index.get(71);
-    assertEquals(fromCol, fromIdx);
+  void request() {
+    var s = new TestSubscription();
+    var ups = new Upstream();
+    ups.request(1);
+    ups.setOrCancel(s);
+    ups.request(5);
+    ups.cancel();
+    ups.request(1);
+    assertEquals(1, s.cancels);
+    assertEquals(1, s.demands.size());
+    assertEquals(5, s.demands.poll());
   }"
-(double value),"class remove {
+(int value),"class valueOf {
+public static BigRational valueOf(int value) {
+		if (value == 0) {
+			return ZERO;
+		}
+		if (value == 1) {
+			return ONE;
+		}
+		return new BigRational(value);
+	}
+}","@Test(expected=NumberFormatException.class)
+	public void testValueOfDoublePositiveInfinity() {
+		valueOf(Double.POSITIVE_INFINITY);
+	}"
+(int value),"class doRemoteFunction {
 @Override
-    public boolean remove(double value)
-    {
-        return myList.remove(value);
+  public long doRemoteFunction(int value) {
+
+    long waitTime = (long) Math.floor(randomProvider.random() * 1000);
+
+    try {
+      sleep(waitTime);
+    } catch (InterruptedException e) {
+      LOGGER.error(""Thread sleep state interrupted"", e);
     }
-}","@Test(expected = UnsupportedOperationException.class)
-    public void testRemoveAfterPetrify1()
-    {
-        PETRIFIED_LIST.remove(TEST_DOUBLE);
+    return waitTime <= THRESHOLD ? value * 10
+            : RemoteServiceStatus.FAILURE.getRemoteServiceStatusValue();
+  }
+}","@Test
+  void testFailedCall() {
+    var remoteService = new RemoteService(new StaticRandomProvider(0.21));
+    var result = remoteService.doRemoteFunction(10);
+    assertEquals(RemoteServiceStatus.FAILURE.getRemoteServiceStatusValue(), result);
+  }"
+(double value),"class setTol {
+public void setTol(double value) {
+        if (value <= 0 || value > 1e-2) {
+            throw new TramoException(""Invalid Tol parameter"");
+        }
+        tol_ = value;
+    }
+}","@Test(expected = TramoException.class)
+    public void testSetTolLowerBound() {
+        EstimateSpec spec = new EstimateSpec();
+        spec.setTol(-0.1);
     }"
 (int b),"class write {
 @Override
     public void write(int b) throws IOException {
-        if (pos == buf.length) {
-            finishChunk(false);
-        }
-        buf[pos++] = (byte) b;
+        super.write(b);
+        this.transferProgress.notify(new byte[]{(byte) b}, 1);
     }
 }","@Test
-    public void testWrite() throws Exception {
+    public void readByteArray() throws IOException {
+        byte[] buffer = new byte[SIZE];
+        Arrays.fill(buffer, (byte) 1);
+        this.outputStream.write(buffer);
 
-        String host = ""192.168.0.30"";
-        int port = 6379;
-        String queueName = ""tom-test"";
-        boolean overwrite = true;
-        int chunkSize = 4;
-
-
-        String testOutput = ""aaaaabbbbbcccccdddddeeeeefffff"";
-        byte[] bTestOutput = testOutput.getBytes();
-
-        try (RedisOutputStream ros = new RedisOutputStream(host, port, queueName, overwrite, chunkSize)) {
-            ros.write(bTestOutput);
-        }
+        assertArrayEquals(buffer, this.transferProgress.getBuffer());
+        assertEquals(SIZE, this.transferProgress.getLength());
     }"
-(int n),"class close_to_zero {
-public int close_to_zero(int n) {
-    if (n > 0) {
-      n--;
-    } else {
-      n++;
-    }
-    return n;
-  }
-}","@Test
-  public void test01() {
-    assertEquals(9, new CloseToZero().close_to_zero(10));
-  }"
-(int n),"class value {
-public static long value(int n) {
-        if (n < 0 ||
-            n > 20) {
-            throw new CombinatoricsException(CombinatoricsException.OUT_OF_RANGE,
-                                             n, 0, 20);
-        }
-
-        return FACTORIALS[n];
-    }
-}","@Test
-    void testFactorialZero() {
-        Assertions.assertEquals(1, Factorial.value(0), ""0!"");
-    }"
-(int id),"class contains {
-public boolean contains(int id) {
-    for (int part : myParts) {
-      if (part == id) return true;
-    }
-    return false;
-  }
-}","@Test
-  public void testContains() {
-    IdPath p = new IdPath(1, 2);
-
-    assertTrue(p.contains(1));
-    assertTrue(p.contains(2));
-
-    assertFalse(p.contains(3));
-  }"
-(double x),"class value {
-public double value(double x) {
-        return value(m - x, k, b, q, a, oneOverN);
+(int n),"class bernoulli {
+public static BigRational bernoulli(int n) {
+		if (n < 0) {
+			throw new ArithmeticException(""Illegal bernoulli(n) for n < 0: n = "" + n);
+		}
+    	if (n == 1) {
+    		return valueOf(-1, 2);
+    	} else if (n % 2 == 1) {
+    		return ZERO;
+    	}
+    	
+    	synchronized (bernoulliCache) {
+    		int index = n / 2;
+    		
+    		if (bernoulliCache.size() <= index) {
+    			for (int i = bernoulliCache.size(); i <= index; i++) {
+    				BigRational b = calculateBernoulli(i * 2);
+					bernoulliCache.add(b);
+				}
+    		}
+    		
+    		return bernoulliCache.get(index);
+		}
     }
 }","@Test
-    public void testCompareSigmoid() {
-        final UnivariateFunction sig = new Sigmoid();
-        final UnivariateFunction sigL = new Logistic(1, 0, 1, 1, 0, 1);
-
-        final double min = -2;
-        final double max = 2;
-        final int n = 100;
-        final double delta = (max - min) / n;
-        for (int i = 0; i < n; i++) {
-            final double x = min + i * delta;
-            Assert.assertEquals(""x="" + x, sig.value(x), sigL.value(x), EPS);
-        }
-    }"
-(int key),"class remove {
-public int remove(int key) {
-    return delegate.remove(key);
-  }
-}","@Test
-  public void testRemove() {
-    tIntIntHashMap.remove(0);
-    verify(delegate).remove(0);
-  }"
-( int rowOffset ),"class getFloat {
+	public void testBernoulli() {
+		assertEquals(""1"", bernoulli(0).reduce().toRationalString());
+		assertEquals(""-1/2"", bernoulli(1).reduce().toRationalString());
+		assertEquals(""1/6"", bernoulli(2).reduce().toRationalString());
+		assertEquals(""0"", bernoulli(3).reduce().toRationalString());
+		assertEquals(""-1/30"", bernoulli(4).reduce().toRationalString());
+		assertEquals(""0"", bernoulli(5).reduce().toRationalString());
+		assertEquals(""1/42"", bernoulli(6).reduce().toRationalString());
+		assertEquals(""0"", bernoulli(7).reduce().toRationalString());
+		assertEquals(""-1/30"", bernoulli(8).reduce().toRationalString());
+		assertEquals(""0"", bernoulli(9).reduce().toRationalString());
+		assertEquals(""5/66"", bernoulli(10).reduce().toRationalString());
+		assertEquals(""0"", bernoulli(11).reduce().toRationalString());
+		assertEquals(""-691/2730"", bernoulli(12).reduce().toRationalString());
+		assertEquals(""0"", bernoulli(13).reduce().toRationalString());
+		assertEquals(""7/6"", bernoulli(14).reduce().toRationalString());
+		assertEquals(""0"", bernoulli(15).reduce().toRationalString());
+		assertEquals(""-3617/510"", bernoulli(16).reduce().toRationalString());
+		assertEquals(""0"", bernoulli(17).reduce().toRationalString());
+		assertEquals(""43867/798"", bernoulli(18).reduce().toRationalString());
+	}"
+(int n),"class getPolynomials {
 @Override
-  public float getFloat( int rowOffset ) throws InvalidAccessException {
-    final float result;
+  public DoubleFunction1D[] getPolynomials(int n) {
+    ArgChecker.isTrue(n >= 0);
+    DoubleFunction1D[] polynomials = new DoubleFunction1D[n + 1];
+    for (int i = 0; i <= n; i++) {
+      if (i == 0) {
+        polynomials[i] = getOne();
+      } else if (i == 1) {
+        polynomials[i] = getX();
+      } else {
+        polynomials[i] = (polynomials[i - 1]
+            .multiply(getX())
+            .multiply(2 * i - 1)
+            .subtract(polynomials[i - 2].multiply(i - 1))).multiply(1. / i);
+      }
+    }
+    return polynomials;
+  }
+}","@Test
+  public void testBadN() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> LEGENDRE.getPolynomials(-3));
+  }"
+(int id),"class delete {
+@Override
+    public void delete(int id) throws IOException {
+        String commitMsg = ""Deleted metadata object "" + getID() + ""_"" + id + "" in store"";
+        // Commit to SVN
+        SVNCommitInfo info;
+        try {
+            SVNRepository repository = getRepository();
+            ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
+            editor.openRoot(-1);
+            editor.deleteEntry(""/"" + getSlotPath(id), -1);
+            editor.closeDir();
+
+            info = editor.closeEdit();
+            LOGGER.info(""SVN commit of delete finished, new revision {}"", info.getNewRevision());
+        } catch (SVNException e) {
+            LOGGER.error(""Error while deleting {} in SVN "", id, e);
+        } finally {
+            super.delete(id);
+        }
+    }
+}","@Test
+    public void delete() throws Exception {
+        System.out.println(""TEST DELETE"");
+        Document xml1 = new Document(new Element(""root""));
+        int id = getVersStore().create(new MCRJDOMContent(xml1)).getID();
+        assertTrue(getVersStore().exists(id));
+        getVersStore().delete(id);
+        assertFalse(getVersStore().exists(id));
+    }"
+(double x),"class toDegrees {
+public static double toDegrees(double x)
+    {
+        if (Double.isInfinite(x) || x == 0.0) { // Matches +/- 0.0; return correct sign
+            return x;
+        }
+
+        // These are 180/PI split into high and low order bits
+        final double facta = 57.2957763671875;
+        final double factb = 3.145894820876798E-6;
+
+        double xa = doubleHighPart(x);
+        double xb = x - xa;
+
+        return xb * factb + xb * facta + xa * factb + xa * facta;
+    }
+}","@Test
+    public void testToDegrees() {
+        double maxerrulp = 0.0;
+        for (int i = 0; i < NUMBER_OF_TRIALS; i++) {
+            double x = generator.nextDouble();
+            double tst = field.newDfp(x).multiply(180).divide(field.getPi()).toDouble();
+            double ref = FastMath.toDegrees(x);
+            double err = (tst - ref) / ref;
+
+            if (err != 0) {
+                double ulp = Math.abs(ref -
+                                      Double.longBitsToDouble((Double.doubleToLongBits(ref) ^ 1)));
+                double errulp = field.newDfp(tst).subtract(DfpMath.exp(field.newDfp(x)).subtract(field.getOne())).divide(field.newDfp(ulp)).toDouble();
+//                System.out.println(x + ""\t"" + tst + ""\t"" + ref + ""\t"" + err + ""\t"" + errulp);
+
+                maxerrulp = Math.max(maxerrulp, Math.abs(errulp));
+            }
+        }
+        Assert.assertTrue(""toDegrees() had errors in excess of "" + MAX_ERROR_ULP + "" ULP"", maxerrulp < MAX_ERROR_ULP);
+
+    }"
+(int key),"class containsKey {
+public boolean containsKey(int key) {
+    return delegate.containsKey(key);
+  }
+}","@Test
+  public void testContainsKey() {
+    tIntIntHashMap.containsKey(0);
+    verify(delegate).containsKey(0);
+  }"
+( int rowOffset ),"class getLong {
+@Override
+  public long getLong( int rowOffset ) throws InvalidAccessException {
+    final long result;
     switch ( getType().getMinorType() ) {
       // 1. Regular type:
-      case FLOAT4:
-        result = innerAccessor.getFloat( rowOffset );
-        break;
-
-      // 2. Converted-from types:
-      case INT:
-        result = innerAccessor.getInt( rowOffset );
-        break;
       case BIGINT:
         result = innerAccessor.getLong( rowOffset );
         break;
+
+      // 2. Converted-from types:
+      case TINYINT:
+        result = innerAccessor.getByte( rowOffset );
+        break;
+      case SMALLINT:
+        result = innerAccessor.getShort( rowOffset );
+        break;
+      case INT:
+        result = innerAccessor.getInt( rowOffset );
+        break;
+      case FLOAT4:
+        result = getLongValueOrThrow( innerAccessor.getFloat( rowOffset ),
+                                      ""Java float / SQL REAL/FLOAT"" );
+        break;
       case FLOAT8:
-        final double value = innerAccessor.getDouble( rowOffset );
-        if ( Float.MIN_VALUE <= value && value <= Float.MAX_VALUE ) {
-          result = (float) value;
-        } else {
-          throw newOverflowException( ""getFloat(...)"",
-                                      ""Java double / SQL DOUBLE PRECISION"",
-                                      value );
-        }
+        result = getLongValueOrThrow( innerAccessor.getDouble( rowOffset ),
+                                      ""Java double / SQL DOUBLE PRECISION"" );
         break;
-      case DECIMAL:
-        final BigDecimal decimalValue = innerAccessor.getBigDecimal( rowOffset );
-        final float tempFloat = decimalValue.floatValue();
-        if ( Float.NEGATIVE_INFINITY == tempFloat || Float.POSITIVE_INFINITY == tempFloat) {
-          throw newOverflowException( ""getFloat(...)"",
-            ""Java decimal / SQL DECIMAL PRECISION"",
-            tempFloat );
-        } else {
-          result = tempFloat;
-        }
-        break;
+
       // 3. Not-yet-converted and unconvertible types:
       default:
-        result = innerAccessor.getInt( rowOffset );
+        result = innerAccessor.getLong( rowOffset );
         break;
     }
     return result;
   }
 }","@Test
-  public void test_getFloat_on_FLOAT_getsIt() throws InvalidAccessException {
+  public void test_getLong_on_SMALLINT_getsIt() throws InvalidAccessException {
     final SqlAccessor uut1 =
-        new TypeConvertingSqlAccessor( new FloatStubAccessor( 1.23f ) );
-    assertThat( uut1.getFloat( 0 ), equalTo( 1.23f ) );
+        new TypeConvertingSqlAccessor( new SmallIntStubAccessor( (short) 32767 ) );
+    assertThat( uut1.getLong( 0 ), equalTo( 32767L ) );
     final SqlAccessor uut2 =
-        new TypeConvertingSqlAccessor( new FloatStubAccessor( Float.MAX_VALUE ) );
-    assertThat( uut2.getFloat( 0 ), equalTo( Float.MAX_VALUE ) );
-    final SqlAccessor uut3 =
-        new TypeConvertingSqlAccessor( new FloatStubAccessor( Float.MIN_VALUE ) );
-    assertThat( uut3.getFloat( 0 ), equalTo( Float.MIN_VALUE ) );
+        new TypeConvertingSqlAccessor( new SmallIntStubAccessor( (short) -32768 ) );
+    assertThat( uut2.getLong( 0 ), equalTo( -32768L ) );
   }"
