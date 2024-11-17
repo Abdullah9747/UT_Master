@@ -1,0 +1,963 @@
+Parameter,Function Name,Random Function Name,Function,Test Case
+( int columnIndex ),getArray,eyqvcwne( int columnIndex ),"class getArray {
+@Override
+    public Array getArray( int columnIndex ) throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+}","@Test( expected = SQLFeatureNotSupportedException.class )
+    public void featureNotSupportedCallingGetArrayColName() throws SQLException {
+        resultSet.getArray(""colname"");
+    }"
+( int rowOffset ),getFloat,snrjietu( int rowOffset ),"class getFloat {
+@Override
+  public float getFloat( int rowOffset ) throws InvalidAccessException {
+    final float result;
+    switch ( getType().getMinorType() ) {
+      // 1. Regular type:
+      case FLOAT4:
+        result = innerAccessor.getFloat( rowOffset );
+        break;
+
+      // 2. Converted-from types:
+      case INT:
+        result = innerAccessor.getInt( rowOffset );
+        break;
+      case BIGINT:
+        result = innerAccessor.getLong( rowOffset );
+        break;
+      case FLOAT8:
+        final double value = innerAccessor.getDouble( rowOffset );
+        if ( Float.MIN_VALUE <= value && value <= Float.MAX_VALUE ) {
+          result = (float) value;
+        } else {
+          throw newOverflowException( ""getFloat(...)"",
+                                      ""Java double / SQL DOUBLE PRECISION"",
+                                      value );
+        }
+        break;
+      case DECIMAL:
+        final BigDecimal decimalValue = innerAccessor.getBigDecimal( rowOffset );
+        final float tempFloat = decimalValue.floatValue();
+        if ( Float.NEGATIVE_INFINITY == tempFloat || Float.POSITIVE_INFINITY == tempFloat) {
+          throw newOverflowException( ""getFloat(...)"",
+            ""Java decimal / SQL DECIMAL PRECISION"",
+            tempFloat );
+        } else {
+          result = tempFloat;
+        }
+        break;
+      // 3. Not-yet-converted and unconvertible types:
+      default:
+        result = innerAccessor.getInt( rowOffset );
+        break;
+    }
+    return result;
+  }
+}","@Test
+  public void test_getFloat_on_DOUBLE_thatFits_getsIt() throws InvalidAccessException {
+    final SqlAccessor uut1 =
+        new TypeConvertingSqlAccessor( new DoubleStubAccessor( 1.125 ) );
+    assertThat( uut1.getFloat( 0 ), equalTo( 1.125f ) );
+    final SqlAccessor uut2 =
+        new TypeConvertingSqlAccessor( new DoubleStubAccessor( Float.MAX_VALUE ) );
+    assertThat( uut2.getFloat( 0 ), equalTo( Float.MAX_VALUE ) );
+  }"
+(boolean enable),setDownloadTxDependencies,hlzcxjnv(boolean enable),"class setDownloadTxDependencies {
+public void setDownloadTxDependencies(boolean enable) {
+        vDownloadTxDependencyDepth = enable ? Integer.MAX_VALUE : 0;
+    }
+}","@Test
+    public void recursiveDependencyDownloadDisabled() throws Exception {
+        peer.setDownloadTxDependencies(false);
+        connect();
+        // Check that if we request dependency download to be disabled and receive a relevant tx, things work correctly.
+        Transaction tx = FakeTxBuilder.createFakeTx(UNITTEST, COIN, address);
+        final Transaction[] result = new Transaction[1];
+        wallet.addCoinsReceivedEventListener(new WalletCoinsReceivedEventListener() {
+            @Override
+            public void onCoinsReceived(Wallet wallet, Transaction tx, Coin prevBalance, Coin newBalance) {
+                result[0] = tx;
+            }
+        });
+        inbound(writeTarget, tx);
+        pingAndWait(writeTarget);
+        assertEquals(tx, result[0]);
+    }"
+(boolean enabled),setMyLocationEnabled,mqqdbvxb(boolean enabled),"class setMyLocationEnabled {
+public void setMyLocationEnabled(boolean enabled) {
+    setMyLocationEnabled(enabled, true);
+  }
+}","@Test public void setMyLocationEnabled_shouldCenterMapIfFindMeIsActive() throws Exception {
+    doCallRealMethod().when(mapController).setPositionEased(any(LngLat.class), anyInt());
+    when(mapController.getPosition()).thenCallRealMethod();
+
+    overlayManager.setMyLocationEnabled(true);
+    findMeButton.performClick();
+    Location location = mock(Location.class);
+    when(location.getLatitude()).thenReturn(-70.0);
+    when(location.getLongitude()).thenReturn(-40.0);
+    overlayManager.locationListener.onLocationChanged(location);
+    assertThat(mapController.getPosition().latitude).isEqualTo(-70.0);
+    assertThat(mapController.getPosition().longitude).isEqualTo(-40.0);
+  }"
+(boolean value),setHorizontallyCenter,iueqewtd(boolean value),"class setHorizontallyCenter {
+@Override
+    public void setHorizontallyCenter(boolean value) {
+        throw new UnsupportedOperationException();
+    }
+}","@Test(expected = UnsupportedOperationException.class)
+    public void setHorizontallyCenter() throws Exception {
+        streamingSheet.setHorizontallyCenter(true);
+    }"
+(char c),hexCharToIntValue,tzrnhvcm(char c),"class hexCharToIntValue {
+static public int hexCharToIntValue(char c) {
+        if (c == '0') {
+            return 0;
+        } else if (c == '1') {
+            return 1;
+        } else if (c == '2') {
+            return 2;
+        } else if (c == '3') {
+            return 3;
+        } else if (c == '4') {
+            return 4;
+        } else if (c == '5') {
+            return 5;
+        } else if (c == '6') {
+            return 6;
+        } else if (c == '7') {
+            return 7;
+        } else if (c == '8') {
+            return 8;
+        } else if (c == '9') {
+            return 9;
+        } else if (c == 'A' || c == 'a') {
+            return 10;
+        } else if (c == 'B' || c == 'b') {
+            return 11;
+        } else if (c == 'C' || c == 'c') {
+            return 12;
+        } else if (c == 'D' || c == 'd') {
+            return 13;
+        } else if (c == 'E' || c == 'e') {
+            return 14;
+        } else if (c == 'F' || c == 'f') {
+            return 15;
+        } else {
+            throw new IllegalArgumentException(""The character ["" + c + ""] does not represent a valid hex digit"");
+        }
+    }
+}","@Test
+    public void hexCharToIntValue() throws Exception {
+        Assert.assertEquals(0, HexUtil.hexCharToIntValue('0'));
+        Assert.assertEquals(1, HexUtil.hexCharToIntValue('1'));
+        Assert.assertEquals(2, HexUtil.hexCharToIntValue('2'));
+        Assert.assertEquals(3, HexUtil.hexCharToIntValue('3'));
+        Assert.assertEquals(4, HexUtil.hexCharToIntValue('4'));
+        Assert.assertEquals(5, HexUtil.hexCharToIntValue('5'));
+        Assert.assertEquals(6, HexUtil.hexCharToIntValue('6'));
+        Assert.assertEquals(7, HexUtil.hexCharToIntValue('7'));
+        Assert.assertEquals(8, HexUtil.hexCharToIntValue('8'));
+        Assert.assertEquals(9, HexUtil.hexCharToIntValue('9'));
+        Assert.assertEquals(10, HexUtil.hexCharToIntValue('A'));
+        Assert.assertEquals(11, HexUtil.hexCharToIntValue('B'));
+        Assert.assertEquals(12, HexUtil.hexCharToIntValue('C'));
+        Assert.assertEquals(13, HexUtil.hexCharToIntValue('D'));
+        Assert.assertEquals(14, HexUtil.hexCharToIntValue('E'));
+        Assert.assertEquals(15, HexUtil.hexCharToIntValue('F'));
+        Assert.assertEquals(10, HexUtil.hexCharToIntValue('a'));
+        Assert.assertEquals(11, HexUtil.hexCharToIntValue('b'));
+        Assert.assertEquals(12, HexUtil.hexCharToIntValue('c'));
+        Assert.assertEquals(13, HexUtil.hexCharToIntValue('d'));
+        Assert.assertEquals(14, HexUtil.hexCharToIntValue('e'));
+        Assert.assertEquals(15, HexUtil.hexCharToIntValue('f'));
+
+        try {
+            Assert.assertEquals(15, HexUtil.hexCharToIntValue('g'));
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            // correct behavior
+        }
+    }"
+(double value),convert,srveuigl(double value),"class convert {
+public double convert(double value) {
+    if (Double.isNaN(value)) {
+      return value;
+    }
+
+    if (from.equals(to)) {
+      return value;
+    }
+
+    BigDecimal result = new BigDecimal(String.valueOf(value)).multiply(multiplier);
+    return result.doubleValue();
+  }
+}","@Test
+  public void testConvertDoubleNan() {
+    double nan = Double.NaN;
+    ConvertDistances converter = new ConvertDistances(ConvertDistances.Distance.MILE,
+                                                      ConvertDistances.Distance.KILOMETER);
+    Assert.assertEquals(nan, converter.convert(nan), delta);
+  }"
+(double value),setPcr,pinsbgam(double value),"class setPcr {
+public void setPcr(double value) {
+        if (value < .8 || value > 1) {
+            throw new TramoException(""PCR should belong to [0.8, 1.0]"");
+        }
+        pcr_ = value;
+    }
+}","@Test(expected = TramoException.class)
+    public void testSetPcUpperBound() {
+        AutoModelSpec spec = new AutoModelSpec();
+        spec.setPcr(0.31);
+    }"
+(double x),density,pvireidn(double x),"class density {
+@Override
+    public double density(double x) {
+        if (x <= 0) {
+            return 0;
+        }
+        final double x0 = Math.log(x) - scale;
+        final double x1 = x0 / shape;
+        return Math.exp(-0.5 * x1 * x1) / (shape * SQRT2PI * x);
+    }
+}","@Test
+    void testDensity() {
+        final double[] x = new double[]{-2, -1, 0, 1, 2};
+        // R 2.13: print(dlnorm(c(-2,-1,0,1,2)), digits=10)
+        checkDensity(0, 1, x, new double[] {0.0000000000, 0.0000000000,
+                                            0.0000000000, 0.3989422804,
+                                            0.1568740193});
+        // R 2.13: print(dlnorm(c(-2,-1,0,1,2), mean=1.1), digits=10)
+        checkDensity(1.1, 1, x, new double[] {0.0000000000, 0.0000000000,
+                                              0.0000000000, 0.2178521770,
+                                              0.1836267118});
+    }"
+"(double x, double y)",y2Lat,"fnadejme(double x, double y)","class y2Lat {
+public double y2Lat(double x, double y)
+    {
+        double lat=lat0;
+        double ro = sqrt(x*x + y*y);
+        if (ro!=0.0)
+        {
+            double c = 2.0 * atan(ro / (2.0 * RADIUS));
+            lat = asin(cos(c) * sin(lat0Rad) + (y * sin(c) * cos(lat0Rad)) / ro);
+            lat = toDegrees(lat);
+        }
+        return lat;
+    }
+}","@Test
+    public void testY2Lat() throws Exception {
+        assertEquals(56.0, transformer.y2Lat(0.0, 0.0), 1e-10);
+        assertEquals(56.0, transformer.y2Lat(6204.034306340757, 4.4884447780805115), 1e-10);
+        assertEquals(56.1, transformer.y2Lat(0.0, 11094.62855321888), 1e-10);
+        assertEquals(56.0, transformer.y2Lat(-6204.034306340658, 4.4884447780805115), 1e-10);
+        assertEquals(55.9, transformer.y2Lat(0.0, -11094.628553220642), 1e-10);
+    }"
+"(int a, int b)",add,"fnlniuym(int a, int b)","class add {
+public int add(int a, int b) {
+        notifyJmsQueue(a, b);
+        return a + b;
+    }
+}","@Test
+    public void addPositiveIntegers() {
+        assertEquals(7, calc.add(2, 5));
+    }"
+(int b),write,scxvpruq(int b),"class write {
+@Override
+    public void write(int b) throws IOException {
+        filePosition++;
+        super.write(b);
+    }
+}","@Test
+    public void testWriteByteArrayWithLengthAndOffset() throws IOException {
+        byte[] arr = new byte[345];
+        random.nextBytes(arr);
+        writer.write(arr, 10, 300);
+
+        expectData(Arrays.copyOfRange(arr, 10, 310));
+    }"
+(int column),viewColumn,lannblrb(int column),"class viewColumn {
+@Override
+  public Vector viewColumn(int column) {
+    if (column < 0 || column >= columnSize()) {
+      throw new IndexException(column, columnSize());
+    }
+    return new VectorView(matrix.viewColumn(column + offset[COL]), offset[ROW], rowSize());
+  }
+}","@Test(expected = IndexException.class)
+  public void testViewColumnIndexUnder() {
+    test.viewColumn(-1);
+  }"
+(int columnIndex),getLong,nkoffmxc(int columnIndex),"class getLong {
+@Override
+    public long getLong(int columnIndex) {
+        ensureState();
+        throw unsupported(""long"");
+    }
+}","@Test
+    public void getLongByIndexThrowsUnsupportedOperationException() {
+        resultSet.next();
+        expectUnsupportedOperation(""long"");
+        resultSet.getLong(0);
+    }"
+(int count),getName,nbmumyur(int count),"class getName {
+@Override
+  public GcsPath getName(int count) {
+    checkArgument(count >= 0);
+
+    Iterator<Path> iterator = iterator();
+    for (int i = 0; i < count; ++i) {
+      checkArgument(iterator.hasNext());
+      iterator.next();
+    }
+
+    checkArgument(iterator.hasNext());
+    return (GcsPath) iterator.next();
+  }
+}","@Test
+  public void testGetName() {
+    GcsPath a = GcsPath.fromComponents(""bucket"", ""a/b/c/d"");
+    assertEquals(5, a.getNameCount());
+    assertThat(a.getName(0).toString(), Matchers.equalTo(""gs://bucket/""));
+    assertThat(a.getName(1).toString(), Matchers.equalTo(""a""));
+    assertThat(a.getName(2).toString(), Matchers.equalTo(""b""));
+    assertThat(a.getName(3).toString(), Matchers.equalTo(""c""));
+    assertThat(a.getName(4).toString(), Matchers.equalTo(""d""));
+  }"
+(int i),getIntUnsafe,kccwcedx(int i),"class getIntUnsafe {
+@Override
+    public int getIntUnsafe(int i) {
+        throw new UnsupportedOperationException();
+    }
+}","@Test(expected = UnsupportedOperationException.class)
+    public void getIntUnsafe() {
+        trieSet.getIntUnsafe(0);
+    }"
+(int id),retrieve,gtvgihro(int id),"class retrieve {
+@Override
+    public MCRVersionedMetadata retrieve(int id) throws IOException {
+        MCRVersionedMetadata metadata = (MCRVersionedMetadata) super.retrieve(id);
+        if (metadata != null) {
+            return metadata;
+        }
+        return new MCRVersionedMetadata(this, getSlot(id), id, super.forceDocType, true);
+    }
+}","@Test
+    public void retrieve() throws Exception {
+        Document xml1 = new Document(new Element(""root""));
+        int id = getVersStore().create(new MCRJDOMContent(xml1)).getID();
+        MCRVersionedMetadata sm1 = getVersStore().retrieve(id);
+        MCRContent xml2 = sm1.getMetadata();
+        assertEquals(new MCRJDOMContent(xml1).asString(), xml2.asString());
+    }"
+(int id),getUsers,yxcztxxh(int id),"class getUsers {
+public TagUsers getUsers(int id) {
+        String url = WxEndpoint.get(""url.tag.user.get"");
+        logger.debug(""get tag user: {}"", id);
+        String response = wxClient.get(String.format(url, id));
+        TagUsers tagUsers = JsonMapper.defaultMapper().fromJson(response, TagUsers.class);
+        tagUsers.setTagId(id);
+        return tagUsers;
+    }
+}","@Test
+    public void testGetUsers() {
+        TagUsers tagUsers = Tags.defaultTags().getUsers(200);
+    }"
+(int index),get,wtfkmllp(int index),"class get {
+public PlaceholderType get(int index) {
+        if (index >= this.Array.length) {
+            return null;
+        } else {
+            return this.Array[index];
+        }
+
+    }
+}","@Test
+    public void getTest() {
+        System.out.println(""Perform getTest"");
+
+        ArrayDeque<Integer> array = new ArrayDeque<>();
+
+        array.addFirst(123);
+        array.addLast(234);
+        array.addFirst(345);
+        array.addLast(456);
+
+        System.out.println(array.get(3));
+    }"
+(int index),nth,rmaaorcw(int index),"class nth {
+@Override
+    public Object nth(int index) {
+        assertIndexInBounds(index);
+
+        if (index == 2) {
+            return item3;
+        } else {
+            return super.nth(index);
+        }
+    }
+}","@Test
+    public void testAccessingNegative() {
+        assertThrows(IndexOutOfBoundsException.class, () -> someTuple.nth(-1));
+    }"
+(int index),getByte,fnmgttrm(int index),"class getByte {
+@Override
+    public byte getByte(int index) {
+        checkIndex(index, 1);
+        return buffer.getByte(index);
+    }
+}","@Test
+    public void testGetByte() {
+        ByteBuf buf = Unpooled.copiedBuffer(""TestBuffer"", CharsetUtil.ISO_8859_1);
+        ReplayingDecoderByteBuf buffer = new ReplayingDecoderByteBuf(buf);
+
+        boolean error;
+        int i = 0;
+        try {
+            for (;;) {
+                buffer.getByte(i);
+                i++;
+            }
+        } catch (Signal e) {
+            error = true;
+        }
+
+        assertTrue(error);
+        assertEquals(10, i);
+
+        buf.release();
+    }"
+(int index),putFramePathOnStack,aomdlsuy(int index),"class putFramePathOnStack {
+public void putFramePathOnStack(int index) {
+    if (!switchRequestComingFromFrameSwitcher) {
+      expandFramePathStack(new IndexedFrame(index));
+    }
+  }
+}","@Test
+  public void shouldPutFrameOnStackById() {
+    //given
+    assumeThatDequeSizeIs(1);
+
+    //when
+    testedObject.putFramePathOnStack(1);
+
+    //then
+    assertThatDequeSizeIs(2);
+  }"
+(int index),get,mshclnje(int index),"class get {
+@Override
+  public double get(int index) {
+    if (index < 0 || index >= size) {
+      throw new IndexException(index, size);
+    }
+    return getQuick(index);
+  }
+}","@Test
+  public void testGet() {
+    for (int i = 0; i < test.size(); i++) {
+      if (i % 2 == 0) {
+        assertEquals(""get ["" + i + ']', 0.0, test.get(i), EPSILON);
+      } else {
+        assertEquals(""get ["" + i + ']', values[i/2], test.get(i), EPSILON);
+      }
+    }
+  }"
+(int index),isNull,dyzotyer(int index),"class isNull {
+@Override
+  public boolean isNull(int index) {
+    return ac.isNull(index);
+  }
+}","@Test
+  public void testIsNull() throws Exception {
+    assertNotNull(accessor.getObject(0));
+    assertNotNull(accessor.getTime(0, PST_CALENDAR));
+    assertNull(accessor.getObject(1));
+    assertNull(accessor.getTime(1, PST_CALENDAR));
+  }"
+(int index),get,khawzlhe(int index),"class get {
+@Override
+public InputStream get(int index) throws IOException
+{
+  initializeFiles(getConfiguration());
+  if (index >= 0 && index < files.size())
+  {
+    return HadoopFileUtils.open(getConfiguration(), files.get(index));
+  }
+
+  throw new IOException(""Index out of range ("" + index + "") "");
+}
+}","@Test
+@Category(UnitTest.class)
+public void testGet() throws Exception
+{
+  String text =
+      ""Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut ullamcorper est. Phasellus sed nisl arcu. Nullam non sem quam. Pellentesque vel neque quis erat ultricies dapibus a ac mauris. Morbi sodales vitae nisl ullamcorper facilisis. Quisque pellentesque est in fermentum luctus. Etiam sed nibh id dui faucibus luctus vel sit amet odio. Fusce non sollicitudin ligula, ac fermentum leo. Nulla facilisi."";
+  OutputStream outputStream = provider.add();
+  PrintStream out = new PrintStream(outputStream);
+  out.print(text);
+
+  outputStream.close();
+
+  Assert.assertEquals(""Adhoc size should be 1!"", 1, provider.size());
+
+  InputStream instream = provider.get(0);
+  String intext = IOUtils.toString(instream);
+  instream.close();
+
+  Assert.assertEquals(""Input string is not equal to output string"", text, intext);
+}"
+(int index),getByte,zlizrsyk(int index),"class getByte {
+@Override
+    public byte getByte(int index) {
+        checkIndex(index);
+        return _getByte(index);
+    }
+}","@Test(expected = IndexOutOfBoundsException.class)
+    public void getByteBoundaryCheck1() {
+        buffer.getByte(-1);
+    }"
+"(int index, int value)",setShort,"mqorvnks(int index, int value)","class setShort {
+@Override
+    public ByteBuf setShort(int index, int value) {
+        checkIndex(index, 2);
+        _setShort(index, value);
+        return this;
+    }
+}","@Test(expected = IllegalReferenceCountException.class)
+    public void testSetShortAfterRelease() {
+        releasedBuffer().setShort(0, 1);
+    }"
+(int key),get,angjxclu(int key),"class get {
+public V get(int key) {
+    return delegate.get(key);
+  }
+}","@Test
+  public void testGet() {
+    tIntObjectHashMap.get(0);
+    verify(delegate).get(0);
+  }"
+(int length),readBytes,jujaljho(int length),"class readBytes {
+@Override
+    public ByteBuf readBytes(int length) {
+        checkReadableBytes(length);
+        if (length == 0) {
+            return Unpooled.EMPTY_BUFFER;
+        }
+
+        // Use an unpooled heap buffer because there's no way to mandate a user to free the returned buffer.
+        ByteBuf buf = Unpooled.buffer(length, maxCapacity);
+        buf.writeBytes(this, readerIndex, length);
+        readerIndex += length;
+        return buf;
+    }
+}","@Test(expected = IllegalReferenceCountException.class)
+    public void testReadBytesAfterRelease7() {
+        releasedBuffer().readBytes(ByteBuffer.allocate(8));
+    }"
+(int level),calculateShipBuildTimeSpeedup,wyfigdmc(int level),"class calculateShipBuildTimeSpeedup {
+@Override
+    public double calculateShipBuildTimeSpeedup(int level) {
+        Preconditions.checkArgument(level >= 0, ""level must be >= 0"");
+
+        if (level == 0) {
+            return 0;
+        }
+
+        return Math.min(1, (level - 1) * 0.1);
+    }
+}","@Test
+    public void testCalculateShipBuildTimeSpeedup() throws Exception {
+        assertThat(sut.calculateShipBuildTimeSpeedup(1), is(0.0));
+        assertThat(sut.calculateShipBuildTimeSpeedup(2), is(0.1));
+        assertThat(sut.calculateShipBuildTimeSpeedup(3), is(0.2));
+    }"
+(int n),isHappy,aydftnbi(int n),"class isHappy {
+public boolean isHappy(int n) {
+        return false;
+    }
+}","@Test
+    public void testAll() {
+        for (int i = 0; i < nums.length; i++) {
+            Assert.assertEquals(results[i], testObject.isHappy(nums[i]));
+        }
+    }"
+(int offset),readInt,qrxtjdaw(int offset),"class readInt {
+public int readInt(int offset) {
+        byte[] buf = this.buf;
+        offset += baseOffset;
+        return (buf[offset] & 0xff) |
+                ((buf[offset+1] & 0xff) << 8) |
+                ((buf[offset+2] & 0xff) << 16) |
+                (buf[offset+3] << 24);
+    }
+}","@Test
+    public void testReadInt() {
+        BaseDexBuffer dexBuf = new BaseDexBuffer(new byte[] {0x11, 0x22, 0x33, 0x44});
+        Assert.assertEquals(0x44332211, dexBuf.readInt(0));
+
+        dexBuf = new BaseDexBuffer(new byte[] {0x00, 0x00, 0x00, 0x00});
+        Assert.assertEquals(0, dexBuf.readInt(0));
+
+        dexBuf = new BaseDexBuffer(new byte[] {(byte)0xff, (byte)0xff, (byte)0xff, 0x7f});
+        Assert.assertEquals(Integer.MAX_VALUE, dexBuf.readInt(0));
+
+        dexBuf = new BaseDexBuffer(new byte[] {0x00, 0x00, 0x00, (byte)0x80});
+        Assert.assertEquals(Integer.MIN_VALUE, dexBuf.readInt(0));
+
+        dexBuf = new BaseDexBuffer(new byte[] {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0x80});
+        Assert.assertEquals(0x80ffffff, dexBuf.readInt(0));
+
+        dexBuf = new BaseDexBuffer(new byte[] {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff});
+        Assert.assertEquals(-1, dexBuf.readInt(0));
+    }"
+(int port),setPort,vtkxmgyn(int port),"class setPort {
+public void setPort(int port) {
+    this.port = port;
+  }
+}","@Test
+  public void negativePort() {
+    graphiteConfiguration.setPort(-1);
+    Set<ConstraintViolation<GraphiteConfiguration>> violations = validator.validate(graphiteConfiguration);
+    assertThat(violations.size(), is(1));
+  }"
+(int position),get,shglcqom(int position),"class get {
+@Nullable
+    public E get(int position) throws T, IllegalArgumentException, NoSuchElementException {
+        advance(position);
+        return next();
+    }
+}","@Test(expected = NoSuchElementException.class)
+    public void testGetNoSuchElementException() {
+        create(""one"", ""two"").get(3);
+    }"
+"(int row, int column)",getQuick,"cgouxpcx(int row, int column)","class getQuick {
+@Override
+  public double getQuick(int row, int column) {
+    return matrix.getQuick(offset[ROW] + row, offset[COL] + column);
+  }
+}","@Test
+  public void testAssignMatrixBinaryFunction() {
+    test.assign(test, Functions.PLUS);
+    for (int row = 0; row < test.rowSize(); row++) {
+      for (int col = 0; col < test.columnSize(); col++) {
+        assertEquals(""value["" + row + ""]["" + col + ']',
+            2 * values[row + 1][col + 1], test.getQuick(row, col), EPSILON);
+      }
+    }
+  }"
+"(int sizeout, int sizein, long in1, long in2)",evaluateBinary,"purncxct(int sizeout, int sizein, long in1, long in2)","class evaluateBinary {
+@Override
+	public long evaluateBinary(int sizeout, int sizein, long in1, long in2) {
+		FloatFormat format = FloatFormatFactory.getFloatFormat(sizein);
+		return format.opMult(in1, in2);
+	}
+}","@Test
+	public void testEvaluateBinaryBigInteger() {
+
+		OpBehaviorFloatMult op = new OpBehaviorFloatMult();
+
+		FloatFormat ff = FloatFormatFactory.getFloatFormat(8);
+
+		BigInteger a = ff.getEncoding(BigDecimal.valueOf(2.5d));
+		BigInteger b = ff.getEncoding(BigDecimal.valueOf(1.5d));
+		BigInteger result = op.evaluateBinary(8, 8, a, b);
+		Assert.assertEquals(BigDecimal.valueOf(3.75d), ff.getHostFloat(result));
+
+		b = ff.getEncoding(FloatFormat.BIG_POSITIVE_INFINITY);
+		result = op.evaluateBinary(8, 8, a, b);
+		Assert.assertEquals(FloatFormat.BIG_POSITIVE_INFINITY, ff.getHostFloat(result));
+
+		a = ff.getEncoding(FloatFormat.BIG_NEGATIVE_INFINITY);
+		result = op.evaluateBinary(8, 8, a, b);
+		Assert.assertEquals(FloatFormat.BIG_NEGATIVE_INFINITY, ff.getHostFloat(result));
+
+		b = ff.getEncoding(FloatFormat.BIG_NaN);
+		result = op.evaluateBinary(8, 8, a, b);
+		Assert.assertEquals(FloatFormat.BIG_NaN, ff.getHostFloat(result));
+	}"
+"(int start, int end)",getSubStringContainer,"qgmpfvfb(int start, int end)","class getSubStringContainer {
+public StringContainer getSubStringContainer(int start, int end) {
+    int realStartIndex = start >= 0 ? start : count + start;
+    int realEndIndex = end >= 0 ? end : count + end;
+    if (realStartIndex < 0 || realStartIndex >= count) {
+      throw new IndexOutOfBoundsException(String.format(
+          ""start Index: %d, Real start Index: %d, Size: %d"", start, realStartIndex, count));
+    }
+    if (realEndIndex < 0 || realEndIndex >= count) {
+      throw new IndexOutOfBoundsException(String.format(
+          ""end Index: %d, Real end Index: %d, Size: %d"", end, realEndIndex, count));
+    }
+    StringContainer ret = new StringContainer(joinSeparator);
+    if (realStartIndex < reverseList.size()) {
+      for (int i = reverseList.size() - 1 - realStartIndex; i >= Math.max(0,
+          reverseList.size() - 1 - realEndIndex); i--) {
+        ret.addTail(this.reverseList.get(i));
+      }
+    }
+    if (realEndIndex >= reverseList.size()) {
+      for (int i = Math.max(0, realStartIndex - reverseList.size()); i <= realEndIndex - reverseList.size(); i++) {
+        ret.addTail(this.sequenceList.get(i));
+      }
+    }
+    return ret;
+  }
+}","@Test
+  public void testGetSubStringContainer() {
+    StringContainer a = new StringContainer();
+    try {
+      a.getSubStringContainer(0, 1);
+    } catch (Exception e) {
+      assertTrue(e instanceof IndexOutOfBoundsException);
+    }
+    a.addTail(""a"", ""bbb"", ""cc"");
+    assertEquals("""", a.getSubStringContainer(1, 0).toString());
+    assertEquals(""a"", a.getSubStringContainer(0, 0).toString());
+    assertEquals(""bbbcc"", a.getSubStringContainer(1, -1).toString());
+    assertEquals(""bbb"", a.getSubStringContainer(-2, -2).toString());
+    try {
+      a.getSubStringContainer(1, 4);
+    } catch (Exception e) {
+      assertTrue(e instanceof IndexOutOfBoundsException);
+    }
+    a.addHead(""dd"", ""eeee"");
+    assertEquals(""eeeea"", a.getSubStringContainer(1, 2).toString());
+    assertEquals(""eeeea"", a.getSubStringContainer(1, -3).toString());
+    assertEquals(""dd"", a.getSubStringContainer(0, 0).toString());
+    assertEquals(""cc"", a.getSubStringContainer(-1, -1).toString());
+    assertEquals(""ddeeeeabbbcc"", a.getSubStringContainer(-5, -1).toString());
+    try {
+      a.getSubString(9);
+    } catch (Exception e) {
+      assertTrue(e instanceof IndexOutOfBoundsException);
+    }
+  }"
+(int v),nextValueOut,kewcgifi(int v),"class nextValueOut {
+@Override
+    public int nextValueOut(int v) {
+        int lb = 0, ub = 1;
+        if (isInstantiated()) { // if this is instantiated
+            lb = ub = mValue;
+        }
+        if (lb - 1 <= v && v <= ub) {
+            return ub + 1;
+        } else {
+            return v + 1;
+        }
+    }
+}","@Test(groups=""1s"", timeOut=60000)
+    public void testNextOut1(){
+        Model model = new Model();
+        IntVar x = model.boolVar();
+        Assert.assertEquals(x.nextValueOut(-2), -1);
+        Assert.assertEquals(x.nextValueOut(-1), 2);
+        Assert.assertEquals(x.nextValueOut(2), 3);
+    }"
+"(int width, int height)",setSize,"qrzgacpm(int width, int height)","class setSize {
+public void setSize(int width, int height) {
+    if (width > 0 && height > 0 & !isDestroy && mRendered && mRenderContainer != null) {
+      ViewGroup.LayoutParams layoutParams = mRenderContainer.getLayoutParams();
+      if (layoutParams != null) {
+        final float realWidth = width;
+        final float realHeight = height;
+        if (mRenderContainer.getWidth() != width || mRenderContainer.getHeight() != height) {
+          layoutParams.width = width;
+          layoutParams.height = height;
+          mRenderContainer.setLayoutParams(layoutParams);
+        }
+
+        if (mRootComp != null && layoutParams != null) {
+          final boolean isWidthWrapContent = layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT;
+          final boolean isHeightWrapContent = layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT;
+
+          WXBridgeManager.getInstance().post(new Runnable() {
+            @Override
+            public void run() {
+              WXBridgeManager.getInstance().setDefaultRootSize(getInstanceId(), realWidth, realHeight, isWidthWrapContent,
+                      isHeightWrapContent);
+            }
+          });
+        }
+      }
+    }
+  }
+}","@Test
+  public void testSetSize() throws Exception {
+    setupRoot(mInstance);
+    mInstance.setSize(10,10);
+  }"
+(int x),normalApproximateProbability,khxlwbvs(int x),"class normalApproximateProbability {
+public double normalApproximateProbability(int x)  {
+        // Calculate the probability using half-correction.
+        return normal.cumulativeProbability(x + 0.5);
+    }
+}","@Test
+    void testNormalApproximateProbability() {
+        PoissonDistribution dist = new PoissonDistribution(100);
+        double result = dist.normalApproximateProbability(110) -
+            dist.normalApproximateProbability(89);
+        Assertions.assertEquals(0.706281887248, result, 1e-10);
+
+        dist = new PoissonDistribution(10000);
+        result = dist.normalApproximateProbability(10200) -
+            dist.normalApproximateProbability(9899);
+        Assertions.assertEquals(0.820070051552, result, 1E-10);
+    }"
+(long id),get,ztlzysvh(long id),"class get {
+public User get(long id) {
+        return userBiz.getById(id);
+    }
+}","@Test
+    public void testGetId() throws Exception {
+        long id = 1;
+        User user = userService.get(id);
+        Assert.assertNotNull(user);
+        Assert.assertEquals(""banchuanyu"", user.getName());
+    }"
+(long n),skip,sbqaxlcp(long n),"class skip {
+@Override
+  public long skip(long n) throws IOException {
+    if (n <= 0) {
+      return 0;
+    }
+
+    long ret = mBlockInfo.length - mReadByte;
+    if (ret > n) {
+      ret = n;
+    }
+
+    if (mCurrentBuffer != null) {
+      if (mCurrentBuffer.remaining() < ret) {
+        mBufferStartPosition = mReadByte + ret;
+        updateCurrentBuffer();
+      }
+      if (mCurrentBuffer != null) {
+        if (ret > 0) {
+          if (mRecache) {
+            mBlockOutStream.cancel();
+          }
+          mRecache = false;
+        }
+        return (int) ret;
+      }
+      setupStreamFromUnderFs(mBlockInfo.offset + mReadByte, mUFSConf);
+    }
+
+    long tmp = mCheckpointInputStream.skip(ret);
+    ret = Math.min(ret, tmp);
+    mReadByte += ret;
+
+    if (ret > 0) {
+      if (mRecache) {
+        mBlockOutStream.cancel();
+      }
+      mRecache = false;
+    }
+    return ret;
+  }
+}","@Test
+  public void skipTest() throws IOException {
+    for (int k = MIN_LEN + DELTA; k <= MAX_LEN; k += DELTA) {
+      WriteType op = WriteType.THROUGH;
+      int fileId = TestUtils.createByteFile(mTfs, ""/root/testFile_"" + k + ""_"" + op, op, k);
+
+      TachyonFile file = mTfs.getFile(fileId);
+      InStream is = file.getInStream(ReadType.CACHE);
+      Assert.assertTrue(is instanceof RemoteBlockInStream);
+      Assert.assertEquals(k / 2, is.skip(k / 2));
+      Assert.assertEquals(k / 2, is.read());
+      is.close();
+      Assert.assertFalse(file.isInMemory());
+
+      if (k >= 3) {
+        is = file.getInStream(ReadType.CACHE);
+        Assert.assertTrue(is instanceof RemoteBlockInStream);
+        int t = k / 3;
+        Assert.assertEquals(t, is.skip(t));
+        Assert.assertEquals(t, is.read());
+        Assert.assertEquals(t, is.skip(t));
+        Assert.assertEquals(2 * t + 1, is.read());
+        is.close();
+        Assert.assertFalse(file.isInMemory());
+      }
+    }
+  }"
+(long offset),setLastOffset,cdttuddc(long offset),"class setLastOffset {
+@Override
+    public void setLastOffset(long offset) {
+        buffer.putLong(BASE_OFFSET_OFFSET, offset - lastOffsetDelta());
+    }
+}","@Test
+    public void testSetLastOffset() {
+        SimpleRecord[] simpleRecords = new SimpleRecord[] {
+            new SimpleRecord(1L, ""a"".getBytes(), ""1"".getBytes()),
+            new SimpleRecord(2L, ""b"".getBytes(), ""2"".getBytes()),
+            new SimpleRecord(3L, ""c"".getBytes(), ""3"".getBytes())
+        };
+        MemoryRecords records = MemoryRecords.withRecords(RecordBatch.MAGIC_VALUE_V2, 0L,
+                CompressionType.NONE, TimestampType.CREATE_TIME, simpleRecords);
+
+        long lastOffset = 500L;
+        long firstOffset = lastOffset - simpleRecords.length + 1;
+
+        DefaultRecordBatch batch = new DefaultRecordBatch(records.buffer());
+        batch.setLastOffset(lastOffset);
+        assertEquals(lastOffset, batch.lastOffset());
+        assertEquals(firstOffset, batch.baseOffset());
+        assertTrue(batch.isValid());
+
+        List<MutableRecordBatch> recordBatches = Utils.toList(records.batches().iterator());
+        assertEquals(1, recordBatches.size());
+        assertEquals(lastOffset, recordBatches.get(0).lastOffset());
+
+        long offset = firstOffset;
+        for (Record record : records.records())
+            assertEquals(offset++, record.offset());
+    }"
+(long timestamp),hasHappenDuringCredentialStuffing,beuhtmfh(long timestamp),"class hasHappenDuringCredentialStuffing {
+public boolean hasHappenDuringCredentialStuffing(long timestamp) {
+        return credentialStuffingWindows.contains(timestamp);
+    }
+}","@Test
+    void credentialStuffingShouldExpire() {
+        final long afterCredentialStuffingExpired = CS_EVENT_OCCURRENCE_TIME.plus(CS_DURATION).plus(1, SECONDS).toEpochMilli();
+
+        handleCSEvent();
+        final boolean isActive = registry.hasHappenDuringCredentialStuffing(afterCredentialStuffingExpired);
+
+        assertFalse(isActive);
+    }"
+(long userId),enableNotifications,djoaylur(long userId),"class enableNotifications {
+public TwitterProfile enableNotifications(long userId) {
+		requireUserAuthorization();
+		LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
+		params.set(""user_id"", String.valueOf(userId));
+		params.set(""device"", ""true"");
+		return restTemplate.postForObject(buildUri(""friendships/update.json"", params), EMPTY_DATA, TwitterProfile.class);
+	}
+}","@Test
+	public void enableNotifications_byUserId() {
+		mockServer.expect(requestTo(""https://api.twitter.com/1.1/friendships/update.json?user_id=98765&device=true""))
+			.andExpect(method(POST))
+			.andRespond(withSuccess(jsonResource(""follow""), APPLICATION_JSON));
+		TwitterProfile unFollowedUser = twitter.friendOperations().enableNotifications(98765);
+		assertEquals(""oizik2"", unFollowedUser.getScreenName());
+		mockServer.verify();
+	}"
+(long value),borders,nzlitqxt(long value),"class borders {
+public boolean borders(long value)
+    {
+        return value == myStartValue - 1 || value == myEndValue + 1;
+    }
+}","@Test
+    public void testBordersWithValue()
+    {
+        RangeLongBlock aBlock = new RangeLongBlock(3, 5);
+        Assert.assertTrue(aBlock.borders(2));
+        Assert.assertTrue(aBlock.borders(6));
+        Assert.assertFalse(aBlock.borders(3));
+        Assert.assertFalse(aBlock.borders(4));
+        Assert.assertFalse(aBlock.borders(5));
+        Assert.assertFalse(aBlock.borders(1));
+        Assert.assertFalse(aBlock.borders(7));
+    }"

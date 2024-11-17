@@ -160,7 +160,7 @@ class DataFilter:
                 # Store original function name
                 original_data.append({
                     'Parameter': row['Parameter'],
-                    'Function': func_name,
+                    'Function Name': func_name,
                     'Test Case': row['Test Case']
 
                 })
@@ -168,7 +168,7 @@ class DataFilter:
                 # Store random function name with parameters
                 random_data.append({
                     'Parameter': row['Parameter'],
-                    'Function': f"{random_name}({params})",
+                    'Random Function Name': f"{random_name}({params})",
                     'Test Case': row['Test Case']
                 })
                 
@@ -181,7 +181,38 @@ class DataFilter:
         df_original.to_csv('Output/original_functions.csv', index=False)
         df_random.to_csv('Output/random_functions.csv', index=False)
         
-
+    #write a function to combine the data of three csv files into one and have all colums each are same only one time 
+    def combine_csv_files(self,original_file, random_file, Selected_file, output_file):
+        # Read the input CSV files
+        df_original = pd.read_csv(original_file)
+        df_random = pd.read_csv(random_file)
+        df_Selected = pd.read_csv(Selected_file)
         
+        # Combine the data by merging on Parameter
+        # Read input files, keeping common columns only once
+        df_original = pd.read_csv(original_file)[['Parameter', 'Function Name', 'Test Case']]
+        df_random = pd.read_csv(random_file)[['Parameter', 'Random Function Name', 'Test Case']]
+        df_Selected = pd.read_csv(Selected_file)[['Parameter', 'Function', 'Test Case']]
+
+        # First merge original with random
+        # Remove rows where 'Function Name' or 'Random Function Name' is NaN
+
+        # Merge and print row count
+        df_combined = pd.merge(df_original, df_random, on=['Parameter', 'Test Case'], how='inner')
+        df_combined = pd.merge(df_original, df_random, on=['Parameter', 'Test Case'], how='outer')
+
+        # Then merge with selected
+        df_combined = pd.merge(df_combined, df_Selected, on=['Parameter', 'Test Case'], how='outer')
+
+        # Reorder columns
+        df_combined = df_combined[['Parameter', 'Function Name', 'Random Function Name', 'Function', 'Test Case']]
+
+        df_combined = df_combined.dropna(subset=['Function Name', 'Random Function Name', 'Function'])
+        print(f"Final rows after Everythings: {len(df_combined)}")
+        # Save to a new CSV file
+        df_combined.to_csv(output_file, index=False)
+        print(f"Combined data saved to {output_file}")
+        os.remove(original_file)
+        os.remove(random_file)        
         
         

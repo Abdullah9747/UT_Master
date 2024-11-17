@@ -1,121 +1,119 @@
 Parameter,Function,Test Case
-(int number),"class delete {
-public void delete(int number) {
-        RadixTreeNode node = find(number);
-        if (node == null) {
-            return;
-        }
-        node.setLastBit(false);
-        if (node.isLeaf()) {
-            while (true) {
-                if (node.isLastBit()) {
-                    return;
-                }
-                if (!node.isLeaf()) {
-                    return;
-                }
-                if (node.isRoot()) {
-                    return;
-                }
-                final RadixTreeNode parent = (RadixTreeNode) node.getParent();
-                if (parent.getLeftChild() == node) {
-                    parent.setLeftChild(null);
-                } else {
-                    parent.setRightChild(null);
-                }
-                node = parent;
+(boolean enable),"class setDownloadTxDependencies {
+public void setDownloadTxDependencies(boolean enable) {
+        vDownloadTxDependencyDepth = enable ? Integer.MAX_VALUE : 0;
+    }
+}","@Test
+    public void recursiveDependencyDownloadDisabled() throws Exception {
+        peer.setDownloadTxDependencies(false);
+        connect();
+        // Check that if we request dependency download to be disabled and receive a relevant tx, things work correctly.
+        Transaction tx = FakeTxBuilder.createFakeTx(UNITTEST, COIN, address);
+        final Transaction[] result = new Transaction[1];
+        wallet.addCoinsReceivedEventListener(new WalletCoinsReceivedEventListener() {
+            @Override
+            public void onCoinsReceived(Wallet wallet, Transaction tx, Coin prevBalance, Coin newBalance) {
+                result[0] = tx;
             }
-        }
-    }
-}","@Test(expectedExceptions = UnsupportedOperationException.class)
-    public void testBitDeletion() throws Exception {
-        new RadixTree().delete(Bit.NEUTRAL);
+        });
+        inbound(writeTarget, tx);
+        pingAndWait(writeTarget);
+        assertEquals(tx, result[0]);
     }"
-(int index),"class get {
-public float get(int index) {
-        switch (index) {
-            case 0:
-                return x;
-            case 1:
-                return y;
-            case 2:
-                return z;
-        }
-        throw new IllegalArgumentException(""index must be either 0, 1 or 2"");
+(byte b),"class toHexWithZeros {
+public static String toHexWithZeros(byte b) {
+    if (b == 0) {
+      return ""00"";
+    }
+    String s = toHex(b);
+    if (s.length() == 1) {
+      return ""0"" + s;
+    } else {
+      return s;
+    }
+  }
+}","@Test(expected = NullPointerException.class)
+  public void toHexWithZerosExceptionTest() {
+    toHexWithZeros(null);
+  }"
+(int number),"class getNegativeLong {
+public static Long getNegativeLong(int number) {
+        return ( - (long) number);
     }
 }","@Test
-    public void testGet_illegalArgumentException() {
-        thrown.expect(IllegalArgumentException.class);
-        new Vector3f(0.0f, 0.0f, 0.0f).get(536_870_914);
+    public void getNegativeLong_NegativeInt_PositiveLong() {
+        assertThat(CommonUtils.getNegativeLong(-2), is(2l));
     }"
-(int index),"class nth {
+(int number),"class translate {
+public static String translate(int number) {
+      return Integer.toString(translateToInt(number));
+   }
+}","@Test
+   public void
+   it_translates_3() {
+      assertThat(translate(3)).isEqualTo(""100"");
+   }"
+(int count),"class getName {
 @Override
-    public Object nth(int index) {
-        assertIndexInBounds(index);
+  public GcsPath getName(int count) {
+    checkArgument(count >= 0);
 
-        assertIndexInBounds(index);
+    Iterator<Path> iterator = iterator();
+    for (int i = 0; i < count; ++i) {
+      checkArgument(iterator.hasNext());
+      iterator.next();
+    }
 
-        if (index == 6) {
-            return item7;
-        } else {
-            return super.nth(index);
-        }
+    checkArgument(iterator.hasNext());
+    return (GcsPath) iterator.next();
+  }
+}","@Test
+  public void testGetName() {
+    GcsPath a = GcsPath.fromComponents(""bucket"", ""a/b/c/d"");
+    assertEquals(5, a.getNameCount());
+    assertThat(a.getName(0).toString(), Matchers.equalTo(""gs://bucket/""));
+    assertThat(a.getName(1).toString(), Matchers.equalTo(""a""));
+    assertThat(a.getName(2).toString(), Matchers.equalTo(""b""));
+    assertThat(a.getName(3).toString(), Matchers.equalTo(""c""));
+    assertThat(a.getName(4).toString(), Matchers.equalTo(""d""));
+  }"
+(int port),"class setPort {
+public void setPort(int port) {
+    this.port = port;
+  }
+}","@Test
+  public void negativePort() {
+    graphiteConfiguration.setPort(-1);
+    Set<ConstraintViolation<GraphiteConfiguration>> violations = validator.validate(graphiteConfiguration);
+    assertThat(violations.size(), is(1));
+  }"
+(int index),"class codonByIndex {
+@Value.Derived
+    @Nullable
+    public List<GenomeRegion> codonByIndex(int index) {
+        return codonRangeByIndex(index, index);
     }
 }","@Test
-    public void testNth() {
-        assertThat(someTuple.nth(0)).isEqualTo(1);
-        assertThat(someTuple.nth(1)).isEqualTo(2);
-        assertThat(someTuple.nth(2)).isEqualTo(3);
-        assertThat(someTuple.nth(3)).isEqualTo(4);
-        assertThat(someTuple.nth(4)).isEqualTo(5);
-        assertThat(someTuple.nth(5)).isEqualTo(6);
-        assertThat(someTuple.nth(6)).isEqualTo(7);
-        assertThat(someTuple.getItem1()).isEqualTo(1);
-        assertThat(someTuple.getItem2()).isEqualTo(2);
-        assertThat(someTuple.getItem3()).isEqualTo(3);
-        assertThat(someTuple.getItem4()).isEqualTo(4);
-        assertThat(someTuple.getItem5()).isEqualTo(5);
-        assertThat(someTuple.getItem6()).isEqualTo(6);
-        assertThat(someTuple.getItem7()).isEqualTo(7);
-        assertThat(someTuple.size()).isEqualTo(7);
-    }"
-(int index),"class getColumnKey {
-@Override
-    public Comparable getColumnKey(int index) {
-        return this.keys.get(index);
-    }
-}","@Test
-    public void testGetColumnKey() {
-        TaskSeriesCollection c = createCollection1();
-        assertEquals(""Task 1"", c.getColumnKey(0));
-        assertEquals(""Task 2"", c.getColumnKey(1));
-        assertEquals(""Task 3"", c.getColumnKey(2));
-    }"
-(int index),"class getAttributeValue {
-@Override
-	public String getAttributeValue(int index)
-	{
-		return this.replace(super.getAttributeValue(index));
-	}
-}","@Test
-	public void getAttributeValueByName()
-	{
-		String namespaceURI = ""url"";
-		String localName = ""name"";
-		String expected = ""expected"";
-		
-		when(this.reader.getAttributeValue(namespaceURI, localName)).thenReturn(expected);
+    public void worksForRealBRAFCodon600() {
+        HmfTranscriptRegion braf = HmfGenePanelSupplier.allGenesMap37().get(""BRAF"");
 
-		String result = this.filter.getAttributeValue(namespaceURI, localName);
-		
-		assertSame(expected, result);
-		
-		when(this.reader.getAttributeValue(namespaceURI, localName)).thenReturn(SYSTEM_PROPERTY);
-		
-		result = this.filter.getAttributeValue(namespaceURI, localName);
-		
-		assertEquals(PROPERTY_VALUE, result);
-	}"
+        List<GenomeRegion> codon600 = braf.codonByIndex(600);
+        assertNotNull(codon600);
+        assertEquals(1, codon600.size());
+
+        assertEquals(140453135, codon600.get(0).start());
+        assertEquals(140453137, codon600.get(0).end());
+    }"
+(int index),"class getByte {
+@Override
+    public byte getByte(int index) {
+        checkIndex(index);
+        return _getByte(index);
+    }
+}","@Test(expected = IndexOutOfBoundsException.class)
+    public void getByteBoundaryCheck1() {
+        buffer.getByte(-1);
+    }"
 (int index),"class isNull {
 @Override
   public boolean isNull(int index) {
@@ -128,389 +126,1725 @@ public float get(int index) {
     assertNull(accessor.getObject(1));
     assertNull(accessor.getTime(1, PST_CALENDAR));
   }"
-(int size),"class emptyCombination {
-public static int[] emptyCombination(int size) {
-        Preconditions.check(size >= 0);
-        
-        final int[] combination = new int[size];
-        Arrays.fill(combination, NO_VALUE);
-        
-        return combination;
-    }
-}","@Test
-    void emptyCombinationCannotHaveNegativeSize() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> CombinationUtil.emptyCombination(-1));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> CombinationUtil.emptyCombination(-312));
-    }"
-(int i),"class generate {
-public static List<Integer> generate(int i) {
-        if (isOne(i)) {
+(int index),"class delete {
+@Override public ConstList<E> delete(int index) {
+        if (index == 0) {
             return emptyList();
-        } else if (i == 2) {
-            return new ArrayList<Integer>() {{
-                add(2);
-            }};
-
-        } else if (i == 4) {
-            return new ArrayList<Integer>() {{
-                add(2);
-                add(2);
-            }};
-        } else {
-            return new ArrayList<Integer>() {{
-                add(3);
-            }};
         }
+        throw new IndexOutOfBoundsException();
     }
-}","@Test
-    public void testOneHasNoPrimitives() {
-        assertThat(list(ONE), is(PrimeNumbers.generate(1)));
+}","@Test(expected = IndexOutOfBoundsException.class)
+    public void test_delete_out_of_bounds() {
+        new BasicList1<>(1).delete(1);
     }"
-(long id),"class createCached {
-@SuppressWarnings(""unchecked"")
-    public static <T> Id<T> createCached(long id) {
-        return objectCache.getUnchecked(id);
-    }
-}","@Test
-    public void cachedIdReturnsTheSameInstance() {
-        Assertions.assertSame(Id.createCached(RAW_ID), Id.createCached(RAW_ID));
-    }"
-"(int x, int y)","class onGrid {
-public boolean onGrid(int x, int y) {
-        return x >= 0 && x < width && y >= 0 && y < height;
-    }
-}","@Test
-    public void onGridInPointsTest() {
-        Grid grid = new Grid(session, 3, 2);
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 2; y++) {
-                assertThat(grid.onGrid(x,y)).isTrue();
-            }
-        }
-    }"
-(int length),"class alphaNumeric {
-public static String alphaNumeric(int length) {
-        StringBuilder builder = new StringBuilder(length);
-        for (int i = 0; i < length; i++)
-            builder.append(ALPHA_NUMERIC.charAt(ThreadLocalRandom.current().nextInt(ALPHA_NUMERIC.length())));
-        return builder.toString();
-    }
-}","@Test
-    void randomAlphaNumeric() {
-        assertThat(Randoms.alphaNumeric(3)).hasSize(3);
-        assertThat(Randoms.alphaNumeric(5)).hasSize(5);
-        assertThat(Randoms.alphaNumeric(10)).hasSize(10);
-    }"
-(long value),"class add {
+(int index),"class getByte {
 @Override
-    public void add(long value) {
-        lock.lockWrite();
-        super.add(value);
-        lock.unlockWrite();
+    public byte getByte(int index) {
+        checkIndex(index, 1);
+        return buffer.getByte(index);
     }
 }","@Test
-    public void testAddItems() {
-        ConcurrentLongArray a = new ConcurrentLongArray();
-        CountDownLatch latch = new CountDownLatch(10);
-        createStartAndJoinThreads(new Runnable() {
-            @Override
-            public void run() {
-                latch.countDown();
-                try {
-                    latch.await();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                for (int i = 0; i < 1000; i++) {
-                    a.add(i);
-                }
+    public void testGetByte() {
+        ByteBuf buf = Unpooled.copiedBuffer(""TestBuffer"", CharsetUtil.ISO_8859_1);
+        ReplayingDecoderByteBuf buffer = new ReplayingDecoderByteBuf(buf);
+
+        boolean error;
+        int i = 0;
+        try {
+            for (;;) {
+                buffer.getByte(i);
+                i++;
             }
-        }, 10);
-        assertEquals(a.size, 10*1000);
+        } catch (Signal e) {
+            error = true;
+        }
+
+        assertTrue(error);
+        assertEquals(10, i);
+
+        buf.release();
+    }"
+(int index),"class get {
+@Override
+  public double get(int index) {
+    if (index < 0 || index >= size) {
+      throw new IndexException(index, size);
+    }
+    return getQuick(index);
+  }
+}","@Test
+  public void testGet() {
+    for (int i = 0; i < test.size(); i++) {
+      if (i % 2 == 0) {
+        assertEquals(""get ["" + i + ']', 0.0, test.get(i), EPSILON);
+      } else {
+        assertEquals(""get ["" + i + ']', values[i/2], test.get(i), EPSILON);
+      }
+    }
+  }"
+(int index),"class nth {
+@Override
+    public Object nth(int index) {
+        assertIndexInBounds(index);
+
+        if (index == 2) {
+            return item3;
+        } else {
+            return super.nth(index);
+        }
+    }
+}","@Test
+    public void testAccessingNegative() {
+        assertThrows(IndexOutOfBoundsException.class, () -> someTuple.nth(-1));
+    }"
+(int index),"class get {
+public PlaceholderType get(int index) {
+        if (index >= this.Array.length) {
+            return null;
+        } else {
+            return this.Array[index];
+        }
+
+    }
+}","@Test
+    public void getTest() {
+        System.out.println(""Perform getTest"");
+
+        ArrayDeque<Integer> array = new ArrayDeque<>();
+
+        array.addFirst(123);
+        array.addLast(234);
+        array.addFirst(345);
+        array.addLast(456);
+
+        System.out.println(array.get(3));
+    }"
+(int index),"class putFramePathOnStack {
+public void putFramePathOnStack(int index) {
+    if (!switchRequestComingFromFrameSwitcher) {
+      expandFramePathStack(new IndexedFrame(index));
+    }
+  }
+}","@Test
+  public void shouldPutFrameOnStackById() {
+    //given
+    assumeThatDequeSizeIs(1);
+
+    //when
+    testedObject.putFramePathOnStack(1);
+
+    //then
+    assertThatDequeSizeIs(2);
+  }"
+(int index),"class get {
+@Override
+public InputStream get(int index) throws IOException
+{
+  initializeFiles(getConfiguration());
+  if (index >= 0 && index < files.size())
+  {
+    return HadoopFileUtils.open(getConfiguration(), files.get(index));
+  }
+
+  throw new IOException(""Index out of range ("" + index + "") "");
+}
+}","@Test
+@Category(UnitTest.class)
+public void testGet() throws Exception
+{
+  String text =
+      ""Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut ullamcorper est. Phasellus sed nisl arcu. Nullam non sem quam. Pellentesque vel neque quis erat ultricies dapibus a ac mauris. Morbi sodales vitae nisl ullamcorper facilisis. Quisque pellentesque est in fermentum luctus. Etiam sed nibh id dui faucibus luctus vel sit amet odio. Fusce non sollicitudin ligula, ac fermentum leo. Nulla facilisi."";
+  OutputStream outputStream = provider.add();
+  PrintStream out = new PrintStream(outputStream);
+  out.print(text);
+
+  outputStream.close();
+
+  Assert.assertEquals(""Adhoc size should be 1!"", 1, provider.size());
+
+  InputStream instream = provider.get(0);
+  String intext = IOUtils.toString(instream);
+  instream.close();
+
+  Assert.assertEquals(""Input string is not equal to output string"", text, intext);
+}"
+(int size),"class generateRandomBytes {
+public static byte[] generateRandomBytes(int size) {
+        byte[] bytes = new byte[size];
+        SecureRandomUtils.secureRandom().nextBytes(bytes);
+        return bytes;
+    }
+}","@Test
+    public void testGenerateRandomBytes() {
+        assertThat(SecureRandomUtils.generateRandomBytes(0), is(new byte[]{}));
+        assertThat(SecureRandomUtils.generateRandomBytes(10).length, is(10));
+    }"
+(double d),"class human {
+public static String human(double d) {
+    if (d == 0d) {
+      return ""0"";
+    }
+    if (d < 0d) {
+      return ""-"" + human(-d);
+    }
+    final int digitCount = (int) Math.floor(Math.log10(d));
+    switch (digitCount) {
+    case 0:
+    case 1:
+    case 2:
+      return Integer.toString((int) d);
+    case 3:
+    case 4:
+    case 5:
+      return digits3(Math.round(d / 10D), digitCount % 3) + ""K"";
+    case 6:
+    case 7:
+    case 8:
+      return digits3(Math.round(d / 10000D), digitCount % 3) + ""M"";
+    case 9:
+    case 10:
+    case 11:
+      return digits3(Math.round(d / 10000000D), digitCount % 3) + ""G"";
+    default:
+      return Double.toString(d);
+    }
+  }
+}","@Test void testHuman() {
+    assertThat(Util.human(0D), equalTo(""0""));
+    assertThat(Util.human(1D), equalTo(""1""));
+    assertThat(Util.human(19D), equalTo(""19""));
+    assertThat(Util.human(198D), equalTo(""198""));
+    assertThat(Util.human(1000D), equalTo(""1.00K""));
+    assertThat(Util.human(1002D), equalTo(""1.00K""));
+    assertThat(Util.human(1009D), equalTo(""1.01K""));
+    assertThat(Util.human(1234D), equalTo(""1.23K""));
+    assertThat(Util.human(1987D), equalTo(""1.99K""));
+    assertThat(Util.human(1999D), equalTo(""2.00K""));
+    assertThat(Util.human(86837.2D), equalTo(""86.8K""));
+    assertThat(Util.human(868372.8D), equalTo(""868K""));
+    assertThat(Util.human(1009000D), equalTo(""1.01M""));
+    assertThat(Util.human(1999999D), equalTo(""2.00M""));
+    assertThat(Util.human(1009000000D), equalTo(""1.01G""));
+    assertThat(Util.human(1999999000D), equalTo(""2.00G""));
+
+    assertThat(Util.human(-1D), equalTo(""-1""));
+    assertThat(Util.human(-19D), equalTo(""-19""));
+    assertThat(Util.human(-198D), equalTo(""-198""));
+    assertThat(Util.human(-1999999000D), equalTo(""-2.00G""));
+
+    // not ideal - should use m (milli) and u (micro)
+    assertThat(Util.human(0.18D), equalTo(""0.18""));
+    assertThat(Util.human(0.018D), equalTo(""0.018""));
+    assertThat(Util.human(0.0018D), equalTo(""0.0018""));
+    assertThat(Util.human(0.00018D), equalTo(""1.8E-4""));
+    assertThat(Util.human(0.000018D), equalTo(""1.8E-5""));
+    assertThat(Util.human(0.0000018D), equalTo(""1.8E-6""));
+
+    // bad - should round to 3 digits
+    assertThat(Util.human(0.181111D), equalTo(""0.181111""));
+    assertThat(Util.human(0.0181111D), equalTo(""0.0181111""));
+    assertThat(Util.human(0.00181111D), equalTo(""0.00181111""));
+    assertThat(Util.human(0.000181111D), equalTo(""1.81111E-4""));
+    assertThat(Util.human(0.0000181111D), equalTo(""1.81111E-5""));
+    assertThat(Util.human(0.00000181111D), equalTo(""1.81111E-6""));
+
+  }"
+(int column),"class viewColumn {
+@Override
+  public Vector viewColumn(int column) {
+    if (column < 0 || column >= columnSize()) {
+      throw new IndexException(column, columnSize());
+    }
+    return new VectorView(matrix.viewColumn(column + offset[COL]), offset[ROW], rowSize());
+  }
+}","@Test(expected = IndexException.class)
+  public void testViewColumnIndexUnder() {
+    test.viewColumn(-1);
+  }"
+(char c),"class hexCharToIntValue {
+static public int hexCharToIntValue(char c) {
+        if (c == '0') {
+            return 0;
+        } else if (c == '1') {
+            return 1;
+        } else if (c == '2') {
+            return 2;
+        } else if (c == '3') {
+            return 3;
+        } else if (c == '4') {
+            return 4;
+        } else if (c == '5') {
+            return 5;
+        } else if (c == '6') {
+            return 6;
+        } else if (c == '7') {
+            return 7;
+        } else if (c == '8') {
+            return 8;
+        } else if (c == '9') {
+            return 9;
+        } else if (c == 'A' || c == 'a') {
+            return 10;
+        } else if (c == 'B' || c == 'b') {
+            return 11;
+        } else if (c == 'C' || c == 'c') {
+            return 12;
+        } else if (c == 'D' || c == 'd') {
+            return 13;
+        } else if (c == 'E' || c == 'e') {
+            return 14;
+        } else if (c == 'F' || c == 'f') {
+            return 15;
+        } else {
+            throw new IllegalArgumentException(""The character ["" + c + ""] does not represent a valid hex digit"");
+        }
+    }
+}","@Test
+    public void hexCharToIntValue() throws Exception {
+        Assert.assertEquals(0, HexUtil.hexCharToIntValue('0'));
+        Assert.assertEquals(1, HexUtil.hexCharToIntValue('1'));
+        Assert.assertEquals(2, HexUtil.hexCharToIntValue('2'));
+        Assert.assertEquals(3, HexUtil.hexCharToIntValue('3'));
+        Assert.assertEquals(4, HexUtil.hexCharToIntValue('4'));
+        Assert.assertEquals(5, HexUtil.hexCharToIntValue('5'));
+        Assert.assertEquals(6, HexUtil.hexCharToIntValue('6'));
+        Assert.assertEquals(7, HexUtil.hexCharToIntValue('7'));
+        Assert.assertEquals(8, HexUtil.hexCharToIntValue('8'));
+        Assert.assertEquals(9, HexUtil.hexCharToIntValue('9'));
+        Assert.assertEquals(10, HexUtil.hexCharToIntValue('A'));
+        Assert.assertEquals(11, HexUtil.hexCharToIntValue('B'));
+        Assert.assertEquals(12, HexUtil.hexCharToIntValue('C'));
+        Assert.assertEquals(13, HexUtil.hexCharToIntValue('D'));
+        Assert.assertEquals(14, HexUtil.hexCharToIntValue('E'));
+        Assert.assertEquals(15, HexUtil.hexCharToIntValue('F'));
+        Assert.assertEquals(10, HexUtil.hexCharToIntValue('a'));
+        Assert.assertEquals(11, HexUtil.hexCharToIntValue('b'));
+        Assert.assertEquals(12, HexUtil.hexCharToIntValue('c'));
+        Assert.assertEquals(13, HexUtil.hexCharToIntValue('d'));
+        Assert.assertEquals(14, HexUtil.hexCharToIntValue('e'));
+        Assert.assertEquals(15, HexUtil.hexCharToIntValue('f'));
+
+        try {
+            Assert.assertEquals(15, HexUtil.hexCharToIntValue('g'));
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            // correct behavior
+        }
+    }"
+(int i),"class encode {
+public static final String encode(int i) {
+		char[] cbuf = new char[8];
+		int charPos = cbuf.length - 1;
+		do {
+			cbuf[charPos--] = DIGITS[i & 0xF];
+			i >>>= 4;
+			cbuf[charPos--] = DIGITS[i & 0xF];
+			i >>>= 4;
+		} while (i != 0);
+		return new String(cbuf, charPos + 1, cbuf.length - charPos - 1);
+	}
+}","@Test
+	public final void testEncode() {
+		for (int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++) {
+			final String expected = String.format(""%02X"",
+					Integer.valueOf(i & 0xFF));
+			final String actual = Hex.encode(new byte[] { (byte) i });
+			Assert.assertEquals(expected, actual);
+		}
+	}"
+(int i),"class getIntUnsafe {
+@Override
+    public int getIntUnsafe(int i) {
+        throw new UnsupportedOperationException();
+    }
+}","@Test(expected = UnsupportedOperationException.class)
+    public void getIntUnsafe() {
+        trieSet.getIntUnsafe(0);
+    }"
+(long id),"class get {
+public User get(long id) {
+        return userBiz.getById(id);
+    }
+}","@Test
+    public void testGetId() throws Exception {
+        long id = 1;
+        User user = userService.get(id);
+        Assert.assertNotNull(user);
+        Assert.assertEquals(""banchuanyu"", user.getName());
+    }"
+(long id),"class findOne {
+@Override
+    @Transactional
+    public ServiceResult<FileTypeResource> findOne(long id) {
+
+        return find(fileTypeRepository.findById(id), notFoundError(FileType.class, id))
+                .andOnSuccessReturn(fileType -> fileTypeMapper.mapToResource(fileType));
+    }
+}","@Test
+    public void findOne() {
+
+        Long fileTypeId = 1L;
+
+        FileType fileType = new FileType();
+        FileTypeResource fileTypeResource = new FileTypeResource();
+
+        when(fileTypeRepositoryMock.findById(fileTypeId)).thenReturn(Optional.of(fileType));
+        when(fileTypeMapperMock.mapToResource(fileType)).thenReturn(fileTypeResource);
+
+        ServiceResult<FileTypeResource> result = service.findOne(fileTypeId);
+
+        assertTrue(result.isSuccess());
+        assertEquals(fileTypeResource, result.getSuccess());
+
+        verify(fileTypeRepositoryMock).findById(fileTypeId);
+    }"
+(boolean b),"class setEnableConcurrentAddRemove {
+void setEnableConcurrentAddRemove(boolean b) {
+        enableConcurrentAddRemove = b;
+    }
+}","@Test
+    public void mergeAddAddNormalDocShouldFail() throws Exception {
+        final DocumentNodeStore store = builderProvider.newBuilder().getNodeStore();
+        store.setEnableConcurrentAddRemove(true);
+        SingleInstanceConflictUtility.generateConflict(store,
+                new String[]{"":1"", ""a""}, new String[]{},
+                new String[]{"":2"", ""b""}, new String[]{},
+                new String[]{"":3"", ""a"", ""b""}, new String[]{},
+                false, ""Add-add merge conflicts for normal docs should fail"");
+    }"
+"(int x, int y)","class getDayGridPositionAtLocation {
+protected Point getDayGridPositionAtLocation(int x, int y) {
+        Rectangle monthDetailsBounds = getMonthDetailsBoundsAtLocation(x, y);
+        if ((monthDetailsBounds == null) ||(!monthDetailsBounds.contains(x, y))) return null;
+        int calendarRow = (y - monthDetailsBounds.y) / fullBoxHeight + DAY_HEADER_ROW; 
+        int absoluteColumn = (x - monthDetailsBounds.x) / fullBoxWidth;
+        int calendarColumn = absoluteColumn + FIRST_DAY_COLUMN;
+        if (!isLeftToRight) {
+            int leading = monthDetailsBounds.x + monthDetailsBounds.width;
+            calendarColumn = (leading - x) / fullBoxWidth + FIRST_DAY_COLUMN;
+        }
+        if (monthView.isShowingWeekNumber()) {
+            calendarColumn -= 1;
+        }
+        return new Point(calendarColumn, calendarRow);
+    }
+}","@Test
+    public void testDayGridPositionAtLocationLastColumnRToL() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.fine(""cannot run test - headless environment"");
+            return;
+        }
+        BasicMonthViewUI ui = getRealizedMonthViewUI(ComponentOrientation.RIGHT_TO_LEFT);
+        Point location = getLocationInColumn(ui, 0);
+        Point dayGridPosition = ui.getDayGridPositionAtLocation(location.x, location.y); 
+        assertEquals(""last logical column in RToL"", BasicMonthViewUI.LAST_DAY_COLUMN, 
+                dayGridPosition.x);
+     }"
+"(int x, int y)","class times {
+public static int times(int x, int y)
+    {
+        return new HelloWorldJNI().timesHello(x, y);
+    }
+}","@Test public final void testTimes()
+    {
+        Assert.assertEquals(42, Hello.times(3, 14));
+    }"
+"(int row, int column)","class getQuick {
+@Override
+  public double getQuick(int row, int column) {
+    return matrix.getQuick(offset[ROW] + row, offset[COL] + column);
+  }
+}","@Test
+  public void testAssignMatrixBinaryFunction() {
+    test.assign(test, Functions.PLUS);
+    for (int row = 0; row < test.rowSize(); row++) {
+      for (int col = 0; col < test.columnSize(); col++) {
+        assertEquals(""value["" + row + ""]["" + col + ']',
+            2 * values[row + 1][col + 1], test.getQuick(row, col), EPSILON);
+      }
+    }
+  }"
+(int length),"class readBytes {
+@Override
+    public ByteBuf readBytes(int length) {
+        checkReadableBytes(length);
+        if (length == 0) {
+            return Unpooled.EMPTY_BUFFER;
+        }
+
+        // Use an unpooled heap buffer because there's no way to mandate a user to free the returned buffer.
+        ByteBuf buf = Unpooled.buffer(length, maxCapacity);
+        buf.writeBytes(this, readerIndex, length);
+        readerIndex += length;
+        return buf;
+    }
+}","@Test(expected = IllegalReferenceCountException.class)
+    public void testReadBytesAfterRelease7() {
+        releasedBuffer().readBytes(ByteBuffer.allocate(8));
+    }"
+(int length),"class randomLetters {
+public static String randomLetters(int length) {
+        return new RandomStringGenerator.Builder()
+                .filteredBy(LETTERS)
+                .build().generate(length);
+    }
+}","@Test
+    public void testRandomLetters() {
+        for (int length = 1; length < 10; length++) {
+            String value = RandomStringUtils.randomLetters(length);
+            //LOGGER.debug( ""random alpha string: "" + value );
+
+            Assert.assertEquals(
+                    ""random string has a length of "" + length,
+                    length, value.length());
+
+            Assert.assertTrue(
+                    ""random string is alpha"",
+                    isAsciiAlpha(value));
+        }
+    }"
+(long value),"class toBytes {
+public static byte[] toBytes(long value) {
+
+    long v = value;
+    byte[] bytes = new byte[8];
+    for (int i = 7; i >= 0; i--) {
+      bytes[i] = (byte) v;
+      v >>= 8;
+    }
+    return bytes;
+  }
+}","@Test
+  public void testToBytes() {
+
+    assertThat(BinaryType.toBytes(0x0FEDCBA98)).containsExactly(0x0FE, 0x0DC, 0x0BA, 0x098);
+    assertThat(BinaryType.toBytes(0x0FEDCBA9876543210L)).containsExactly(0x0FE, 0x0DC, 0x0BA, 0x098, 0x076, 0x054, 0x032, 0x010);
+  }"
+(long value),"class borders {
+public boolean borders(long value)
+    {
+        return value == myStartValue - 1 || value == myEndValue + 1;
+    }
+}","@Test
+    public void testBordersWithValue()
+    {
+        RangeLongBlock aBlock = new RangeLongBlock(3, 5);
+        Assert.assertTrue(aBlock.borders(2));
+        Assert.assertTrue(aBlock.borders(6));
+        Assert.assertFalse(aBlock.borders(3));
+        Assert.assertFalse(aBlock.borders(4));
+        Assert.assertFalse(aBlock.borders(5));
+        Assert.assertFalse(aBlock.borders(1));
+        Assert.assertFalse(aBlock.borders(7));
+    }"
+(long offset),"class setLastOffset {
+@Override
+    public void setLastOffset(long offset) {
+        buffer.putLong(BASE_OFFSET_OFFSET, offset - lastOffsetDelta());
+    }
+}","@Test
+    public void testSetLastOffset() {
+        SimpleRecord[] simpleRecords = new SimpleRecord[] {
+            new SimpleRecord(1L, ""a"".getBytes(), ""1"".getBytes()),
+            new SimpleRecord(2L, ""b"".getBytes(), ""2"".getBytes()),
+            new SimpleRecord(3L, ""c"".getBytes(), ""3"".getBytes())
+        };
+        MemoryRecords records = MemoryRecords.withRecords(RecordBatch.MAGIC_VALUE_V2, 0L,
+                CompressionType.NONE, TimestampType.CREATE_TIME, simpleRecords);
+
+        long lastOffset = 500L;
+        long firstOffset = lastOffset - simpleRecords.length + 1;
+
+        DefaultRecordBatch batch = new DefaultRecordBatch(records.buffer());
+        batch.setLastOffset(lastOffset);
+        assertEquals(lastOffset, batch.lastOffset());
+        assertEquals(firstOffset, batch.baseOffset());
+        assertTrue(batch.isValid());
+
+        List<MutableRecordBatch> recordBatches = Utils.toList(records.batches().iterator());
+        assertEquals(1, recordBatches.size());
+        assertEquals(lastOffset, recordBatches.get(0).lastOffset());
+
+        long offset = firstOffset;
+        for (Record record : records.records())
+            assertEquals(offset++, record.offset());
     }"
 (int position),"class get {
-protected abstract E get(int position);
-}","@Test
-    public void testFullIteration() {
-        final AbstractIndexedIterator<String> testIterator = new AbstractIndexedIterator<String>(testData.size()) {
-
-            @Override
-            protected String get(final int position) {
-                return testData.get(position);
-            }
-
-        };
-        assertTrue(elementsEqual(testData.iterator(), testIterator));
+@Nullable
+    public E get(int position) throws T, IllegalArgumentException, NoSuchElementException {
+        advance(position);
+        return next();
+    }
+}","@Test(expected = NoSuchElementException.class)
+    public void testGetNoSuchElementException() {
+        create(""one"", ""two"").get(3);
     }"
-(long n),"class request {
-public void request(long n) {
-    Subscription currentSubscription = subscription;
-    if (currentSubscription != null) {
-      currentSubscription.request(n);
-    }
-  }
-}","@Test
-  void request() {
-    var s = new TestSubscription();
-    var ups = new Upstream();
-    ups.request(1);
-    ups.setOrCancel(s);
-    ups.request(5);
-    ups.cancel();
-    ups.request(1);
-    assertEquals(1, s.cancels);
-    assertEquals(1, s.demands.size());
-    assertEquals(5, s.demands.poll());
-  }"
-(int value),"class valueOf {
-public static BigRational valueOf(int value) {
-		if (value == 0) {
-			return ZERO;
-		}
-		if (value == 1) {
-			return ONE;
-		}
-		return new BigRational(value);
-	}
-}","@Test(expected=NumberFormatException.class)
-	public void testValueOfDoublePositiveInfinity() {
-		valueOf(Double.POSITIVE_INFINITY);
-	}"
-(int value),"class doRemoteFunction {
+(int position),"class getStringArray {
 @Override
-  public long doRemoteFunction(int value) {
-
-    long waitTime = (long) Math.floor(randomProvider.random() * 1000);
-
-    try {
-      sleep(waitTime);
-    } catch (InterruptedException e) {
-      LOGGER.error(""Thread sleep state interrupted"", e);
+    public String[] getStringArray(int position) {
+        ValueHolder[] array = getArray(position);
+        String[] result = new String[array.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = array[i].getString();
+        }
+        return result;
     }
-    return waitTime <= THRESHOLD ? value * 10
-            : RemoteServiceStatus.FAILURE.getRemoteServiceStatusValue();
+}","@Test
+    public void testGetStringArray() {
+
+        // zaleznosci
+        ValueHolder h1 = new IntegerHolder(100L);
+        ValueHolder h2 = new IntegerHolder(200L);
+
+        // 1 element tablicowy
+        ValueHolder[] e1 = {h1, h2};
+
+        // testowany obiekt - value(1) to tablica
+        MultiValue mv = new DefaultMultiValue(new Object[]{e1});
+
+        // oczekiwany wynik
+        String[] expectedResult = {""100"", ""200""};
+
+        // weryfikacja
+        assertArrayEquals(expectedResult, mv.getStringArray(0));
+    }"
+(int level),"class calculateShipBuildTimeSpeedup {
+@Override
+    public double calculateShipBuildTimeSpeedup(int level) {
+        Preconditions.checkArgument(level >= 0, ""level must be >= 0"");
+
+        if (level == 0) {
+            return 0;
+        }
+
+        return Math.min(1, (level - 1) * 0.1);
+    }
+}","@Test
+    public void testCalculateShipBuildTimeSpeedup() throws Exception {
+        assertThat(sut.calculateShipBuildTimeSpeedup(1), is(0.0));
+        assertThat(sut.calculateShipBuildTimeSpeedup(2), is(0.1));
+        assertThat(sut.calculateShipBuildTimeSpeedup(3), is(0.2));
+    }"
+(long n),"class skip {
+@Override
+  public long skip(long n) throws IOException {
+    if (n <= 0) {
+      return 0;
+    }
+
+    long ret = mBlockInfo.length - mReadByte;
+    if (ret > n) {
+      ret = n;
+    }
+
+    if (mCurrentBuffer != null) {
+      if (mCurrentBuffer.remaining() < ret) {
+        mBufferStartPosition = mReadByte + ret;
+        updateCurrentBuffer();
+      }
+      if (mCurrentBuffer != null) {
+        if (ret > 0) {
+          if (mRecache) {
+            mBlockOutStream.cancel();
+          }
+          mRecache = false;
+        }
+        return (int) ret;
+      }
+      setupStreamFromUnderFs(mBlockInfo.offset + mReadByte, mUFSConf);
+    }
+
+    long tmp = mCheckpointInputStream.skip(ret);
+    ret = Math.min(ret, tmp);
+    mReadByte += ret;
+
+    if (ret > 0) {
+      if (mRecache) {
+        mBlockOutStream.cancel();
+      }
+      mRecache = false;
+    }
+    return ret;
   }
 }","@Test
-  void testFailedCall() {
-    var remoteService = new RemoteService(new StaticRandomProvider(0.21));
-    var result = remoteService.doRemoteFunction(10);
-    assertEquals(RemoteServiceStatus.FAILURE.getRemoteServiceStatusValue(), result);
+  public void skipTest() throws IOException {
+    for (int k = MIN_LEN + DELTA; k <= MAX_LEN; k += DELTA) {
+      WriteType op = WriteType.THROUGH;
+      int fileId = TestUtils.createByteFile(mTfs, ""/root/testFile_"" + k + ""_"" + op, op, k);
+
+      TachyonFile file = mTfs.getFile(fileId);
+      InStream is = file.getInStream(ReadType.CACHE);
+      Assert.assertTrue(is instanceof RemoteBlockInStream);
+      Assert.assertEquals(k / 2, is.skip(k / 2));
+      Assert.assertEquals(k / 2, is.read());
+      is.close();
+      Assert.assertFalse(file.isInMemory());
+
+      if (k >= 3) {
+        is = file.getInStream(ReadType.CACHE);
+        Assert.assertTrue(is instanceof RemoteBlockInStream);
+        int t = k / 3;
+        Assert.assertEquals(t, is.skip(t));
+        Assert.assertEquals(t, is.read());
+        Assert.assertEquals(t, is.skip(t));
+        Assert.assertEquals(2 * t + 1, is.read());
+        is.close();
+        Assert.assertFalse(file.isInMemory());
+      }
+    }
   }"
-(double value),"class setTol {
-public void setTol(double value) {
-        if (value <= 0 || value > 1e-2) {
-            throw new TramoException(""Invalid Tol parameter"");
+(int value),"class copyShort {
+public static ByteBuf copyShort(int value) {
+        ByteBuf buf = buffer(2);
+        buf.writeShort(value);
+        return buf;
+    }
+}","@Test
+    public void testWrapShortFromShortArray() {
+        ByteBuf buffer = copyShort(new short[]{1, 4});
+        assertEquals(4, buffer.capacity());
+        assertEquals(1, buffer.readShort());
+        assertEquals(4, buffer.readShort());
+        assertFalse(buffer.isReadable());
+        buffer.release();
+
+        buffer = copyShort((short[]) null);
+        assertEquals(0, buffer.capacity());
+        buffer.release();
+
+        buffer = copyShort(new short[] {});
+        assertEquals(0, buffer.capacity());
+        buffer.release();
+    }"
+(int value),"class sizeOfInteger {
+public static int sizeOfInteger(int value) {
+        int contentLength = 0;
+        do {
+            value >>>= 8;
+            contentLength++;
+        } while (value != 0);
+        return DerUtils.sizeOf(ASN1_INTEGER_TAG_NUM, contentLength);
+    }
+}","@Test
+    public void testSizeOfInteger() {
+        assertEquals(3, Asn1Utils.sizeOfInteger(15));
+        assertEquals(4, Asn1Utils.sizeOfInteger(512));
+        assertEquals(6, Asn1Utils.sizeOfInteger(1954663611));
+    }"
+(int value),"class valueOf {
+@NonNull
+  public static Priority valueOf(int value) {
+    Priority priority = PRIORITY_MAP.get(value);
+    if (priority == null) {
+      throw new IllegalArgumentException(""Unknown Priority for value "" + value);
+    }
+    return priority;
+  }
+}","@Test
+  public void forValue_withInvalidValue_shouldThrow() {
+    assertThrows(IllegalArgumentException.class, () -> PriorityMapping.valueOf(-1));
+    assertThrows(IllegalArgumentException.class, () -> PriorityMapping.valueOf(3));
+  }"
+(int value),"class intToUnsignedLong {
+public static long intToUnsignedLong(int value) {
+        return value & 0x00000000ffffffffL;
+    }
+}","@Test
+    public void testIntToUnsignedLong() {
+        int a = 0;
+        int b = 1;
+        int c = -1;
+        int d = Integer.MAX_VALUE;
+        int e = Integer.MIN_VALUE;
+        int f = 12345;
+        Assert.assertEquals(""Wrong conversion"", 0, BinContent.intToUnsignedLong(a));
+        Assert.assertEquals(""Wrong conversion"", 1, BinContent.intToUnsignedLong(b));
+        Assert.assertEquals(""Wrong conversion"", 4294967295L, BinContent.intToUnsignedLong(c));
+        Assert.assertEquals(""Wrong conversion"", Integer.MAX_VALUE, BinContent.intToUnsignedLong(d));
+        Assert.assertEquals(""Wrong conversion"", ((long) Integer.MAX_VALUE) + 1, BinContent.intToUnsignedLong(e));
+        Assert.assertEquals(""Wrong conversion"", 12345, BinContent.intToUnsignedLong(f));
+    }"
+"(int start, int end)","class getSubStringContainer {
+public StringContainer getSubStringContainer(int start, int end) {
+    int realStartIndex = start >= 0 ? start : count + start;
+    int realEndIndex = end >= 0 ? end : count + end;
+    if (realStartIndex < 0 || realStartIndex >= count) {
+      throw new IndexOutOfBoundsException(String.format(
+          ""start Index: %d, Real start Index: %d, Size: %d"", start, realStartIndex, count));
+    }
+    if (realEndIndex < 0 || realEndIndex >= count) {
+      throw new IndexOutOfBoundsException(String.format(
+          ""end Index: %d, Real end Index: %d, Size: %d"", end, realEndIndex, count));
+    }
+    StringContainer ret = new StringContainer(joinSeparator);
+    if (realStartIndex < reverseList.size()) {
+      for (int i = reverseList.size() - 1 - realStartIndex; i >= Math.max(0,
+          reverseList.size() - 1 - realEndIndex); i--) {
+        ret.addTail(this.reverseList.get(i));
+      }
+    }
+    if (realEndIndex >= reverseList.size()) {
+      for (int i = Math.max(0, realStartIndex - reverseList.size()); i <= realEndIndex - reverseList.size(); i++) {
+        ret.addTail(this.sequenceList.get(i));
+      }
+    }
+    return ret;
+  }
+}","@Test
+  public void testGetSubStringContainer() {
+    StringContainer a = new StringContainer();
+    try {
+      a.getSubStringContainer(0, 1);
+    } catch (Exception e) {
+      assertTrue(e instanceof IndexOutOfBoundsException);
+    }
+    a.addTail(""a"", ""bbb"", ""cc"");
+    assertEquals("""", a.getSubStringContainer(1, 0).toString());
+    assertEquals(""a"", a.getSubStringContainer(0, 0).toString());
+    assertEquals(""bbbcc"", a.getSubStringContainer(1, -1).toString());
+    assertEquals(""bbb"", a.getSubStringContainer(-2, -2).toString());
+    try {
+      a.getSubStringContainer(1, 4);
+    } catch (Exception e) {
+      assertTrue(e instanceof IndexOutOfBoundsException);
+    }
+    a.addHead(""dd"", ""eeee"");
+    assertEquals(""eeeea"", a.getSubStringContainer(1, 2).toString());
+    assertEquals(""eeeea"", a.getSubStringContainer(1, -3).toString());
+    assertEquals(""dd"", a.getSubStringContainer(0, 0).toString());
+    assertEquals(""cc"", a.getSubStringContainer(-1, -1).toString());
+    assertEquals(""ddeeeeabbbcc"", a.getSubStringContainer(-5, -1).toString());
+    try {
+      a.getSubString(9);
+    } catch (Exception e) {
+      assertTrue(e instanceof IndexOutOfBoundsException);
+    }
+  }"
+(double value),"class convert {
+public double convert(double value) {
+    if (Double.isNaN(value)) {
+      return value;
+    }
+
+    if (from.equals(to)) {
+      return value;
+    }
+
+    BigDecimal result = new BigDecimal(String.valueOf(value)).multiply(multiplier);
+    return result.doubleValue();
+  }
+}","@Test
+  public void testConvertDoubleNan() {
+    double nan = Double.NaN;
+    ConvertDistances converter = new ConvertDistances(ConvertDistances.Distance.MILE,
+                                                      ConvertDistances.Distance.KILOMETER);
+    Assert.assertEquals(nan, converter.convert(nan), delta);
+  }"
+(double value),"class pow3 {
+public static double pow3(double value) {
+    return value * value * value;
+  }
+}","@Test
+  public void test_pow3() {
+    assertThat(MathUtils.pow3(3)).isEqualTo(27);
+    assertThat(MathUtils.pow3(2)).isEqualTo(8);
+    assertThat(MathUtils.pow3(1)).isEqualTo(1);
+    assertThat(MathUtils.pow3(0)).isEqualTo(0);
+    assertThat(MathUtils.pow3(-1)).isEqualTo(-1);
+    assertThat(MathUtils.pow3(-2)).isEqualTo(-8);
+    assertThat(MathUtils.pow3(-3)).isEqualTo(-27);
+    assertThat(MathUtils.pow3(Double.POSITIVE_INFINITY)).isEqualTo(Double.POSITIVE_INFINITY);
+    assertThat(MathUtils.pow3(Double.NEGATIVE_INFINITY)).isEqualTo(Double.NEGATIVE_INFINITY);
+    assertThat(MathUtils.pow3(Double.NaN)).isNaN();
+    assertThat(MathUtils.pow3(Double.POSITIVE_INFINITY)).isEqualTo(Math.pow(Double.POSITIVE_INFINITY, 3));
+    assertThat(MathUtils.pow3(Double.NEGATIVE_INFINITY)).isEqualTo(Math.pow(Double.NEGATIVE_INFINITY, 3));
+    assertThat(MathUtils.pow3(Double.NaN)).isNaN();
+  }"
+(double value),"class setPcr {
+public void setPcr(double value) {
+        if (value < .8 || value > 1) {
+            throw new TramoException(""PCR should belong to [0.8, 1.0]"");
         }
-        tol_ = value;
+        pcr_ = value;
     }
 }","@Test(expected = TramoException.class)
-    public void testSetTolLowerBound() {
-        EstimateSpec spec = new EstimateSpec();
-        spec.setTol(-0.1);
+    public void testSetPcUpperBound() {
+        AutoModelSpec spec = new AutoModelSpec();
+        spec.setPcr(0.31);
+    }"
+(boolean value),"class setHorizontallyCenter {
+@Override
+    public void setHorizontallyCenter(boolean value) {
+        throw new UnsupportedOperationException();
+    }
+}","@Test(expected = UnsupportedOperationException.class)
+    public void setHorizontallyCenter() throws Exception {
+        streamingSheet.setHorizontallyCenter(true);
+    }"
+(int len),"class sendMessageLength {
+protected void sendMessageLength(int len) throws IOException {
+        try {
+            serverOut.write (
+                ISOUtil.str2bcd (
+                    ISOUtil.zeropad (Integer.toString (len % 10000), 4), true
+                )
+            );
+        } 
+        catch (ISOException e) {
+            Logger.log (new LogEvent (this, ""send-message-length"", e));
+        }
+    }
+}","@Test
+    public void testSendMessageLengthThrowsNullPointerException() throws Throwable {
+        byte[] TPDU = new byte[0];
+        NCCChannel nCCChannel = new NCCChannel(new ISO87APackager(), TPDU);
+        try {
+            nCCChannel.sendMessageLength(100);
+            fail(""Expected NullPointerException to be thrown"");
+        } catch (NullPointerException ex) {
+            if (isJavaVersionAtMost(JAVA_14)) {
+                assertNull(ex.getMessage(), ""ex.getMessage()"");
+            } else {
+                assertEquals(""Cannot invoke \""java.io.DataOutputStream.write(byte[])\"" because \""this.serverOut\"" is null"", ex.getMessage(), ""ex.getMessage()"");
+            }
+        }
+    }"
+(boolean enabled),"class setMyLocationEnabled {
+public void setMyLocationEnabled(boolean enabled) {
+    setMyLocationEnabled(enabled, true);
+  }
+}","@Test public void setMyLocationEnabled_shouldCenterMapIfFindMeIsActive() throws Exception {
+    doCallRealMethod().when(mapController).setPositionEased(any(LngLat.class), anyInt());
+    when(mapController.getPosition()).thenCallRealMethod();
+
+    overlayManager.setMyLocationEnabled(true);
+    findMeButton.performClick();
+    Location location = mock(Location.class);
+    when(location.getLatitude()).thenReturn(-70.0);
+    when(location.getLongitude()).thenReturn(-40.0);
+    overlayManager.locationListener.onLocationChanged(location);
+    assertThat(mapController.getPosition().latitude).isEqualTo(-70.0);
+    assertThat(mapController.getPosition().longitude).isEqualTo(-40.0);
+  }"
+(int columnIndex),"class getLong {
+@Override
+    public long getLong(int columnIndex) {
+        ensureState();
+        throw unsupported(""long"");
+    }
+}","@Test
+    public void getLongByIndexThrowsUnsupportedOperationException() {
+        resultSet.next();
+        expectUnsupportedOperation(""long"");
+        resultSet.getLong(0);
+    }"
+(long millis),"class millisToSlot {
+static int millisToSlot(long millis) {
+        return (int)((millis % (BASE_SLOTS_PER_GRANULARITY * MILLISECONDS_IN_SLOT)) / MILLISECONDS_IN_SLOT);
+    }
+}","@Test
+    public void millisToSlotWithNegativeReturnsNegative() {
+        Assert.assertEquals(0, Granularity.millisToSlot(-0));
+        Assert.assertEquals(0, Granularity.millisToSlot(-1));
+        Assert.assertEquals(0, Granularity.millisToSlot(-299999L));
+        Assert.assertEquals(-1, Granularity.millisToSlot(-300000L));
+        Assert.assertEquals(-1, Granularity.millisToSlot(-300001L));
+        Assert.assertEquals(-1, Granularity.millisToSlot(-599999L));
+        Assert.assertEquals(-2, Granularity.millisToSlot(-600000L));
+        Assert.assertEquals(-2, Granularity.millisToSlot(-600001L));
+        Assert.assertEquals(-4030, Granularity.millisToSlot(-1209299999L));
+        Assert.assertEquals(-4031, Granularity.millisToSlot(-1209300000L));
+        Assert.assertEquals(-4031, Granularity.millisToSlot(-1209300001L));
+        Assert.assertEquals(-4031, Granularity.millisToSlot(-1209599999L));
+        Assert.assertEquals(0, Granularity.millisToSlot(-1209600000L));
     }"
 (int b),"class write {
 @Override
     public void write(int b) throws IOException {
+        filePosition++;
         super.write(b);
-        this.transferProgress.notify(new byte[]{(byte) b}, 1);
     }
 }","@Test
-    public void readByteArray() throws IOException {
-        byte[] buffer = new byte[SIZE];
-        Arrays.fill(buffer, (byte) 1);
-        this.outputStream.write(buffer);
+    public void testWriteByteArrayWithLengthAndOffset() throws IOException {
+        byte[] arr = new byte[345];
+        random.nextBytes(arr);
+        writer.write(arr, 10, 300);
 
-        assertArrayEquals(buffer, this.transferProgress.getBuffer());
-        assertEquals(SIZE, this.transferProgress.getLength());
+        expectData(Arrays.copyOfRange(arr, 10, 310));
     }"
-(int n),"class bernoulli {
-public static BigRational bernoulli(int n) {
-		if (n < 0) {
-			throw new ArithmeticException(""Illegal bernoulli(n) for n < 0: n = "" + n);
-		}
-    	if (n == 1) {
-    		return valueOf(-1, 2);
-    	} else if (n % 2 == 1) {
-    		return ZERO;
-    	}
-    	
-    	synchronized (bernoulliCache) {
-    		int index = n / 2;
-    		
-    		if (bernoulliCache.size() <= index) {
-    			for (int i = bernoulliCache.size(); i <= index; i++) {
-    				BigRational b = calculateBernoulli(i * 2);
-					bernoulliCache.add(b);
-				}
-    		}
-    		
-    		return bernoulliCache.get(index);
-		}
+(int n),"class isHappy {
+public boolean isHappy(int n) {
+        return false;
     }
 }","@Test
-	public void testBernoulli() {
-		assertEquals(""1"", bernoulli(0).reduce().toRationalString());
-		assertEquals(""-1/2"", bernoulli(1).reduce().toRationalString());
-		assertEquals(""1/6"", bernoulli(2).reduce().toRationalString());
-		assertEquals(""0"", bernoulli(3).reduce().toRationalString());
-		assertEquals(""-1/30"", bernoulli(4).reduce().toRationalString());
-		assertEquals(""0"", bernoulli(5).reduce().toRationalString());
-		assertEquals(""1/42"", bernoulli(6).reduce().toRationalString());
-		assertEquals(""0"", bernoulli(7).reduce().toRationalString());
-		assertEquals(""-1/30"", bernoulli(8).reduce().toRationalString());
-		assertEquals(""0"", bernoulli(9).reduce().toRationalString());
-		assertEquals(""5/66"", bernoulli(10).reduce().toRationalString());
-		assertEquals(""0"", bernoulli(11).reduce().toRationalString());
-		assertEquals(""-691/2730"", bernoulli(12).reduce().toRationalString());
-		assertEquals(""0"", bernoulli(13).reduce().toRationalString());
-		assertEquals(""7/6"", bernoulli(14).reduce().toRationalString());
-		assertEquals(""0"", bernoulli(15).reduce().toRationalString());
-		assertEquals(""-3617/510"", bernoulli(16).reduce().toRationalString());
-		assertEquals(""0"", bernoulli(17).reduce().toRationalString());
-		assertEquals(""43867/798"", bernoulli(18).reduce().toRationalString());
-	}"
-(int n),"class getPolynomials {
+    public void testAll() {
+        for (int i = 0; i < nums.length; i++) {
+            Assert.assertEquals(results[i], testObject.isHappy(nums[i]));
+        }
+    }"
+(int n),"class pollN {
 @Override
-  public DoubleFunction1D[] getPolynomials(int n) {
-    ArgChecker.isTrue(n >= 0);
-    DoubleFunction1D[] polynomials = new DoubleFunction1D[n + 1];
-    for (int i = 0; i <= n; i++) {
-      if (i == 0) {
-        polynomials[i] = getOne();
-      } else if (i == 1) {
-        polynomials[i] = getX();
-      } else {
-        polynomials[i] = (polynomials[i - 1]
-            .multiply(getX())
-            .multiply(2 * i - 1)
-            .subtract(polynomials[i - 2].multiply(i - 1))).multiply(1. / i);
-      }
+  public List<T> pollN(int n) {
+    if (n >= size) {
+      // if we need to remove all elements then do fast polling
+      return pollAll();
     }
-    return polynomials;
+    List<T> retList = new ArrayList<T>(n);
+    while (n-- > 0 && head != null) {
+      T curr = head.element;
+      this.removeElem(curr);
+      retList.add(curr);
+    }
+    shrinkIfNecessary();
+    return retList;
   }
 }","@Test
-  public void testBadN() {
-    assertThatIllegalArgumentException()
-        .isThrownBy(() -> LEGENDRE.getPolynomials(-3));
-  }"
-(int id),"class delete {
-@Override
-    public void delete(int id) throws IOException {
-        String commitMsg = ""Deleted metadata object "" + getID() + ""_"" + id + "" in store"";
-        // Commit to SVN
-        SVNCommitInfo info;
-        try {
-            SVNRepository repository = getRepository();
-            ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
-            editor.openRoot(-1);
-            editor.deleteEntry(""/"" + getSlotPath(id), -1);
-            editor.closeDir();
+  public void testPollNMulti() {
+    LOG.info(""Test pollN multi"");
 
-            info = editor.closeEdit();
-            LOGGER.info(""SVN commit of delete finished, new revision {}"", info.getNewRevision());
-        } catch (SVNException e) {
-            LOGGER.error(""Error while deleting {} in SVN "", id, e);
-        } finally {
-            super.delete(id);
-        }
+    // use addAll
+    set.addAll(list);
+
+    // poll existing elements
+    List<Integer> l = set.pollN(10);
+    assertEquals(10, l.size());
+
+    for (int i = 0; i < 10; i++) {
+      assertEquals(list.get(i), l.get(i));
+    }
+
+    // poll more elements than present
+    l = set.pollN(1000);
+    assertEquals(NUM - 10, l.size());
+
+    // check the order
+    for (int i = 10; i < NUM; i++) {
+      assertEquals(list.get(i), l.get(i - 10));
+    }
+    // set is empty
+    assertTrue(set.isEmpty());
+    assertEquals(0, set.size());
+
+    LOG.info(""Test pollN multi - DONE"");
+  }"
+(int n),"class bernoulli {
+public static BigDecimal bernoulli(int n) {
+        return BigDecimalMath.bernoulli(n, currentMathContext());
     }
 }","@Test
-    public void delete() throws Exception {
-        System.out.println(""TEST DELETE"");
+    public void testBernoulli() {
+        assertEquals(
+                BigDecimalMath.bernoulli(12, DefaultBigDecimalMath.getDefaultMathContext()),
+                DefaultBigDecimalMath.bernoulli(12));
+    }"
+(int n),"class generateHexUnif {
+public static String generateHexUnif(int n) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < n; i++) {
+      Character c = HEX_ALPHA.charAt(r.nextInt(HEX_ALPHA_LEN));
+      sb.append(c);
+    }
+
+    return sb.toString();
+  }
+}","@Test
+  public void testHexUnifSpread() {
+    int n = 1000;
+    int m = 32;
+    Set<String> outs = new HashSet<>(n);
+    for (int i = 0; i < n; i++)
+      outs.add(AnalyticUUIDGeneratorFactory.generateHexUnif(m));
+    assertEquals(1000, outs.size());
+  }"
+"(int index, int value)","class setShort {
+@Override
+    public ByteBuf setShort(int index, int value) {
+        checkIndex(index, 2);
+        _setShort(index, value);
+        return this;
+    }
+}","@Test(expected = IllegalReferenceCountException.class)
+    public void testSetShortAfterRelease() {
+        releasedBuffer().setShort(0, 1);
+    }"
+(int id),"class getUsers {
+public TagUsers getUsers(int id) {
+        String url = WxEndpoint.get(""url.tag.user.get"");
+        logger.debug(""get tag user: {}"", id);
+        String response = wxClient.get(String.format(url, id));
+        TagUsers tagUsers = JsonMapper.defaultMapper().fromJson(response, TagUsers.class);
+        tagUsers.setTagId(id);
+        return tagUsers;
+    }
+}","@Test
+    public void testGetUsers() {
+        TagUsers tagUsers = Tags.defaultTags().getUsers(200);
+    }"
+(int id),"class destroyLoader {
+@MainThread
+    public abstract void destroyLoader(int id);
+}","@Test(expected = IllegalStateException.class)
+    public void enforceOnMainThread_destroyLoader() {
+        mLoaderManager.destroyLoader(-1);
+    }"
+(int id),"class retrieve {
+@Override
+    public MCRVersionedMetadata retrieve(int id) throws IOException {
+        MCRVersionedMetadata metadata = (MCRVersionedMetadata) super.retrieve(id);
+        if (metadata != null) {
+            return metadata;
+        }
+        return new MCRVersionedMetadata(this, getSlot(id), id, super.forceDocType, true);
+    }
+}","@Test
+    public void retrieve() throws Exception {
         Document xml1 = new Document(new Element(""root""));
         int id = getVersStore().create(new MCRJDOMContent(xml1)).getID();
-        assertTrue(getVersStore().exists(id));
-        getVersStore().delete(id);
-        assertFalse(getVersStore().exists(id));
+        MCRVersionedMetadata sm1 = getVersStore().retrieve(id);
+        MCRContent xml2 = sm1.getMetadata();
+        assertEquals(new MCRJDOMContent(xml1).asString(), xml2.asString());
     }"
-(double x),"class toDegrees {
-public static double toDegrees(double x)
-    {
-        if (Double.isInfinite(x) || x == 0.0) { // Matches +/- 0.0; return correct sign
-            return x;
+(int v),"class nextValueOut {
+@Override
+    public int nextValueOut(int v) {
+        int lb = 0, ub = 1;
+        if (isInstantiated()) { // if this is instantiated
+            lb = ub = mValue;
         }
-
-        // These are 180/PI split into high and low order bits
-        final double facta = 57.2957763671875;
-        final double factb = 3.145894820876798E-6;
-
-        double xa = doubleHighPart(x);
-        double xb = x - xa;
-
-        return xb * factb + xb * facta + xa * factb + xa * facta;
+        if (lb - 1 <= v && v <= ub) {
+            return ub + 1;
+        } else {
+            return v + 1;
+        }
+    }
+}","@Test(groups=""1s"", timeOut=60000)
+    public void testNextOut1(){
+        Model model = new Model();
+        IntVar x = model.boolVar();
+        Assert.assertEquals(x.nextValueOut(-2), -1);
+        Assert.assertEquals(x.nextValueOut(-1), 2);
+        Assert.assertEquals(x.nextValueOut(2), 3);
+    }"
+(int limit),"class limit {
+public QueryBuilder<Q> limit(int limit) {
+        this.limit = limit;
+        return this;
     }
 }","@Test
-    public void testToDegrees() {
-        double maxerrulp = 0.0;
-        for (int i = 0; i < NUMBER_OF_TRIALS; i++) {
-            double x = generator.nextDouble();
-            double tst = field.newDfp(x).multiply(180).divide(field.getPi()).toDouble();
-            double ref = FastMath.toDegrees(x);
-            double err = (tst - ref) / ref;
+    public void limit() throws IOException, MalformedQueryException, QueryEvaluationException, AccessDeniedException {
+        QueryResultsTable results = builder().selectId().limit(2).build().rawExecute(thesaurus);
 
-            if (err != 0) {
-                double ulp = Math.abs(ref -
-                                      Double.longBitsToDouble((Double.doubleToLongBits(ref) ^ 1)));
-                double errulp = field.newDfp(tst).subtract(DfpMath.exp(field.newDfp(x)).subtract(field.getOne())).divide(field.newDfp(ulp)).toDouble();
-//                System.out.println(x + ""\t"" + tst + ""\t"" + ref + ""\t"" + err + ""\t"" + errulp);
-
-                maxerrulp = Math.max(maxerrulp, Math.abs(errulp));
-            }
+        assertEquals(1, results.getColumnCount());
+        assertEquals(2, results.getRowCount());
+    }"
+"(int a, int b)","class add {
+public int add(int a, int b) {
+        notifyJmsQueue(a, b);
+        return a + b;
+    }
+}","@Test
+    public void addPositiveIntegers() {
+        assertEquals(7, calc.add(2, 5));
+    }"
+(long userId),"class enableNotifications {
+public TwitterProfile enableNotifications(long userId) {
+		requireUserAuthorization();
+		LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
+		params.set(""user_id"", String.valueOf(userId));
+		params.set(""device"", ""true"");
+		return restTemplate.postForObject(buildUri(""friendships/update.json"", params), EMPTY_DATA, TwitterProfile.class);
+	}
+}","@Test
+	public void enableNotifications_byUserId() {
+		mockServer.expect(requestTo(""https://api.twitter.com/1.1/friendships/update.json?user_id=98765&device=true""))
+			.andExpect(method(POST))
+			.andRespond(withSuccess(jsonResource(""follow""), APPLICATION_JSON));
+		TwitterProfile unFollowedUser = twitter.friendOperations().enableNotifications(98765);
+		assertEquals(""oizik2"", unFollowedUser.getScreenName());
+		mockServer.verify();
+	}"
+(int val),"class requireNegative {
+public static int requireNegative(int val) {
+        if (val > -1) {
+            throw new IllegalArgumentException(val + IS_NOT_NEGATIVE);
         }
-        Assert.assertTrue(""toDegrees() had errors in excess of "" + MAX_ERROR_ULP + "" ULP"", maxerrulp < MAX_ERROR_ULP);
+        return val;
+    }
+}","@Test
+    void testRequireNegative2() {
+        assertThrows(RuntimeException.class, () -> IntRangeUtil.requireNegative(1, RuntimeException::new));
+    }"
+(double val),"class add {
+public abstract void add(double val);
+}","@Test
+    public void testAdd() {
+        System.out.println(""add"");
+        double val = 0.0;
+        AbstractGraphPanelChartElement instance = new AbstractGraphPanelChartElementImpl();
+        try {
+            instance.add(val);
+            Assert.fail(""Exception expected"");
+        } catch (UnsupportedOperationException e) {
+        }
+    }"
+(int x),"class normalApproximateProbability {
+public double normalApproximateProbability(int x)  {
+        // Calculate the probability using half-correction.
+        return normal.cumulativeProbability(x + 0.5);
+    }
+}","@Test
+    void testNormalApproximateProbability() {
+        PoissonDistribution dist = new PoissonDistribution(100);
+        double result = dist.normalApproximateProbability(110) -
+            dist.normalApproximateProbability(89);
+        Assertions.assertEquals(0.706281887248, result, 1e-10);
+
+        dist = new PoissonDistribution(10000);
+        result = dist.normalApproximateProbability(10200) -
+            dist.normalApproximateProbability(9899);
+        Assertions.assertEquals(0.820070051552, result, 1E-10);
+    }"
+"(double x, double y)","class y2Lat {
+public double y2Lat(double x, double y)
+    {
+        double lat=lat0;
+        double ro = sqrt(x*x + y*y);
+        if (ro!=0.0)
+        {
+            double c = 2.0 * atan(ro / (2.0 * RADIUS));
+            lat = asin(cos(c) * sin(lat0Rad) + (y * sin(c) * cos(lat0Rad)) / ro);
+            lat = toDegrees(lat);
+        }
+        return lat;
+    }
+}","@Test
+    public void testY2Lat() throws Exception {
+        assertEquals(56.0, transformer.y2Lat(0.0, 0.0), 1e-10);
+        assertEquals(56.0, transformer.y2Lat(6204.034306340757, 4.4884447780805115), 1e-10);
+        assertEquals(56.1, transformer.y2Lat(0.0, 11094.62855321888), 1e-10);
+        assertEquals(56.0, transformer.y2Lat(-6204.034306340658, 4.4884447780805115), 1e-10);
+        assertEquals(55.9, transformer.y2Lat(0.0, -11094.628553220642), 1e-10);
+    }"
+(int offset),"class readInt {
+public int readInt(int offset) {
+        byte[] buf = this.buf;
+        offset += baseOffset;
+        return (buf[offset] & 0xff) |
+                ((buf[offset+1] & 0xff) << 8) |
+                ((buf[offset+2] & 0xff) << 16) |
+                (buf[offset+3] << 24);
+    }
+}","@Test
+    public void testReadInt() {
+        BaseDexBuffer dexBuf = new BaseDexBuffer(new byte[] {0x11, 0x22, 0x33, 0x44});
+        Assert.assertEquals(0x44332211, dexBuf.readInt(0));
+
+        dexBuf = new BaseDexBuffer(new byte[] {0x00, 0x00, 0x00, 0x00});
+        Assert.assertEquals(0, dexBuf.readInt(0));
+
+        dexBuf = new BaseDexBuffer(new byte[] {(byte)0xff, (byte)0xff, (byte)0xff, 0x7f});
+        Assert.assertEquals(Integer.MAX_VALUE, dexBuf.readInt(0));
+
+        dexBuf = new BaseDexBuffer(new byte[] {0x00, 0x00, 0x00, (byte)0x80});
+        Assert.assertEquals(Integer.MIN_VALUE, dexBuf.readInt(0));
+
+        dexBuf = new BaseDexBuffer(new byte[] {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0x80});
+        Assert.assertEquals(0x80ffffff, dexBuf.readInt(0));
+
+        dexBuf = new BaseDexBuffer(new byte[] {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff});
+        Assert.assertEquals(-1, dexBuf.readInt(0));
+    }"
+(double x),"class acos {
+public static double acos(double x) {
+      if (x != x) {
+          return Double.NaN;
+      }
+
+      if (x > 1.0 || x < -1.0) {
+          return Double.NaN;
+      }
+
+      if (x == -1.0) {
+          return Math.PI;
+      }
+
+      if (x == 1.0) {
+          return 0.0;
+      }
+
+      if (x == 0) {
+          return Math.PI/2.0;
+      }
+
+      /* Compute acos(x) = atan(sqrt(1-x*x)/x) */
+
+      /* Split x */
+      double temp = x * HEX_40000000;
+      final double xa = x + temp - temp;
+      final double xb = x - xa;
+
+      /* Square it */
+      double ya = xa*xa;
+      double yb = xa*xb*2.0 + xb*xb;
+
+      /* Subtract from 1 */
+      ya = -ya;
+      yb = -yb;
+
+      double za = 1.0 + ya;
+      double zb = -(za - 1.0 - ya);
+
+      temp = za + yb;
+      zb += -(temp - za - yb);
+      za = temp;
+
+      /* Square root */
+      double y = sqrt(za);
+      temp = y * HEX_40000000;
+      ya = y + temp - temp;
+      yb = y - ya;
+
+      /* Extend precision of sqrt */
+      yb += (za - ya*ya - 2*ya*yb - yb*yb) / (2.0*y);
+
+      /* Contribution of zb to sqrt */
+      yb += zb / (2.0*y);
+      y = ya+yb;
+      yb = -(y - ya - yb);
+
+      // Compute ratio r = y/x
+      double r = y/x;
+
+      // Did r overflow?
+      if (Double.isInfinite(r)) { // x is effectively zero
+          return Math.PI/2; // so return the appropriate value
+      }
+
+      double ra = doubleHighPart(r);
+      double rb = r - ra;
+
+      rb += (y - ra*xa - ra*xb - rb*xa - rb*xb) / x;  // Correct for rounding in division
+      rb += yb / x;  // Add in effect additional bits of sqrt.
+
+      temp = ra + rb;
+      rb = -(temp - ra - rb);
+      ra = temp;
+
+      return atan(ra, rb, x<0);
+    }
+}","@Test
+    public void testAcosSpecialCases() {
+        
+        Assert.assertTrue(""acos(NaN) should be NaN"", Double.isNaN(FastMath.acos(Double.NaN)));
+        
+        Assert.assertTrue(""acos(-1.1) should be NaN"", Double.isNaN(FastMath.acos(-1.1)));
+
+        Assert.assertTrue(""acos(-1.1) should be NaN"", Double.isNaN(FastMath.acos(1.1)));
+        
+        Assert.assertEquals(""acos(-1.0) should be PI"", FastMath.acos(-1.0), FastMath.PI, Precision.EPSILON);
+
+        Assert.assertEquals(""acos(1.0) should be 0.0"", FastMath.acos(1.0), 0.0, Precision.EPSILON);
+
+        Assert.assertEquals(""acos(0.0) should be PI/2"", FastMath.acos(0.0), FastMath.PI / 2.0, Precision.EPSILON);
+    }"
+(double x),"class density {
+@Override
+    public double density(double x) {
+        if (x <= 0) {
+            return 0;
+        }
+        final double x0 = Math.log(x) - scale;
+        final double x1 = x0 / shape;
+        return Math.exp(-0.5 * x1 * x1) / (shape * SQRT2PI * x);
+    }
+}","@Test
+    void testDensity() {
+        final double[] x = new double[]{-2, -1, 0, 1, 2};
+        // R 2.13: print(dlnorm(c(-2,-1,0,1,2)), digits=10)
+        checkDensity(0, 1, x, new double[] {0.0000000000, 0.0000000000,
+                                            0.0000000000, 0.3989422804,
+                                            0.1568740193});
+        // R 2.13: print(dlnorm(c(-2,-1,0,1,2), mean=1.1), digits=10)
+        checkDensity(1.1, 1, x, new double[] {0.0000000000, 0.0000000000,
+                                              0.0000000000, 0.2178521770,
+                                              0.1836267118});
+    }"
+(long projectId),"class getDocusignUrl {
+@Override
+    public ServiceResult<StringResource> getDocusignUrl(long projectId) {
+        return getProject(projectId).andOnSuccessReturn(project -> {
+            User projectManager = getExistingProjectManager(project).get().getUser();
+            return new StringResource(docusignService.getDocusignUrl(project.getSignedGolDocusignDocument().getEnvelopeId(), projectManager.getId(),
+                    projectManager.getName(), projectManager.getEmail(), String.format(""/project-setup/project/%d/offer"", projectId)));
+        });
+    }
+}","@Test
+    public void getDocusignUrl() {
+        List<ProjectUser> pu = newProjectUser().withRole(PROJECT_MANAGER).withUser(user).withOrganisation(nonAcademicUnfunded).withInvite(newProjectUserInvite().build()).build(1);
+
+        Competition competition = newCompetition()
+                .withName(""Competition 1"")
+                .build();
+
+        Application application = newApplication()
+                .withName(""Application 1"")
+                .withCompetition(competition)
+                .build();
+
+        Project p = newProject()
+                .withProjectUsers(pu)
+                .withPartnerOrganisations(newPartnerOrganisation()
+                        .withOrganisation(nonAcademicUnfunded)
+                        .build(1))
+                .withApplication(application)
+                .withUseDocusignForGrantOfferLetter(true)
+                .build();
+
+        when(projectRepository.findById(p.getId())).thenReturn(Optional.of(p));
+
+        DocusignDocument docusignDocument = new DocusignDocument(user.getId(), DocusignType.SIGNED_GRANT_OFFER_LETTER);
+        docusignDocument.setEnvelopeId(""Envelope"");
+        p.setSignedGolDocusignDocument(docusignDocument);
+
+        when(docusignService.getDocusignUrl(""Envelope"", user.getId(), user.getName(), user.getEmail(), String.format(""/project-setup/project/%d/offer"", p.getId())))
+                .thenReturn(""redirectToDocusign"");
+
+        ServiceResult<StringResource> result = service.getDocusignUrl(p.getId());
+
+        assertTrue(result.isSuccess());
+        assertEquals(result.getSuccess().getContent(), ""redirectToDocusign"");
 
     }"
-(int key),"class containsKey {
-public boolean containsKey(int key) {
-    return delegate.containsKey(key);
+"(int width, int height)","class setSize {
+public void setSize(int width, int height) {
+    if (width > 0 && height > 0 & !isDestroy && mRendered && mRenderContainer != null) {
+      ViewGroup.LayoutParams layoutParams = mRenderContainer.getLayoutParams();
+      if (layoutParams != null) {
+        final float realWidth = width;
+        final float realHeight = height;
+        if (mRenderContainer.getWidth() != width || mRenderContainer.getHeight() != height) {
+          layoutParams.width = width;
+          layoutParams.height = height;
+          mRenderContainer.setLayoutParams(layoutParams);
+        }
+
+        if (mRootComp != null && layoutParams != null) {
+          final boolean isWidthWrapContent = layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT;
+          final boolean isHeightWrapContent = layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT;
+
+          WXBridgeManager.getInstance().post(new Runnable() {
+            @Override
+            public void run() {
+              WXBridgeManager.getInstance().setDefaultRootSize(getInstanceId(), realWidth, realHeight, isWidthWrapContent,
+                      isHeightWrapContent);
+            }
+          });
+        }
+      }
+    }
   }
 }","@Test
-  public void testContainsKey() {
-    tIntIntHashMap.containsKey(0);
-    verify(delegate).containsKey(0);
+  public void testSetSize() throws Exception {
+    setupRoot(mInstance);
+    mInstance.setSize(10,10);
   }"
-( int rowOffset ),"class getLong {
+(long position),"class seek {
+public synchronized void seek(long position) throws IOException {
+    if (position < 0 || position >= count) {
+      throw new IOException(""cannot seek position "" + position + "" as it is out of bounds"");
+    }
+    pos = (int) position;
+  }
+}","@Test(expected=IOException.class)
+  public void testSeekNegative() throws IOException {
+    ByteArrayWrapper wrapper = createInstance(16);
+    // seek a negative position
+    wrapper.seek(-2);
+    wrapper.close();
+  }"
+(int key),"class get {
+public V get(int key) {
+    return delegate.get(key);
+  }
+}","@Test
+  public void testGet() {
+    tIntObjectHashMap.get(0);
+    verify(delegate).get(0);
+  }"
+(long timestamp),"class hasHappenDuringCredentialStuffing {
+public boolean hasHappenDuringCredentialStuffing(long timestamp) {
+        return credentialStuffingWindows.contains(timestamp);
+    }
+}","@Test
+    void credentialStuffingShouldExpire() {
+        final long afterCredentialStuffingExpired = CS_EVENT_OCCURRENCE_TIME.plus(CS_DURATION).plus(1, SECONDS).toEpochMilli();
+
+        handleCSEvent();
+        final boolean isActive = registry.hasHappenDuringCredentialStuffing(afterCredentialStuffingExpired);
+
+        assertFalse(isActive);
+    }"
+(boolean expression),"class checkArgument {
+public static void checkArgument(boolean expression) {
+        checkArgumentInternal(expression, true, ""Illegal argument."", EMPTY_ARGUMENTS);
+    }
+}","@Test
+    public void noThrow_strictMode_checkArgument_failure_withComplexMessage_shouldThrowIllegalArgumentException() {
+        NoThrow.setStrictMode(true);
+        try {
+            NoThrow.checkArgument(false, ""I %s fail"", ""should"");
+            fail(""no exception thrown"");
+        } catch (IllegalArgumentException exception) {
+            assertThat(exception.getMessage()).isEqualTo(""I should fail"");
+        }
+    }"
+( int columnIndex ),"class getArray {
 @Override
-  public long getLong( int rowOffset ) throws InvalidAccessException {
-    final long result;
+    public Array getArray( int columnIndex ) throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+}","@Test( expected = SQLFeatureNotSupportedException.class )
+    public void featureNotSupportedCallingGetArrayColName() throws SQLException {
+        resultSet.getArray(""colname"");
+    }"
+(double sec),"class ofSeconds {
+public static Duration ofSeconds(double sec) {
+        return Duration.ofNanos((long) (sec * NANOSEC_IN_SEC));
+    }
+}","@Test
+    public void minus5() {
+        Duration duration = TimeDuration.ofSeconds(10.250);
+        assertThat(duration.minus(Duration.ofMillis(1750)), equalTo(TimeDuration.ofSeconds(8.5)));
+    }"
+(long index),"class indexInPage {
+static int indexInPage(long index) {
+        return (int) (index & PAGE_MASK);
+    }
+}","@Test
+    void indexInPageForNegativeIndex() {
+        assertEquals(PAGE_SIZE - 1L, indexInPage(-1L));
+        assertEquals(PAGE_SIZE - 2L, indexInPage(-2L));
+        assertEquals(0L, indexInPage(Long.MIN_VALUE));
+    }"
+"(int sizeout, int sizein, long in1, long in2)","class evaluateBinary {
+@Override
+	public long evaluateBinary(int sizeout, int sizein, long in1, long in2) {
+		FloatFormat format = FloatFormatFactory.getFloatFormat(sizein);
+		return format.opMult(in1, in2);
+	}
+}","@Test
+	public void testEvaluateBinaryBigInteger() {
+
+		OpBehaviorFloatMult op = new OpBehaviorFloatMult();
+
+		FloatFormat ff = FloatFormatFactory.getFloatFormat(8);
+
+		BigInteger a = ff.getEncoding(BigDecimal.valueOf(2.5d));
+		BigInteger b = ff.getEncoding(BigDecimal.valueOf(1.5d));
+		BigInteger result = op.evaluateBinary(8, 8, a, b);
+		Assert.assertEquals(BigDecimal.valueOf(3.75d), ff.getHostFloat(result));
+
+		b = ff.getEncoding(FloatFormat.BIG_POSITIVE_INFINITY);
+		result = op.evaluateBinary(8, 8, a, b);
+		Assert.assertEquals(FloatFormat.BIG_POSITIVE_INFINITY, ff.getHostFloat(result));
+
+		a = ff.getEncoding(FloatFormat.BIG_NEGATIVE_INFINITY);
+		result = op.evaluateBinary(8, 8, a, b);
+		Assert.assertEquals(FloatFormat.BIG_NEGATIVE_INFINITY, ff.getHostFloat(result));
+
+		b = ff.getEncoding(FloatFormat.BIG_NaN);
+		result = op.evaluateBinary(8, 8, a, b);
+		Assert.assertEquals(FloatFormat.BIG_NaN, ff.getHostFloat(result));
+	}"
+"(
+      double spot,
+      double strike,
+      double timeToExpiry,
+      double lognormalVol,
+      double interestRate,
+      double costOfCarry,
+      boolean isCall)","class dualDelta {
+public static double dualDelta(
+      double spot,
+      double strike,
+      double timeToExpiry,
+      double lognormalVol,
+      double interestRate,
+      double costOfCarry,
+      boolean isCall) {
+
+    ArgChecker.isTrue(spot >= 0d, ""negative/NaN spot; have {}"", spot);
+    ArgChecker.isTrue(strike >= 0d, ""negative/NaN strike; have {}"", strike);
+    ArgChecker.isTrue(timeToExpiry >= 0d, ""negative/NaN timeToExpiry; have {}"", timeToExpiry);
+    ArgChecker.isTrue(lognormalVol >= 0d, ""negative/NaN lognormalVol; have {}"", lognormalVol);
+    ArgChecker.isFalse(Double.isNaN(interestRate), ""interestRate is NaN"");
+    ArgChecker.isFalse(Double.isNaN(costOfCarry), ""costOfCarry is NaN"");
+
+    double discount = 0d;
+    if (-interestRate > LARGE) {
+      return isCall ? Double.NEGATIVE_INFINITY : (costOfCarry > LARGE ? 0d : Double.POSITIVE_INFINITY);
+    }
+    if (interestRate > LARGE) {
+      return 0d;
+    }
+    discount = (Math.abs(interestRate) < SMALL && timeToExpiry > LARGE) ? 1d : Math.exp(-interestRate * timeToExpiry);
+
+    if (spot > LARGE * strike) {
+      return isCall ? -discount : 0d;
+    }
+    if (spot < SMALL * strike) {
+      return isCall ? 0d : discount;
+    }
+
+    int sign = isCall ? 1 : -1;
+    double rootT = Math.sqrt(timeToExpiry);
+    double sigmaRootT = lognormalVol * rootT;
+    if (Double.isNaN(sigmaRootT)) {
+      sigmaRootT = 1d; //ref value is returned
+    }
+
+    double factor = Math.exp(costOfCarry * timeToExpiry);
+    if (Double.isNaN(factor)) {
+      factor = 1d; //ref value is returned
+    }
+    double rescaledSpot = spot * factor;
+
+    double d2 = 0d;
+    if (Math.abs(spot - strike) < SMALL || sigmaRootT > LARGE || (spot > LARGE && strike > LARGE)) {
+      double coefD2 = (costOfCarry / lognormalVol - 0.5 * lognormalVol);
+      double tmp = coefD2 * rootT;
+      d2 = Double.isNaN(tmp) ? 0d : tmp;
+    } else {
+      if (sigmaRootT < SMALL) {
+        return isCall ? (rescaledSpot > strike ? -discount : 0d) : (rescaledSpot < strike ? discount : 0d);
+      }
+      double tmp = costOfCarry * rootT / lognormalVol;
+      double sig = (costOfCarry >= 0d) ? 1d : -1d;
+      double scnd =
+          Double.isNaN(tmp) ? ((lognormalVol < LARGE && lognormalVol > SMALL) ? sig / lognormalVol : sig * rootT) : tmp;
+      d2 = Math.log(spot / strike) / sigmaRootT + scnd - 0.5 * sigmaRootT;
+    }
+    double norm = NORMAL.getCDF(sign * d2);
+
+    return norm < SMALL ? 0d : -sign * discount * norm;
+  }
+}","@Test
+  public void negativeSpotErrordualDeltaTest() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> BlackScholesFormulaRepository.dualDelta(
+            -SPOT, STRIKES_INPUT[1], TIME_TO_EXPIRY, VOLS[1], INTEREST_RATES[1], COST_OF_CARRY, true));
+  }"
+"(double v1[],double v2[])","class distance {
+public static double distance(double v1[],double v2[]){
+		Asserts.assertEqualLength(v1, v2);
+		double res = 0;
+		for(int i=0;i<v1.length;i++){
+			res += Math.pow(v1[i] - v2[i], 2);
+		}
+		return Math.sqrt(res);
+	}
+}","@Test
+	//jfquesada
+	public void auto_test10(){
+		double[] v1 = new double[]{630665, 770623, 842345, 374581, 758958, 27495, 651919, 223576, 167276, 886831};
+		double[] v2 = new double[]{92901, 84318, 38972, 921072, 202252, 440822, 77306, 339670, 646861, 333933};
+		double res = Pharmacological.distance(v1, v2);
+		double ref = 1750537.6115725134;
+		Asserts.assertDistance(ref);
+		Asserts.assertEquals(res, ref);
+	}"
+( int rowOffset ),"class getFloat {
+@Override
+  public float getFloat( int rowOffset ) throws InvalidAccessException {
+    final float result;
     switch ( getType().getMinorType() ) {
       // 1. Regular type:
-      case BIGINT:
-        result = innerAccessor.getLong( rowOffset );
+      case FLOAT4:
+        result = innerAccessor.getFloat( rowOffset );
         break;
 
       // 2. Converted-from types:
-      case TINYINT:
-        result = innerAccessor.getByte( rowOffset );
-        break;
-      case SMALLINT:
-        result = innerAccessor.getShort( rowOffset );
-        break;
       case INT:
         result = innerAccessor.getInt( rowOffset );
         break;
-      case FLOAT4:
-        result = getLongValueOrThrow( innerAccessor.getFloat( rowOffset ),
-                                      ""Java float / SQL REAL/FLOAT"" );
+      case BIGINT:
+        result = innerAccessor.getLong( rowOffset );
         break;
       case FLOAT8:
-        result = getLongValueOrThrow( innerAccessor.getDouble( rowOffset ),
-                                      ""Java double / SQL DOUBLE PRECISION"" );
+        final double value = innerAccessor.getDouble( rowOffset );
+        if ( Float.MIN_VALUE <= value && value <= Float.MAX_VALUE ) {
+          result = (float) value;
+        } else {
+          throw newOverflowException( ""getFloat(...)"",
+                                      ""Java double / SQL DOUBLE PRECISION"",
+                                      value );
+        }
         break;
-
+      case DECIMAL:
+        final BigDecimal decimalValue = innerAccessor.getBigDecimal( rowOffset );
+        final float tempFloat = decimalValue.floatValue();
+        if ( Float.NEGATIVE_INFINITY == tempFloat || Float.POSITIVE_INFINITY == tempFloat) {
+          throw newOverflowException( ""getFloat(...)"",
+            ""Java decimal / SQL DECIMAL PRECISION"",
+            tempFloat );
+        } else {
+          result = tempFloat;
+        }
+        break;
       // 3. Not-yet-converted and unconvertible types:
       default:
-        result = innerAccessor.getLong( rowOffset );
+        result = innerAccessor.getInt( rowOffset );
         break;
     }
     return result;
   }
 }","@Test
-  public void test_getLong_on_SMALLINT_getsIt() throws InvalidAccessException {
+  public void test_getFloat_on_DOUBLE_thatFits_getsIt() throws InvalidAccessException {
     final SqlAccessor uut1 =
-        new TypeConvertingSqlAccessor( new SmallIntStubAccessor( (short) 32767 ) );
-    assertThat( uut1.getLong( 0 ), equalTo( 32767L ) );
+        new TypeConvertingSqlAccessor( new DoubleStubAccessor( 1.125 ) );
+    assertThat( uut1.getFloat( 0 ), equalTo( 1.125f ) );
     final SqlAccessor uut2 =
-        new TypeConvertingSqlAccessor( new SmallIntStubAccessor( (short) -32768 ) );
-    assertThat( uut2.getLong( 0 ), equalTo( -32768L ) );
+        new TypeConvertingSqlAccessor( new DoubleStubAccessor( Float.MAX_VALUE ) );
+    assertThat( uut2.getFloat( 0 ), equalTo( Float.MAX_VALUE ) );
   }"
+(long applicationId),"class getCompetitionByApplicationId {
+@Override
+    public ServiceResult<CompetitionResource> getCompetitionByApplicationId(long applicationId) {
+        return find(application(applicationId)).andOnSuccessReturn(application ->
+                competitionMapper.mapToResource(application.getCompetition()));
+    }
+}","@Test
+    public void getCompetitionByApplicationId() {
+        CompetitionResource competitionResource = newCompetitionResource().build();
+        Competition competition = newCompetition().build();
+        Application application = newApplication()
+                .withCompetition(competition)
+                .build();
+
+        when(applicationRepositoryMock.findById(application.getId())).thenReturn(Optional.of(application));
+        when(competitionMapperMock.mapToResource(competition)).thenReturn(competitionResource);
+
+        CompetitionResource actual = service.getCompetitionByApplicationId(application.getId()).getSuccess();
+
+        assertEquals(competitionResource, actual);
+
+        verify(applicationRepositoryMock, only()).findById(application.getId());
+        verify(competitionMapperMock, only()).mapToResource(competition);
+    }"
+(long competitionId),"class notifyAssessors {
+@Override
+    public RestResult<Void> notifyAssessors(long competitionId) {
+        return putWithRestResult(String.format(""%s/notify-assessors/competition/%s"", assessorRestUrl, competitionId),
+                Void.class);
+    }
+}","@Test
+    public void notifyAssessors() {
+        long competitionId = 1L;
+
+        setupPutWithRestResultExpectations(format(""%s/notify-assessors/competition/%s"", assessorRestUrl,
+                competitionId), HttpStatus.OK);
+
+        RestResult<Void> result = service.notifyAssessors(competitionId);
+        assertTrue(result.isSuccess());
+    }"
