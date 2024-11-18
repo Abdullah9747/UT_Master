@@ -1,6 +1,7 @@
 import os
 import subprocess
 import re
+import javalang
 
 class SPF:
     def build_classfile(self, file_name):
@@ -142,6 +143,62 @@ class JQF:
             print("Stdout:", e.stdout.decode() if e.stdout else "No output")
             print("Stderr:", e.stderr.decode() if e.stderr else "No errors")
 
+    def make_AST(self,function_code):
+        parameters = []
+        class_name=""
+        method_name=""
+        try:
+            tokens = list(javalang.tokenizer.tokenize(function_code))
+            parser = javalang.parser.Parser(tokens)
+            tree = parser.parse()
+
+            for path, node in tree.filter(javalang.tree.ClassDeclaration):
+                class_name = node.name
+
+                for method in node.methods:
+                    method_name = method.name
+                    parameters = [(param.name, param.type.name) for param in method.parameters]
+            return class_name,parameters,method_name
+        except javalang.parser.JavaSyntaxError as e:
+            print(f"Syntax error: {e.description} position {e.at}")
+        except javalang.tokenizer.LexerError as e:
+            print(f"Tokenization error: {str(e)}")
+        except Exception as e:
+            print(f"Unexpected error: {str(e)}")
+
+    def generate_test_file(self,classname,params,method):
+        libraries="""package dev.fuzzit.examplejava;
+import org.junit.runner.RunWith;
+import edu.berkeley.cs.jqf.fuzz.Fuzz;
+import edu.berkeley.cs.jqf.fuzz.JQF;
+
+@RunWith(JQF.class)
+"""
+        test_class=f"public class {classname}Test"+"{ \n\n@Fuzz\npublic void "+"fuzz"+"("
+        for i in range(len(params)):
+            test_class+=params[i][1]+" "+params[i][0]
+            if i!=len(params)-1:
+                test_class+=","
+        test_class+="){\n"
+        test_class+=f"      {classname}.{method}("
+        for i in range(len(params)):
+            test_class+=params[i][0]
+            if i!=len(params)-1:
+                test_class+=","
+        test_class+=");\n}\n}"
+
+        
+
+        file_content=libraries+test_class
+        write_file_name = os.path.join(os.getcwd(), f'JQF-wsl/java-fuzzing-example/src/test/java/dev/fuzzit/examplejava/{classname}Test.java')
+
+        with open(write_file_name, 'w') as file:
+            file.write(file_content)
+        
+        
+
+
+
 
 
 # Fetch current working directory dynamically
@@ -156,4 +213,14 @@ class JQF:
 # stdout, stderr = run_WSL(command)
 
 JQF_object = JQF()
+# JQF_object.run_jqf("AddNumbersTest")
+functions="""package dev.fuzzit.examplejava;
+
+public class AddNumbers {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+}
+"""
+
 JQF_object.run_jqf("AddNumbersTest")
