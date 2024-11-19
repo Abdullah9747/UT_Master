@@ -1,0 +1,24 @@
+# Specify the target class for analysis
+target=demo.StringExample
+
+# Classpath points to where the compiled examples are located
+classpath=${jpf-symbc}/build/examples
+
+# Sourcepath points to the source files (optional, useful for debugging)
+sourcepath=${jpf-symbc}/src/examples
+
+# Specify the method to execute symbolically with a single symbolic string argument
+symbolic.method = demo.StringExample.test(sym)
+
+# Set the decision procedure for string constraints
+symbolic.string_dp=automata
+symbolic.string_dp_timeout_ms=3000
+
+# Set the listener for symbolic execution
+listener=gov.nasa.jpf.symbc.SymbolicListener
+
+# Allow multiple errors to be tracked
+search.multiple_errors=true
+
+# Optionally, specify output directory for generated test cases
+symbolic.test_case_output_dir=./generated_tests
