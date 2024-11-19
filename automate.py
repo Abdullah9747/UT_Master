@@ -212,7 +212,7 @@ import edu.berkeley.cs.jqf.fuzz.JQF;
 # command = f"cd JQF-wsl && ls"
 # stdout, stderr = run_WSL(command)
 
-JQF_object = JQF()
+#JQF_object = JQF()
 # JQF_object.run_jqf("AddNumbersTest")
 functions="""package dev.fuzzit.examplejava;
 
@@ -223,4 +223,13 @@ public class AddNumbers {
 }
 """
 
-JQF_object.run_jqf("AddNumbersTest")
+#JQF_object.run_jqf("AddNumbersTest")
+
+spf = SPF()
+#file_name = "ExampleClass"
+#params = ["sym", "sym"]
+#time_limit = 5  
+#jpf_file_content = spf.generate_jpf_file(file_name, params, time_limit)
+#print(jpf_file_content)
+
+spf.generate_spf_test("NumericExample")
