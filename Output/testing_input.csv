@@ -1,0 +1,61 @@
+Parameter,Function,Test Case
+"(char begin, char end)","class quoted {
+public static Parser<String> quoted(char begin, char end) {
+    Pattern beforeClosingQuote =
+        Patterns.isChar(begin).next(Patterns.many(CharPredicates.notChar(end)));
+    return beforeClosingQuote.toScanner(Character.toString(begin)).next(isChar(end)).source();
+  }
+}","@Test
+  @SuppressWarnings(""deprecation"")
+  public void testQuoted() {
+    Parser<String> scanner = Scanners.quoted(Scanners.isChar('<'), Scanners.isChar('>'),
+        Patterns.INTEGER.toScanner(""number""));
+    assertStringScanner(mode, scanner, ""<>"");
+    assertStringScanner(mode, scanner, ""<123>"");
+    assertFailure(mode, scanner, """", 1, 1);
+    assertFailure(mode, scanner, ""<12"", 1, 4);
+    assertFailure(mode, scanner, ""<a>"", 1, 2);
+  }"
+"(boolean includeDefaultValue, boolean addTypeMarker)","class toMap {
+public Map<String, Object> toMap(boolean includeDefaultValue, boolean addTypeMarker) {
+        Map<String, Object> eventMap = ProtoConcatenator.concatToMap(timestamp, Arrays.asList(header, body), includeDefaultValue);
+
+        if (addTypeMarker) {
+            eventMap.put(""event_type"", GarmadonSerialization.getTypeName(type));
+        }
+
+        // Specific normalization for FS_EVENT
+        if (GarmadonSerialization.TypeMarker.FS_EVENT == type) {
+            String uri = (String) eventMap.get(""uri"");
+            eventMap.computeIfPresent(""src_path"", (k, v) -> ((String) v).replace(uri, """"));
+            eventMap.computeIfPresent(""dst_path"", (k, v) -> ((String) v).replace(uri, """"));
+            eventMap.computeIfPresent(""uri"", (k, v) -> UriHelper.getUniformizedUri((String) v));
+        }
+
+        return eventMap;
+    }
+}","@Test
+    public void testToMapOnInfinityDoubleReturnMaxNegativeValue() {
+        long timestampMillis = System.currentTimeMillis();
+        EventHeaderProtos.Header header = EventHeaderProtos.Header.newBuilder().build();
+        FlinkEventProtos.OperatorEvent.Builder operatorEvent = FlinkEventProtos.OperatorEvent.newBuilder()
+            .setRecordsLagMax(Double.NEGATIVE_INFINITY);
+
+        GarmadonMessage message = new GarmadonMessage(GarmadonSerialization.TypeMarker.FLINK_OPERATOR_EVENT, timestampMillis, header, operatorEvent.build(), null);
+
+        Map<String, Object> map = message.toMap(true, true);
+
+        TestCase.assertEquals(-Double.MAX_VALUE, map.get(""records_lag_max""));
+    }"
+"(char begin, char end)","class quoted {
+public static Parser<String> quoted(char begin, char end) {
+    Pattern beforeClosingQuote =
+        Patterns.isChar(begin).next(Patterns.many(CharPredicates.notChar(end)));
+    return beforeClosingQuote.toScanner(Character.toString(begin)).next(isChar(end)).source();
+  }
+}","@Test
+  public void testQuoted_byChar() {
+    Parser<String> scanner = Scanners.quoted('<', '>');
+    assertStringScanner(mode, scanner, ""<abc123>"");
+    assertFailure(mode, scanner, ""<a"", 1, 3);
+  }"

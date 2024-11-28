@@ -5,6 +5,15 @@ import csv
 import pandas as pd
 import random
 import string
+import pandas as pd
+import javalang
+from javalang.parser import JavaSyntaxError
+import pandas as pd
+import javalang
+import os
+import logging
+
+logging.basicConfig(level=logging.ERROR)
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
@@ -28,6 +37,8 @@ class DataFilter:
 
         # Save the result to a new CSV file
         result_df.to_csv(output_file, index=False)
+        # Print the number of rows in the result
+        print(f"Selected {len(result_df)} rows from {input_file}")
         print(f"Fair selection completed! Selected data saved to {output_file}")
 
     def is_predefined_type_or_zero_params(self, parameter, filter_parameters):
@@ -213,6 +224,54 @@ class DataFilter:
         df_combined.to_csv(output_file, index=False)
         print(f"Combined data saved to {output_file}")
         os.remove(original_file)
-        os.remove(random_file)        
+        os.remove(random_file)
+
+
+    def check_java_function_compatibility(input_csv, output_csv, function_col='Function'):
+        """
+        Filters rows in the input CSV where the Java function code is compilable.
         
+        Parameters:
+            input_csv (str): Path to the input CSV file.
+            output_csv (str): Path to save the filtered output CSV file.
+            function_col (str): Column name for Java functions.
         
+        Returns:
+            pd.DataFrame: DataFrame containing rows with valid Java functions.
+        """
+        # Ensure input_csv is valid
+        if not isinstance(input_csv, str):
+            raise TypeError(f"input_csv must be a string. Got {type(input_csv)} instead.")
+        
+        if not os.path.exists(input_csv):
+            raise FileNotFoundError(f"The file {input_csv} does not exist.")
+        
+        # Read input CSV
+        df = pd.read_csv(input_csv)
+
+        if function_col not in df.columns:
+            raise KeyError(f"Column '{function_col}' not found in the input CSV.")
+
+        def is_compilable(row):
+            """Check if the Java function is compilable."""
+            try:
+                function_code = str(row[function_col])
+                javalang.parse.parse(function_code)
+                return True
+            except (javalang.parser.JavaSyntaxError, ValueError) as e:
+                logging.error(f"Compilation error in row {row.name}: {e}")
+                return False
+
+        # Apply compilation check row by row
+        mask = df.apply(is_compilable, axis=1)
+
+        # Filter and save valid entries
+        df_valid = df[mask]
+        df_valid.to_csv(output_csv, index=False)
+
+        # Print statistics
+        print(f"Total entries: {len(df)}")
+        print(f"Valid entries: {len(df_valid)}")
+        print(f"Dropped entries: {len(df) - len(df_valid)}")
+
+        return df_valid
