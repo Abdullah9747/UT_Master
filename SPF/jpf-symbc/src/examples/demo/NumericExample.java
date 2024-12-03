@@ -28,7 +28,7 @@ public class NumericExample {
 			System.out.println(">0");
 		else
 			System.out.println("<=0");
-		// System.out.println("c "+Debug.getSymbolicIntegerValue(c));
+		System.out.println("c "+Debug.getSymbolicIntegerValue(c));
 	}
 
 	public static void main(String[] args) {

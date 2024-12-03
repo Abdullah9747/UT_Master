@@ -4,10 +4,10 @@ import edu.berkeley.cs.jqf.fuzz.Fuzz;
 import edu.berkeley.cs.jqf.fuzz.JQF;
 
 @RunWith(JQF.class)
-public class AddNumbersTest{ 
+public class hoursToMinutesTest{ 
 
 @Fuzz
-public void fuzz(int a,int b){
-      AddNumbers.add(a,b);
+public void fuzz(int hours){
+      hoursToMinutes.hoursToMinutes(hours);
 }
 }
