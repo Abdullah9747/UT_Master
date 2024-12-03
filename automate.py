@@ -2,7 +2,7 @@ import os
 import subprocess
 import re
 import javalang
-
+import pandas as pd
 class SPF:
     def build_classfile(self, file_name):
         base_dir = r'SPF\jpf-symbc\src\examples\demo'
@@ -25,7 +25,7 @@ class SPF:
         newpath = os.path.join(os.getcwd(), r'SPF\jpf-symbc')
         os.chdir(newpath)
         print('current dir is: ', os.getcwd())
-        command = f'java -Xmx1024m -ea -jar ../jpf-core/build/RunJPF.jar ./src/examples/demo/{file_name}.jpf'
+        command = f'java -Xmx1024m -ea -jar ../jpf-core/build/RunJPF.jar  ./src/examples/demo/{file_name}.jpf'
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
         
         print(result.stdout)
@@ -112,10 +112,11 @@ class JQF:
         # Define the Docker command
         docker_command = (
             "docker run -v %cd%:/app -it maven:3.6.1-jdk-12 /bin/bash -c "
-            f"\"cd /app && java -jar JQF/fuzz/target/jqf-fuzz-2.1-SNAPSHOT-zest-cli.jar --duration=5s "
+            f"\"cd /app && java -jar JQF/fuzz/target/jqf-fuzz-2.1-SNAPSHOT-zest-cli.jar --duration=60s "
             f"-e target/example-java-1.0-SNAPSHOT-fat-tests.jar dev.fuzzit.examplejava.{filename} fuzz\""
         )
 
+# java -jar JQF/fuzz/target/jqf-fuzz-2.1-SNAPSHOT-zest-cli.jar --duration=60s -e target/example-java-1.0-SNAPSHOT-fat-tests.jar dev.fuzzit.examplejava.hoursToMinutesTest fuzz
         # Define the project directory
         project_dir = r"JQF-wsl\java-fuzzing-example"
 
@@ -143,28 +144,37 @@ class JQF:
             print("Stdout:", e.stdout.decode() if e.stdout else "No output")
             print("Stderr:", e.stderr.decode() if e.stderr else "No errors")
 
-    def make_AST(self,function_code):
-        parameters = []
-        class_name=""
-        method_name=""
+    def make_AST(self, function_code):
+        class_name = ""
+        first_method_name = ""
+        first_method_parameters = []
+
         try:
             tokens = list(javalang.tokenizer.tokenize(function_code))
             parser = javalang.parser.Parser(tokens)
             tree = parser.parse()
 
-            for path, node in tree.filter(javalang.tree.ClassDeclaration):
-                class_name = node.name
+            # Traverse the parsed tree
+            for _, class_node in tree.filter(javalang.tree.ClassDeclaration):
+                class_name = class_node.name
 
-                for method in node.methods:
-                    method_name = method.name
-                    parameters = [(param.name, param.type.name) for param in method.parameters]
-            return class_name,parameters,method_name
+                if class_node.methods:  # Check if the class has methods
+                    first_method = next(iter(class_node.methods))  # Get the first method
+                    first_method_name = first_method.name
+                    first_method_parameters = [
+                        (param.name, param.type.name) for param in first_method.parameters
+                    ]
+                    break  # Exit after finding the first method
+
+            return class_name, first_method_name, first_method_parameters
+
         except javalang.parser.JavaSyntaxError as e:
             print(f"Syntax error: {e.description} position {e.at}")
         except javalang.tokenizer.LexerError as e:
             print(f"Tokenization error: {str(e)}")
         except Exception as e:
             print(f"Unexpected error: {str(e)}")
+
 
     def generate_test_file(self,classname,params,method):
         libraries="""package dev.fuzzit.examplejava;
@@ -212,24 +222,34 @@ import edu.berkeley.cs.jqf.fuzz.JQF;
 # command = f"cd JQF-wsl && ls"
 # stdout, stderr = run_WSL(command)
 
-#JQF_object = JQF()
+
 # JQF_object.run_jqf("AddNumbersTest")
-functions="""package dev.fuzzit.examplejava;
+# functions="""package dev.fuzzit.examplejava;
 
-public class AddNumbers {
-    public static int add(int a, int b) {
-        return a + b;
-    }
-}
-"""
+# public class AddNumbers {
+#     public static int add(int a, int b) {
+#         return a + b;
+#     }
+# }
+# """
 
-#JQF_object.run_jqf("AddNumbersTest")
 
-spf = SPF()
-#file_name = "ExampleClass"
-#params = ["sym", "sym"]
-#time_limit = 5  
-#jpf_file_content = spf.generate_jpf_file(file_name, params, time_limit)
-#print(jpf_file_content)
+# spf = SPF()
+# #file_name = "ExampleClass"
+# #params = ["sym", "sym"]
+# #time_limit = 5  
+# #jpf_file_content = spf.generate_jpf_file(file_name, params, time_limit)
+# #print(jpf_file_content)
 
-spf.generate_spf_test("NumericExample")
+# spf.generate_spf_test("NumericExample")exit
+
+
+
+JQF_object = JQF()
+# function_code=""
+# with open("JQF-wsl/java-fuzzing-example/src/main/java/dev/fuzzit/examplejava/calculateGridPaths.java") as f:
+#     function_code = f.read()
+# class_name,method,params=JQF_object.make_AST(function_code)
+# JQF_object.generate_test_file(class_name,params,method)
+
+JQF_object.run_jqf("calculateGridPathsTest")
