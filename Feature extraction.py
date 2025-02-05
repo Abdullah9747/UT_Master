@@ -150,46 +150,46 @@ public static int longestIncreasingSubsequence(int nums,string nums) {
 }
 """
 
-info = extract_function_info(code)
-
-# Write the extracted information to a CSV file
-if info:
-    # Define the CSV file name
-    csv_file = "function_info.csv"
-    
-    # Define the column headers
-    headers = ["Code","Generic Signature", "Partial Placeholder", "Original Signature", "Javadoc", "Full Implementation"]
-    
-    # Write to the CSV file
-    with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
-        writer = csv.DictWriter(file, fieldnames=headers)
-        
-        # Write the header
-        writer.writeheader()
-        
-        # Write the row with the extracted information
-        writer.writerow({
-            "Code": code,
-            "Generic Signature": info["generic_signature"],
-            "Partial Placeholder": info["partial_placeholder"],
-            "Original Signature": info["original_signature"],
-            "Javadoc": info["javadoc"] if info["javadoc"] else "",
-            "Full Implementation": info["full_impl"]
-        })
-    
-    print(f"Function information has been written to {csv_file}")
-else:
-    print("No function information was extracted.")
-
 # info = extract_function_info(code)
+
+# # Write the extracted information to a CSV file
 # if info:
-#     print("Generic Signature:")
-#     print(info["generic_signature"])
-#     print("\nPartial Placeholder:")
-#     print(info["partial_placeholder"])
-#     print("\nOriginal Signature:")
-#     print(info["original_signature"])
-#     print("\nJavadoc:")
-#     print(info["javadoc"])
-#     print("\nFull Implementation:")
-#     print(info["full_impl"])
+#     # Define the CSV file name
+#     csv_file = "function_info.csv"
+    
+#     # Define the column headers
+#     headers = ["Code","Generic Signature", "Partial Placeholder", "Original Signature", "Javadoc", "Full Implementation"]
+    
+#     # Write to the CSV file
+#     with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
+#         writer = csv.DictWriter(file, fieldnames=headers)
+        
+#         # Write the header
+#         writer.writeheader()
+        
+#         # Write the row with the extracted information
+#         writer.writerow({
+#             "Code": code,
+#             "Generic Signature": info["generic_signature"],
+#             "Partial Placeholder": info["partial_placeholder"],
+#             "Original Signature": info["original_signature"],
+#             "Javadoc": info["javadoc"] if info["javadoc"] else "",
+#             "Full Implementation": info["full_impl"]
+#         })
+    
+#     print(f"Function information has been written to {csv_file}")
+# else:
+#     print("No function information was extracted.")
+
+info = extract_function_info(code)
+if info:
+    print("Generic Signature:")
+    print(info["generic_signature"])
+    print("\nPartial Placeholder:")
+    print(info["partial_placeholder"])
+    print("\nOriginal Signature:")
+    print(info["original_signature"])
+    print("\nJavadoc:")
+    print(info["javadoc"])
+    print("\nFull Implementation:")
+    print(info["full_impl"])
