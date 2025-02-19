@@ -7,89 +7,123 @@ from langchain_google_genai import GoogleGenerativeAI as GGAI
 from langchain_openai import ChatOpenAI as COAI
 
 
-def generate_random_string(length=10):
-    """
-    Generates a random string of the specified length.
-    """
-    letters = string.ascii_letters
-    return ''.join(random.choice(letters) for _ in range(length))
-
-def extract_function_info(code):
-    """
-    Extracts information about a single function from the provided code.
-    
-    Returns a dictionary containing:
-      - generic_signature: a signature with a random function name and all parameters replaced with placeholders.
-      - partial_placeholder: a signature with the actual function name, but with all parameter names replaced with random placeholders.
-      - original_signature: the exact signature from the code.
-      - javadoc: the Javadoc comment (if present).
-      - full_impl: the complete function implementation including Javadoc (if available).
-    """
-    # Regex pattern to capture an optional Javadoc, modifiers, return type, function name,
-    # parameters, and the body of the function.
-    pattern = re.compile(
-        r'(?P<javadoc>/\*\*.*?\*/)?\s*'
-        r'(?P<signature>(?:public|protected|private|static|\s)+\s*'
-        r'(?P<return_type>[^\s]+)\s+'
-        r'(?P<func_name>\w+)\s*\('
-        r'(?P<params>[^\)]*)\)\s*\{(?P<body>.*)\})',
-        re.DOTALL
-    )
-    
-    match = re.search(pattern, code)
-    if not match:
-        return None
-    
-    javadoc = match.group('javadoc')
-    signature = match.group('signature')
-    return_type = match.group('return_type')
-    func_name = match.group('func_name')
-    params = match.group('params').strip()
-    
-    # Parse parameters assuming they are separated by commas and are in the format: "type name"
-    param_list = []
-    if params:
-        param_list = [p.strip() for p in params.split(',') if p.strip()]
-    
-    # Build generic_signature: use a random function name and placeholders for every parameter.
-    generic_params = []
-    for p in param_list:
-        parts = p.split()
-        if parts:
-            # The type is everything except the last part (parameter name)
-            p_type = ' '.join(parts[:-1])
-            generic_params.append(f"{p_type} {generate_random_string()}")
-    generic_signature = f"{return_type} {generate_random_string()}({', '.join(generic_params)})"
-    
-    # Build partial_placeholder: use the actual function name, but replace all parameter names with random placeholders.
-    partial_params = []
-    for p in param_list:
-        parts = p.split()
-        if parts:
-            p_type = ' '.join(parts[:-1])
-            partial_params.append(f"{p_type} {generate_random_string()}")
-    partial_placeholder = f"{return_type} {func_name}({', '.join(partial_params)})"
-    
-    # The original signature remains unchanged.
-    original_signature = f"{return_type} {func_name}({params})"
-    
-    # Combine the Javadoc (if any) with the full function implementation.
-    full_impl = ""
-    if javadoc:
-        full_impl += javadoc.strip() + "\n"
-    full_impl += signature.strip()
-    
-    return {
-        "generic_signature": generic_signature,
-        "partial_placeholder": partial_placeholder,
-        "original_signature": original_signature,
-        "javadoc": javadoc.strip() if javadoc else None,
-        "full_impl": full_impl
-    }
 
 class GenerateTestCasesLLM:
     def __init__(self):
         load_dotenv()
+    def generate_random_string(self, length=10):
+        letters = string.ascii_letters
+        return ''.join(random.choice(letters) for _ in range(length))
+
+    def extract_function_info(self,code ):
+        """
+        Extracts information about a single function from the provided code.
+        
+        Returns a dictionary containing:
+        - generic_signature: a signature with a random function name and all parameters replaced with placeholders.
+        - partial_placeholder: a signature with the actual function name, but with all parameter names replaced with random placeholders.
+        - original_signature: the exact signature from the code.
+        - javadoc: the Javadoc comment (if present).
+        - full_impl: the complete function implementation including Javadoc (if available).
+        """
+        # Regex pattern to capture an optional Javadoc, modifiers, return type, function name,
+        # parameters, and the body of the function.
+        pattern = re.compile(
+            r'(?P<javadoc>/\*\*.*?\*/)?\s*'
+            r'(?P<signature>(?:public|protected|private|static|\s)+\s*'
+            r'(?P<return_type>[^\s]+)\s+'
+            r'(?P<func_name>\w+)\s*\('
+            r'(?P<params>[^\)]*)\)\s*\{(?P<body>.*)\})',
+            re.DOTALL
+        )
+        
+        match = re.search(pattern, code)
+        if not match:
+            return None
+        
+        javadoc = match.group('javadoc')
+        signature = match.group('signature')
+        return_type = match.group('return_type')
+        func_name = match.group('func_name')
+        params = match.group('params').strip()
+        
+        # Parse parameters assuming they are separated by commas and are in the format: "type name"
+        param_list = []
+        if params:
+            param_list = [p.strip() for p in params.split(',') if p.strip()]
+        
+        # Build generic_signature: use a random function name and placeholders for every parameter.
+        generic_params = []
+        for p in param_list:
+            parts = p.split()
+            if parts:
+                # The type is everything except the last part (parameter name)
+                p_type = ' '.join(parts[:-1])
+                generic_params.append(f"{p_type} {self.generate_random_string()}")
+        generic_signature = f"{return_type} {self.generate_random_string()}({', '.join(generic_params)})"
+        
+        # Build partial_placeholder: use the actual function name, but replace all parameter names with random placeholders.
+        partial_params = []
+        for p in param_list:
+            parts = p.split()
+            if parts:
+                p_type = ' '.join(parts[:-1])
+                partial_params.append(f"{p_type} {self.generate_random_string()}")
+        partial_placeholder = f"{return_type} {func_name}({', '.join(partial_params)})"
+        
+        # The original signature remains unchanged.
+        original_signature = f"{return_type} {func_name}({params})"
+        
+        # Combine the Javadoc (if any) with the full function implementation.
+        full_impl = ""
+        if javadoc:
+            full_impl += javadoc.strip() + "\n"
+        full_impl += signature.strip()
+        
+        return {
+            "generic_signature": generic_signature,
+            "partial_placeholder": partial_placeholder,
+            "original_signature": original_signature,
+            "javadoc": javadoc.strip() if javadoc else None,
+            "full_impl": full_impl
+        }
+    
+    def driver_LLM(self,java_code,model):
+        info = self.__init_subclass__extract_function_info(java_code)
+        if not info:
+            print("No function information extracted.")
+            return
+        
+        # Initialize the test case generator
+        test_gen = GenerateTestCasesLLM()
+        
+        # Generate test cases for each output
+        outputs = {
+            "generic_signature": info["generic_signature"],
+            "partial_placeholder": info["partial_placeholder"],
+            "original_signature": info["original_signature"],
+            "javadoc": info["javadoc"],
+            "full_impl": info["full_impl"]
+        }
+        
+        for key, value in outputs.items():
+            if value is None:
+                print(f"Skipping {key} as it is None.")
+                continue
+            
+            print(f"Generating test cases for {key}...")
+            result = test_gen.gen_TC_Gemini(value, model)
+            
+            if isinstance(result, Exception):
+                print(f"Error generating test cases for {key}:", result)
+                continue
+            
+            # Write the generated test cases to a file
+            filename = f"TestCases_{key}.java"
+            with open(filename, "w") as f:
+                f.write(result)
+            print(f"Test cases for {key} generated successfully in {filename}")
+
     def gen_TC_Gemini(self, func, model):
         try:
 
@@ -182,66 +216,66 @@ class GenerateTestCasesJQF:
 
 
 
-def main():
-    load_dotenv()
+# def main():
+#     load_dotenv()
     
-    # Example Java code (replace with actual code input as needed)
-    java_code = """
-public class LIS {
+#     # Example Java code (replace with actual code input as needed)
+#     java_code = """
+# public class LIS {
 
-    /**
-     * Computes the longest increasing subsequence (LIS) in an array of integers.
-     *
-     * @param nums the input array of integers
-     * @return a list representing the longest increasing subsequence
-     */
-    public static List<Integer> longestIncreasingSubsequence(int[] nums) {
-        if (nums == null) {
-            throw new IllegalArgumentException("Input array must not be null");
-        }
-        // ... implementation ...
-        return new ArrayList<>();
-    }
-}
-"""
-    # Extract function information using code1's function
-    info = extract_function_info(java_code)
-    if not info:
-        print("No function information extracted.")
-        return
+#     /**
+#      * Computes the longest increasing subsequence (LIS) in an array of integers.
+#      *
+#      * @param nums the input array of integers
+#      * @return a list representing the longest increasing subsequence
+#      */
+#     public static List<Integer> longestIncreasingSubsequence(int[] nums) {
+#         if (nums == null) {
+#             throw new IllegalArgumentException("Input array must not be null");
+#         }
+#         // ... implementation ...
+#         return new ArrayList<>();
+#     }
+# }
+# """
+#     # Extract function information using code1's function
+#     info = extract_function_info(java_code)
+#     if not info:
+#         print("No function information extracted.")
+#         return
     
-    # Initialize the test case generator
-    test_gen = GenerateTestCasesLLM()
+#     # Initialize the test case generator
+#     test_gen = GenerateTestCasesLLM()
     
-    # Generate test cases for each output
-    outputs = {
-        "generic_signature": info["generic_signature"],
-        "partial_placeholder": info["partial_placeholder"],
-        "original_signature": info["original_signature"],
-        "javadoc": info["javadoc"],
-        "full_impl": info["full_impl"]
-    }
+#     # Generate test cases for each output
+#     outputs = {
+#         "generic_signature": info["generic_signature"],
+#         "partial_placeholder": info["partial_placeholder"],
+#         "original_signature": info["original_signature"],
+#         "javadoc": info["javadoc"],
+#         "full_impl": info["full_impl"]
+#     }
     
-    for key, value in outputs.items():
-        if value is None:
-            print(f"Skipping {key} as it is None.")
-            continue
+#     for key, value in outputs.items():
+#         if value is None:
+#             print(f"Skipping {key} as it is None.")
+#             continue
         
-        print(f"Generating test cases for {key}...")
-        result = test_gen.gen_TC_Gemini(value, "gemini-1.5-flash")
+#         print(f"Generating test cases for {key}...")
+#         result = test_gen.gen_TC_Gemini(value, "gemini-1.5-flash")
         
-        if isinstance(result, Exception):
-            print(f"Error generating test cases for {key}:", result)
-            continue
+#         if isinstance(result, Exception):
+#             print(f"Error generating test cases for {key}:", result)
+#             continue
         
-        # Write the generated test cases to a file
-        filename = f"TestCases_{key}.java"
-        with open(filename, "w") as f:
-            f.write(result)
-        print(f"Test cases for {key} generated successfully in {filename}")
+#         # Write the generated test cases to a file
+#         filename = f"TestCases_{key}.java"
+#         with open(filename, "w") as f:
+#             f.write(result)
+#         print(f"Test cases for {key} generated successfully in {filename}")
 
-# if __name__ == "__main__":
-#     main()
+# # if __name__ == "__main__":
+# #     main()
 
 
 obj=GenerateTestCasesJQF()
