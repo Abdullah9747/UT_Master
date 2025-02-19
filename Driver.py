@@ -25,6 +25,11 @@ class Driver:
         f4="gemini-1.5-flash"
         result=self.GTCSPF.gen_TC_Gemini(result,function,f4)
         print(result)
+    
+    def run_LLM(self,function):
+        f4="gemini-1.5-flash"
+        result=self.GTCLLM.driver_LLM(function,f4)
+        print(result)
 
 
 obj=Driver()
