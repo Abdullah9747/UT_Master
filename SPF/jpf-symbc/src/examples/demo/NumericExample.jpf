@@ -1,9 +1,21 @@
 target=demo.NumericExample
 classpath=${jpf-symbc}/build/examples
 sourcepath=${jpf-symbc}/src/examples
-symbolic.method = demo.NumericExample.test(sym#sym)
 
-#symbolic.dp=z3
-listener = .symbc.SymbolicListener
+# Method to analyze
+symbolic.method=demo.NumericExample.test(sym#sym);demo.NumericExample.test1(sym#sym)
 
+# Search settings for BFS
+search.class=.search.heuristic.BFSHeuristic
+search.depth_limit=10
 search.multiple_errors=true
+
+# Debug settings
+symbolic.debug=true
+search.show_progress=true
+vm.storage.class=nil
+
+# Solver settings
+symbolic.dp=coral
+symbolic.min_int=-100
+symbolic.max_int=100
