@@ -1,3 +1,0 @@
-pip install python-dotenv
-pip install langchain-openai
-pip install --upgrade --quiet  langchain-google-genai
