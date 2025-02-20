@@ -33,23 +33,44 @@ class Driver:
 
 
 obj=Driver()
-function2="""public class CalculateTax {
-    public static double calculateTax(double income, int dependents, boolean hasInvestments) {
-        if (income < 0 || dependents < 0) {
+
+
+function3="""public class ElectricityBill {
+    public static double calculateBill(int unitsConsumed, double ratePerUnit, boolean isPeakMonth) {
+        if (unitsConsumed < 0 || ratePerUnit <= 0) {
             throw new IllegalArgumentException("Invalid input values");
         }
-        double taxRate = income > 100000 ? 0.3 : income > 50000 ? 0.2 : 0.1;
-        double baseTax = income * taxRate;
-        if (dependents > 0) {
-            baseTax -= dependents * 2000; // Deduction per dependent
+        double bill = unitsConsumed * ratePerUnit;
+        if (isPeakMonth) {
+            bill *= 1.2; // Surcharge during peak months
+        } 
+        if (unitsConsumed > 500) {
+            bill += 50; // Additional fixed charge for high usage
+        } else if (unitsConsumed < 100) {
+            bill *= 0.9; // Discount for low usage
         }
-        if (hasInvestments) {
-            baseTax *= 0.85; // Investment rebate
-        }
-        return Math.max(baseTax, 0); // Ensure tax is not negative
+        return bill;
     }
 
 }"""
 
 
-obj.run_spf(function2)
+
+function2="""public class WaterUsage {
+    public static double calculateWaterUsage(int familyMembers, int appliances, boolean hasGarden, int dailyUseLiters) {
+        double baseUsage = familyMembers * dailyUseLiters;
+        if (hasGarden) {
+            baseUsage += 50; // Additional for garden
+        }
+        if (appliances > 0) {
+            baseUsage += appliances * 10; // Additional for appliances
+        }
+        if (familyMembers > 5) {
+            baseUsage *= 1.1; // Slight increase for larger families
+        }
+        return baseUsage;
+    }
+
+}"""
+
+obj.run_jqf(function2)

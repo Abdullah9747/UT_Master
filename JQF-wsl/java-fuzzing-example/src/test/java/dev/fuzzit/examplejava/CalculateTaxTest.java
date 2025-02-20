@@ -4,10 +4,10 @@ import edu.berkeley.cs.jqf.fuzz.Fuzz;
 import edu.berkeley.cs.jqf.fuzz.JQF;
 
 @RunWith(JQF.class)
-public class CalculateTaxTest{ 
+public class calculateTaxTest{ 
 
 @Fuzz
 public void fuzz(double income,int dependents,boolean hasInvestments){
-      CalculateTax.calculateTax(income,dependents,hasInvestments);
+      calculateTax.calculateTax(income,dependents,hasInvestments);
 }
 }
