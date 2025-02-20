@@ -1,6 +1,6 @@
 package dev.fuzzit.examplejava;
 
-public class CalculateTax {
+public class calculateTax {
     public static double calculateTax(double income, int dependents, boolean hasInvestments) {
         if (income < 0 || dependents < 0) {
             throw new IllegalArgumentException("Invalid input values");
@@ -19,6 +19,6 @@ public class CalculateTax {
 public static void main(String[] args) {
 
 
-calculateTax(99.31610338951354, 62, true);
+calculateTax(12.005124466373974, 86, false);
 }
 }

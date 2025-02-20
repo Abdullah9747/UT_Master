@@ -20,6 +20,6 @@ public class ElectricityBill {
 public static void main(String[] args) {
 
 
-calculateBill(66, 33.620863284672666, false);
+calculateBill(9, 44.194329864732374, false);
 }
 }

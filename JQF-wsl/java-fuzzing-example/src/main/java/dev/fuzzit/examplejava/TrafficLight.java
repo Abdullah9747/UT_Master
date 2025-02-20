@@ -19,6 +19,6 @@ public class TrafficLight {
 public static void main(String[] args) {
 
 
-calculateGreenLightTime(40, 55, 92, true);
+calculateGreenLightTime(53, 87, 41, false);
 }
 }

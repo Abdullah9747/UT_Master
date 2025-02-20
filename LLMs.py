@@ -5,8 +5,9 @@ import os
 from dotenv import load_dotenv
 from langchain_google_genai import GoogleGenerativeAI as GGAI
 from langchain_openai import ChatOpenAI as COAI
-
-
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain, SequentialChain
+from langchain.schema.runnable import RunnableLambda, RunnablePassthrough, RunnableSequence
 
 class GenerateTestCasesLLM:
     def __init__(self):
@@ -89,13 +90,13 @@ class GenerateTestCasesLLM:
         }
     
     def driver_LLM(self,java_code,model):
-        info = self.__init_subclass__extract_function_info(java_code)
+        info = self.extract_function_info(java_code)
         if not info:
             print("No function information extracted.")
             return
         
         # Initialize the test case generator
-        test_gen = GenerateTestCasesLLM()
+        # test_gen = GenerateTestCasesLLM()
         
         # Generate test cases for each output
         outputs = {
@@ -112,16 +113,23 @@ class GenerateTestCasesLLM:
                 continue
             
             print(f"Generating test cases for {key}...")
-            result = test_gen.gen_TC_Gemini(value, model)
+            result = self.gen_TC_test(value, model)
             
             if isinstance(result, Exception):
                 print(f"Error generating test cases for {key}:", result)
                 continue
             
             # Write the generated test cases to a file
-            filename = f"TestCases_{key}.java"
+            # filename = f"TestCases_{key}.java"
+            # with open(filename, "w") as f:
+            #     f.write(result)
+            folder = "llmsresults"
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+            filename = os.path.join(folder, f"TestCases_{key}.java")
             with open(filename, "w") as f:
                 f.write(result)
+
             print(f"Test cases for {key} generated successfully in {filename}")
 
     def gen_TC_Gemini(self, func, model):
@@ -139,7 +147,56 @@ class GenerateTestCasesLLM:
         except Exception as e:
             print(e)
             return e
-        
+
+    def gen_TC_test(self, func, model):
+        try:
+            llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
+            # Step 1: Analyze the Java function
+            analysis_prompt = PromptTemplate(
+                input_variables=["func"],
+                template="Analyze the following Java function and explain what it does in simple terms:\n\n{func}"
+            )
+            analysis_chain = LLMChain(llm=llm, prompt=analysis_prompt, output_key="analysis")
+
+            # Step 2: Generate test values for statement coverage
+            # can be branch cov.
+            test_values_prompt = PromptTemplate(
+                input_variables=["analysis"],
+                template="Based on this function analysis, generate test values to ensure statement coverage:\n\n{analysis}"
+            )
+            test_values_chain = LLMChain(llm=llm, prompt=test_values_prompt, output_key="test_values")
+
+            # Step 3: Generate JUnit 4 test cases
+            junit_prompt = PromptTemplate(
+                input_variables=["test_values", "func"],
+                template="You are generating a JUnit 4 test file for the given Java function.\n"
+                        "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
+                        "Just return the JUnit 4 test code, no explanations and code block notations."
+            )
+            junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
+
+            # Create the sequential chain
+            overall_chain = SequentialChain(
+                chains=[analysis_chain, test_values_chain, junit_chain],
+                input_variables=["func"],
+                output_variables=["junit_code"]
+            )
+
+            # Run the chain
+            result = overall_chain({"func": func})
+            if "```java" or "```"in result["junit_code"]:
+
+                result["junit_code"]=result["junit_code"].replace("```java","")
+                result["junit_code"]=result["junit_code"].replace("```","")
+                result["junit_code"]=result["junit_code"][1:]
+            return result["junit_code"]
+        except Exception as e:
+            print(e)
+            return e
+
+
+
+
     def gen_TC_GPT(self, func, model):
         try:
             llm = COAI(model=model, api_key=os.getenv("OPENAI_API_KEY"))
@@ -157,6 +214,46 @@ class GenerateTestCasesLLM:
 class GenerateTestCasesSPF:
     def __init__(self):
         load_dotenv()
+    def gen_TC_test(self, func, test_values, model):
+        try:
+            llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
+
+            # Step 1: Analyze the Java function
+            analysis_prompt = PromptTemplate(
+                input_variables=["func"],
+                template="Analyze the following Java function and explain what it does in simple terms:\n\n{func}"
+            )
+            analysis_chain = LLMChain(llm=llm, prompt=analysis_prompt, output_key="analysis")
+
+            # Step 2: Generate JUnit test
+            junit_prompt = PromptTemplate(
+                input_variables=["analysis", "func", "test_values"],
+                template="Based on this function analysis, generate a JUnit 4 test file for the given Java function.\n"
+                        "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
+                        "Just return the JUnit 4 test code, no explanations and code block notations."
+            )
+            junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
+
+            # Create the sequential chain
+            overall_chain = SequentialChain(
+                chains=[analysis_chain, junit_chain],
+                input_variables=["func", "test_values"],
+                output_variables=["junit_code"]
+            )
+
+            # Run the chain
+            result = overall_chain({"func": func, "test_values": test_values})
+
+            # Remove code block notations if present
+            if "```java" in result["junit_code"] or "```" in result["junit_code"]:
+                result["junit_code"] = result["junit_code"].replace("```java", "").replace("```", "").strip()
+
+            return result["junit_code"]
+
+        except Exception as e:
+            print(e)
+            return str(e)
+
     def gen_TC_Gemini(self,output,func,model):
         try:
             llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
@@ -177,6 +274,47 @@ class GenerateTestCasesSPF:
 class GenerateTestCasesJQF:
     def __init__(self):
         load_dotenv()
+
+    def gen_TC_test(self, func, test_values, model):
+        try:
+            llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
+
+            # Step 1: Analyze the Java function
+            analysis_prompt = PromptTemplate(
+                input_variables=["func"],
+                template="Analyze the following Java function and explain what it does in simple terms:\n\n{func}"
+            )
+            analysis_chain = LLMChain(llm=llm, prompt=analysis_prompt, output_key="analysis")
+
+            # Step 2: Generate JUnit test
+            junit_prompt = PromptTemplate(
+                input_variables=["analysis", "func", "test_values"],
+                template="Based on this function analysis, generate a JUnit 4 test file for the given Java function.\n"
+                        "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
+                        "Just return the JUnit 4 test code, no explanations and code block notations."
+            )
+            junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
+
+            # Create the sequential chain
+            overall_chain = SequentialChain(
+                chains=[analysis_chain, junit_chain],
+                input_variables=["func", "test_values"],
+                output_variables=["junit_code"]
+            )
+
+            # Run the chain
+            result = overall_chain({"func": func, "test_values": test_values})
+
+            # Remove code block notations if present
+            if "```java" in result["junit_code"] or "```" in result["junit_code"]:
+                result["junit_code"] = result["junit_code"].replace("```java", "").replace("```", "").strip()
+
+            return result["junit_code"]
+
+        except Exception as e:
+            print(e)
+            return str(e)
+
     def gen_TC_Gemini(self,plot_data,fuzz_log,fun,model):
         try:
             llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
@@ -216,97 +354,3 @@ class GenerateTestCasesJQF:
 
 
 
-# def main():
-#     load_dotenv()
-    
-#     # Example Java code (replace with actual code input as needed)
-#     java_code = """
-# public class LIS {
-
-#     /**
-#      * Computes the longest increasing subsequence (LIS) in an array of integers.
-#      *
-#      * @param nums the input array of integers
-#      * @return a list representing the longest increasing subsequence
-#      */
-#     public static List<Integer> longestIncreasingSubsequence(int[] nums) {
-#         if (nums == null) {
-#             throw new IllegalArgumentException("Input array must not be null");
-#         }
-#         // ... implementation ...
-#         return new ArrayList<>();
-#     }
-# }
-# """
-#     # Extract function information using code1's function
-#     info = extract_function_info(java_code)
-#     if not info:
-#         print("No function information extracted.")
-#         return
-    
-#     # Initialize the test case generator
-#     test_gen = GenerateTestCasesLLM()
-    
-#     # Generate test cases for each output
-#     outputs = {
-#         "generic_signature": info["generic_signature"],
-#         "partial_placeholder": info["partial_placeholder"],
-#         "original_signature": info["original_signature"],
-#         "javadoc": info["javadoc"],
-#         "full_impl": info["full_impl"]
-#     }
-    
-#     for key, value in outputs.items():
-#         if value is None:
-#             print(f"Skipping {key} as it is None.")
-#             continue
-        
-#         print(f"Generating test cases for {key}...")
-#         result = test_gen.gen_TC_Gemini(value, "gemini-1.5-flash")
-        
-#         if isinstance(result, Exception):
-#             print(f"Error generating test cases for {key}:", result)
-#             continue
-        
-#         # Write the generated test cases to a file
-#         filename = f"TestCases_{key}.java"
-#         with open(filename, "w") as f:
-#             f.write(result)
-#         print(f"Test cases for {key} generated successfully in {filename}")
-
-# # if __name__ == "__main__":
-# #     main()
-
-
-obj=GenerateTestCasesJQF()
-
-f1="E:/FYP/UT_Master/TestValGen/JQF-wsl/java-fuzzing-example/fuzz-results/plot_data"
-f2="E:/FYP/UT_Master/TestValGen/JQF-wsl/java-fuzzing-example/fuzz-results/fuzz.log"
-
-f3="""public class WaterUsage {
-    public static double calculateWaterUsage(int familyMembers, int appliances, boolean hasGarden, int dailyUseLiters) {
-        double baseUsage = familyMembers * dailyUseLiters;
-        if (hasGarden) {
-            baseUsage += 50; // Additional for garden
-        }
-        if (appliances > 0) {
-            baseUsage += appliances * 10; // Additional for appliances
-        }
-        if (familyMembers > 5) {
-            baseUsage *= 1.1; // Slight increase for larger families
-        }
-        return baseUsage;
-    }
-
-}"""
-f4="gemini-1.5-flash"
-
-result=obj.gen_TC_Gemini(f1,f2,f3,f4)
-print(result)
-# with open("E:/FYP/UT_Master/TestValGen/JQF-wsl/java-fuzzing-example/fuzz-results/plot_data", "r") as f:
-#     plot_data = f.read()
-
-# with open("E:/FYP/UT_Master/TestValGen/JQF-wsl/java-fuzzing-example/fuzz-results/fuzz.log", "r") as f:
-#     fuzz_log = f.read()
-
-# print(fuzz_log)
