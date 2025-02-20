@@ -24,7 +24,7 @@ class Driver:
     def run_spf(self,function):
         result=self.spf.driverspf(function)
         f4="gemini-1.5-flash"
-        result=self.GTCSPF.gen_TC_Gemini(result,function,f4)
+        result=self.GTCSPF.gen_TC_test(function,result,f4)
         print(result)
     
     def run_LLM(self,function):
