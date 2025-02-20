@@ -39,7 +39,12 @@ def main():
     functionsno=[i-1 for i in functionsno]
     functions=pd.read_csv("ExtractedData.csv",usecols=["Function"],skiprows= lambda x: x not in functionsno and x!=0) 
     functions=functions.drop_duplicates()
+    functions=functions.reset_index(drop=True)
     print(functions)
+    with open("functions.csv","w") as f:
+
+        functions.to_csv(f)
+
     driver=Driver()
     for i in range(len(functions)):
         function=functions.iloc[i][0]

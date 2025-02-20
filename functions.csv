@@ -1,0 +1,157 @@
+,Function
+0,"class hash {
+public static int hash(int data, int seed) {
+    return hash(ByteBuffer.wrap(Ints.toByteArray(data)), seed);
+  }
+}"
+3,"class of {
+public static Ordinal of(int oneBased) {
+    return oneBased > 0 && oneBased <= FIRST.length ? FIRST[oneBased - 1] : new Ordinal(oneBased);
+  }
+}"
+4,"class removeField {
+public void removeField(int fieldNum)
+	{
+		// range check
+		if (fieldNum < 0 || fieldNum >= this.numFields) {
+			throw new IndexOutOfBoundsException();
+		}
+		int lastIndex = this.numFields - 1;		
+
+		if (fieldNum < lastIndex) {
+			int len = lastIndex - fieldNum;
+			System.arraycopy(this.offsets, fieldNum + 1, this.offsets, fieldNum, len);
+			System.arraycopy(this.lengths, fieldNum + 1, this.lengths, fieldNum, len);
+			System.arraycopy(this.readFields, fieldNum + 1, this.readFields, fieldNum, len);
+			System.arraycopy(this.writeFields, fieldNum + 1, this.writeFields, fieldNum, len);
+			markModified(fieldNum);
+		}
+		this.offsets[lastIndex] = NULL_INDICATOR_OFFSET;
+		this.lengths[lastIndex] = 0;
+		this.writeFields[lastIndex] = null;
+
+		setNumFields(lastIndex);
+	}
+}"
+5,"class getPreferredJavaType {
+public static String getPreferredJavaType(int sqlType, int size,
+			int decimalDigits) {
+		if ((sqlType == Types.DECIMAL || sqlType == Types.NUMERIC)
+				&& decimalDigits == 0) {
+			if (size == 1) {
+				// https://sourceforge.net/tracker/?func=detail&atid=415993&aid=662953&group_id=36044
+				return ""java.lang.Boolean"";
+			} else if (size < 3) {
+				return ""java.lang.Byte"";
+			} else if (size < 5) {
+				return ""java.lang.Short"";
+			} else if (size < 10) {
+				return ""java.lang.Integer"";
+			} else if (size < 19) {
+				return ""java.lang.Long"";
+			} else {
+				return ""java.math.BigDecimal"";
+			}
+		}
+		String result = _preferredJavaTypeForSqlType.getString(sqlType);
+		if (result == null) {
+			result = ""java.lang.Object"";
+		}
+		return result;
+	}
+}"
+6,"class convert {
+String convert(int number) {
+       StringBuilder result = new StringBuilder();
+       result.append(number % 3 == 0 ? ""Pling"" : """");
+       result.append(number % 5 == 0 ? ""Plang"" : """");
+       result.append(number % 7 == 0 ? ""Plong"" : """");
+
+       result = result.length() == 0 ? result.append(number) : result;
+       return result.toString();
+}
+}"
+7,"class isFree {
+public boolean isFree(int count) {
+        if (count < 0) {
+            throw new IllegalArgumentException(""Count cannot be negative"");
+        }
+        return (free() >= count);
+    }
+}"
+8,"class CollectorSource {
+public CollectorSource(int port) {
+    this.src = new ThriftEventSource(port);
+    this.port = port;
+  }
+}"
+9,"class normalize {
+public static int normalize(int i, int bitCount) {
+        int max = 0xffffffff >>> (32 - bitCount);
+        if (i > max)
+            throw new IllegalArgumentException(""The integer cannot fit to bit boundaries."");
+        if (i > (max >>> 1))
+            return i - (max + 1);
+        else
+            return i;
+    }
+}"
+10,"class getQuick {
+@Override
+  public double getQuick(int index) {
+    return vector.getQuick(offset + index);
+  }
+}"
+11,"class getBuffer {
+@Override
+    public ByteBuffer getBuffer(int size) throws IOException {
+        return ByteBuffer.allocate(size);
+    }
+}"
+12,"class dropPartition {
+public void dropPartition(int partitionId) {
+        synchronized (perPartitionDayWriters) {
+            perPartitionDayWriters.remove(partitionId);
+            perPartitionStartOffset.remove(partitionId);
+        }
+    }
+}"
+13,"class getBuffer {
+@Override
+    public ByteBuffer getBuffer(int size) throws IOException {
+        if (raf == null) {
+            raf = new RandomAccessFile(file, ""rw"");
+        }
+        return raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, size);
+    }
+}"
+18,"class setColspan {
+public Column setColspan(int colspan) {
+        this.colspan = checkColspan(colspan);
+        return this;
+    }
+}"
+20,"class viewPart {
+@Override
+  public Vector viewPart(int offset, int length) {
+    if (offset < 0) {
+      throw new IndexException(offset, size());
+    }
+    if (offset + length > size()) {
+      throw new IndexException(offset + length, size());
+    }
+    return new VectorView(vector, offset + this.offset, length);
+  }
+}"
+21,"class expireAtMonth {
+public long expireAtMonth(int addMonth, int atDay, int atHour, int atMin) {
+		long curTime = System.currentTimeMillis();
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MONTH, addMonth);
+		calendar.set(Calendar.DAY_OF_MONTH, atDay);
+		calendar.set(Calendar.HOUR_OF_DAY, atHour);
+		calendar.set(Calendar.MINUTE, atMin);
+		long result = (calendar.getTimeInMillis() - curTime) / 1000;
+		return result;
+	}
+}"
