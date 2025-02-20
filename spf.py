@@ -67,11 +67,27 @@ class SPF:
         return self.extract_specific_part(result.stdout + result.stderr)
 
     def extract_specific_part(self, output):
-        pattern = r"Method Summaries(.*?)====="
-        match = re.search(pattern, output, re.DOTALL)
-        if match:
-            print(match.group(1).strip())
-            return match.group(1).strip()
+        # Process output line by line
+        lines = output.splitlines()
+        # Expected line format:
+        # demo.ClassName.MethodName(...params...)  --> Return Value: ...
+        pattern = r"demo.[^.]+.[^(]+((.?))\s--> Return Value:\s(.+)"
+        for line in lines:
+            line = line.strip()
+            match = re.search(pattern, line)
+            if match:
+                params_list = match.group(1)
+                ret_val = match.group(2).strip()
+                # Remove any extra annotation enclosed in parentheses from parameters,
+                # for example, remove "(don't care)" from " -9223372036854775808(don't care)"
+                params_clean = re.sub(r'\s([^)]*)', '', params_list)
+                # Build the final result string
+                final_val = f"({params_clean}) --> Return Value: {ret_val}"
+                # Remove extra white spaces by splitting on any whitespace and rejoining with a single space
+                final_val = ' '.join(final_val.split())
+                print(final_val)
+                return(final_val)
+            # If no match, optionally print the line (or skip)
 
     def generate_jpf_file(self, file_name, params):
         params= [f'sym' for param in params]
