@@ -86,7 +86,8 @@ class GenerateTestCasesLLM:
             "partial_placeholder": partial_placeholder,
             "original_signature": original_signature,
             "javadoc": javadoc.strip() if javadoc else None,
-            "full_impl": full_impl
+            "full_impl": full_impl,
+            "func_name": func_name
         }
     
     def driver_LLM(self,java_code,model):
@@ -104,8 +105,11 @@ class GenerateTestCasesLLM:
             "partial_placeholder": info["partial_placeholder"],
             "original_signature": info["original_signature"],
             "javadoc": info["javadoc"],
-            "full_impl": info["full_impl"]
+            "full_impl": info["full_impl"],
+            
+
         }
+        func_name=info["func_name"]
         
         for key, value in outputs.items():
             if value is None:
@@ -126,7 +130,7 @@ class GenerateTestCasesLLM:
             folder = "llmsresults"
             if not os.path.exists(folder):
                 os.makedirs(folder)
-            filename = os.path.join(folder, f"TestCases_{key}.java")
+            filename = os.path.join(folder, f"{func_name}_TestCases_{key}.java")
             with open(filename, "w") as f:
                 f.write(result)
 
@@ -169,7 +173,7 @@ class GenerateTestCasesLLM:
             # Step 3: Generate JUnit 4 test cases
             junit_prompt = PromptTemplate(
                 input_variables=["test_values", "func"],
-                template="You are generating a JUnit 4 test file for the given Java function.\n"
+                template="You are going to generate a JUnit 4 test file for the given Java function.\n"
                         "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
                         "Just return the JUnit 4 test code, no explanations and code block notations."
             )
@@ -228,7 +232,7 @@ class GenerateTestCasesSPF:
             # Step 2: Generate JUnit test
             junit_prompt = PromptTemplate(
                 input_variables=["analysis", "func", "test_values"],
-                template="Based on this function analysis, generate a JUnit 4 test file for the given Java function.\n"
+                template="Based on this function {analysis}, generate a JUnit 4 test file for the given Java function.\n"
                         "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
                         "Just return the JUnit 4 test code, no explanations and code block notations."
             )
