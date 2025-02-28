@@ -18,6 +18,6 @@ public class WaterUsage {
 public static void main(String[] args) {
 
 
-calculateWaterUsage(34, 28, true, 69);
+calculateWaterUsage(59, 5, false, 79);
 }
 }

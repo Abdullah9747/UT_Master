@@ -136,23 +136,23 @@ class GenerateTestCasesLLM:
 
             print(f"Test cases for {key} generated successfully in {filename}")
 
+    # def gen_TC_Gemini(self, func, model):
+    #     try:
+
+    #         llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
+    #         messages = [
+    #             ("system", "You are going to generate Junit4 file for the given Java function and do not write anything else like ```java or ```"),
+    #             ("human", "Just give me Junit directly I do not need any other information or code block elements"),
+    #             ("human", func)
+    #         ]
+    #         response = llm.invoke(messages)
+    #         cleaned_response = response.strip("```java").strip("```").strip()
+    #         return cleaned_response
+    #     except Exception as e:
+    #         print(e)
+    #         return e
+
     def gen_TC_Gemini(self, func, model):
-        try:
-
-            llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
-            messages = [
-                ("system", "You are going to generate Junit4 file for the given Java function and do not write anything else like ```java or ```"),
-                ("human", "Just give me Junit directly I do not need any other information or code block elements"),
-                ("human", func)
-            ]
-            response = llm.invoke(messages)
-            cleaned_response = response.strip("```java").strip("```").strip()
-            return cleaned_response
-        except Exception as e:
-            print(e)
-            return e
-
-    def gen_TC_test(self, func, model):
         try:
             llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
             # Step 1: Analyze the Java function
@@ -175,6 +175,7 @@ class GenerateTestCasesLLM:
                 input_variables=["test_values", "func"],
                 template="You are going to generate a JUnit 4 test file for the given Java function.\n"
                         "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
+                        "While writing test make sure to give correct values for both input and what to expect as output."
                         "Just return the JUnit 4 test code, no explanations and code block notations."
             )
             junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
@@ -204,12 +205,46 @@ class GenerateTestCasesLLM:
     def gen_TC_GPT(self, func, model):
         try:
             llm = COAI(model=model, api_key=os.getenv("OPENAI_API_KEY"))
-            messages = [
-                ("system", "You are going to generate Junit4 file for the given Java function and do not write anything else like ```java or ```"),
-                ("human", func)
-            ]
-            response = llm.invoke(messages)
-            return response.content
+            # Step 1: Analyze the Java function
+            analysis_prompt = PromptTemplate(
+                input_variables=["func"],
+                template="Analyze the following Java function and explain what it does in simple terms:\n\n{func}"
+            )
+            analysis_chain = LLMChain(llm=llm, prompt=analysis_prompt, output_key="analysis")
+
+            # Step 2: Generate test values for statement coverage
+            # can be branch cov.
+            test_values_prompt = PromptTemplate(
+                input_variables=["analysis"],
+                template="Based on this function analysis, generate test values to ensure statement coverage:\n\n{analysis}"
+            )
+            test_values_chain = LLMChain(llm=llm, prompt=test_values_prompt, output_key="test_values")
+
+            # Step 3: Generate JUnit 4 test cases
+            junit_prompt = PromptTemplate(
+                input_variables=["test_values", "func"],
+                template="You are going to generate a JUnit 4 test file for the given Java function.\n"
+                        "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
+                        "While writing test make sure to give correct values for both input and what to expect as output."
+                        "Just return the JUnit 4 test code, no explanations and code block notations."
+            )
+            junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
+
+            # Create the sequential chain
+            overall_chain = SequentialChain(
+                chains=[analysis_chain, test_values_chain, junit_chain],
+                input_variables=["func"],
+                output_variables=["junit_code"]
+            )
+
+            # Run the chain
+            result = overall_chain({"func": func})
+            if "```java" or "```"in result["junit_code"]:
+
+                result["junit_code"]=result["junit_code"].replace("```java","")
+                result["junit_code"]=result["junit_code"].replace("```","")
+                result["junit_code"]=result["junit_code"][1:]
+            return result["junit_code"]
         except Exception as e:
             print(e)
             return e
@@ -218,7 +253,7 @@ class GenerateTestCasesLLM:
 class GenerateTestCasesSPF:
     def __init__(self):
         load_dotenv()
-    def gen_TC_test(self, func, test_values, model):
+    def gen_TC_Gemini(self, func, test_values, model):
         try:
             llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
 
@@ -234,6 +269,7 @@ class GenerateTestCasesSPF:
                 input_variables=["analysis", "func", "test_values"],
                 template="Based on this function {analysis}, generate a JUnit 4 test file for the given Java function.\n"
                         "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
+                        "While writing test make sure to give correct values for both input and what to expect as output."
                         "Just return the JUnit 4 test code, no explanations and code block notations."
             )
             junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
@@ -258,28 +294,28 @@ class GenerateTestCasesSPF:
             print(e)
             return str(e)
 
-    def gen_TC_Gemini(self,output,func,model):
-        try:
-            llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
-            messages = [
-                ("system", "You are going to generate Junit4 file for the given Java function and do not write anything else like ```java or ```"),
-                ("human", "Just give me Junit directly I do not need any other information or code block elements"),
-                ("human", f"Function: {func}"),
-                ("human", f"Output: {output}")
-            ]
-            response = llm.invoke(messages)
-            cleaned_response = response.replace("```java","").replace("```","")
-            return cleaned_response
-        except Exception as e:
-            print(e)
-            return e
+    # def gen_TC_Gemini(self,output,func,model):
+    #     try:
+    #         llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
+    #         messages = [
+    #             ("system", "You are going to generate Junit4 file for the given Java function and do not write anything else like ```java or ```"),
+    #             ("human", "Just give me Junit directly I do not need any other information or code block elements"),
+    #             ("human", f"Function: {func}"),
+    #             ("human", f"Output: {output}")
+    #         ]
+    #         response = llm.invoke(messages)
+    #         cleaned_response = response.replace("```java","").replace("```","")
+    #         return cleaned_response
+    #     except Exception as e:
+    #         print(e)
+    #         return e
     
 
 class GenerateTestCasesJQF:
     def __init__(self):
         load_dotenv()
 
-    def gen_TC_test(self, func, test_values, model):
+    def gen_TC_Gemini(self, valid, failures,func, model):
         try:
             llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
 
@@ -292,9 +328,11 @@ class GenerateTestCasesJQF:
 
             # Step 2: Generate JUnit test
             junit_prompt = PromptTemplate(
-                input_variables=["analysis", "func", "test_values"],
+                input_variables=["analysis", "func", "valid", "failures"],
                 template="Based on this function analysis, generate a JUnit 4 test file for the given Java function.\n"
-                        "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
+                        "I will be providing you with the valid and failure test values.\n"
+                        "Use these Valid values: {valid} and also these are test values in case of any failure : {failures}\n\nFunction:\n{func}\n\n"
+                        "While writing test make sure to give correct values for both input and what to expect as output."
                         "Just return the JUnit 4 test code, no explanations and code block notations."
             )
             junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
@@ -302,12 +340,12 @@ class GenerateTestCasesJQF:
             # Create the sequential chain
             overall_chain = SequentialChain(
                 chains=[analysis_chain, junit_chain],
-                input_variables=["func", "test_values"],
+                input_variables=["func", "valid", "failures"],
                 output_variables=["junit_code"]
             )
 
             # Run the chain
-            result = overall_chain({"func": func, "test_values": test_values})
+            result = overall_chain({"func": func, "valid": valid,"failures":failures})
 
             # Remove code block notations if present
             if "```java" in result["junit_code"] or "```" in result["junit_code"]:
@@ -319,23 +357,23 @@ class GenerateTestCasesJQF:
             print(e)
             return str(e)
 
-    def gen_TC_Gemini(self,plot_data,fuzz_log,fun,model):
-        try:
-            llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
-            messages = [
-                ("system", "You are going to generate Junit4 file for the given Java function and do not write anything else like ```java or ```"),
-                ("human", "Just give me Junit directly I do not need any other information or code block elements"),
-                ("human", "I am going to give you the plot data and fuzz log from JQF containing the test values along with logs"),
-                ("human", f"Function: {fun}"),
-                ("human", f"Plot Data: {plot_data}"),
-                ("human", f"Fuzz Log: {fuzz_log}")
-            ]
-            response = llm.invoke(messages)
-            cleaned_response=response.replace("```java","").replace("```","")
-            return cleaned_response
-        except Exception as e:
-            print(e)
-            return e
+    # def gen_TC_Gemini(self,plot_data,fuzz_log,fun,model):
+    #     try:
+    #         llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
+    #         messages = [
+    #             ("system", "You are going to generate Junit4 file for the given Java function and do not write anything else like ```java or ```"),
+    #             ("human", "Just give me Junit directly I do not need any other information or code block elements"),
+    #             ("human", "I am going to give you the plot data and fuzz log from JQF containing the test values along with logs"),
+    #             ("human", f"Function: {fun}"),
+    #             ("human", f"Plot Data: {plot_data}"),
+    #             ("human", f"Fuzz Log: {fuzz_log}")
+    #         ]
+    #         response = llm.invoke(messages)
+    #         cleaned_response=response.replace("```java","").replace("```","")
+    #         return cleaned_response
+    #     except Exception as e:
+    #         print(e)
+    #         return e
        
         
     def gen_TC_GPT(self,plot_data,fuzz_log,fun,model):

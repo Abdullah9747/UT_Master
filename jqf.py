@@ -9,7 +9,10 @@ import numpy as np
 
 
 
+
 class JQF:
+    def __init__(self):
+        self.maindir=os.getcwd()
     def prepare_JQf(self,function_code):
         class_name,method,params=self.make_AST(function_code)
         self.make_JQF_file(class_name,function_code)
@@ -21,6 +24,8 @@ class JQF:
         file_name= self.prepare_JQf(function_code)
         jqf_file_name = f"{file_name}Test"
         self.run_jqf(jqf_file_name)
+        valid_inputs,failure_inputs=self.compile_results(file_name)
+        return valid_inputs,failure_inputs
 
 
     def provide_main(self, file_content):
@@ -28,7 +33,6 @@ class JQF:
         class_name, method, params = self.make_AST(file_content)
         main_content = "public static void main(String[] args) {\n"
         for i in range(len(params)):
-            print(params[i])
             param_type = params[i][1]
             if "[]" in params[i][1]:
                 array_dim = params[i][1].count("[]")    
@@ -155,24 +159,27 @@ class JQF:
 
     def make_JQF_file(self, file_name, file_content):
         # Define the project directory
-        project_dir = r"JQF-wsl\java-fuzzing-example"
+        project_dir = r"JQF\examples"
         file_content=self.provide_main(file_content)
         # Define the file path
-        file_path = os.path.join(project_dir, f"src/main/java/dev/fuzzit/examplejava/{file_name}.java")
-        file_content=f"package dev.fuzzit.examplejava;\n\n{file_content}"
+        file_path = os.path.join(project_dir,f"src/main/java/edu/berkeley/cs/jqf/examples/{file_name}.java")
+        file_content=f"package edu.berkeley.cs.jqf.examples;\n\n{file_content}"
         # Write the file content
         with open(file_path, 'w') as file:
             file.write(file_content)
     def run_jqf_with_compilig(self,filename):
-        docker_command = (
-            "docker run -v %cd%:/app -it maven:3.6.1-jdk-12 /bin/bash -c "
-            f"\"cd /app && mvn package && java -jar JQF/fuzz/target/jqf-fuzz-2.1-SNAPSHOT-zest-cli.jar --duration=60s "
-            f"-e target/example-java-1.0-SNAPSHOT-fat-tests.jar dev.fuzzit.examplejava.{filename} fuzz\""
-        )
+        command = (f"mvn clean install -DskipTests && mvn package &&" 
+            f"mvn jqf:fuzz \"-Dclass=edu.berkeley.cs.jqf.examples.{filename}\" \"-Dmethod=fuzz\"  \"-Dtime=1m\"")
+
+#         docker_command = (
+#     "docker run -v %cd%:/app -it maven:3.6.1-jdk-12 /bin/bash -c "
+#     f"\"cd /app && mvn package && java -jar JQF/fuzz/target/jqf-fuzz-2.1-SNAPSHOT-zest-cli.jar --duration=60s "
+#     f"-e target/example-java-1.0-SNAPSHOT-fat-tests.jar dev.fuzzit.examplejava.{filename} fuzz\""
+# )
 
 # java -jar JQF/fuzz/target/jqf-fuzz-2.1-SNAPSHOT-zest-cli.jar --duration=60s -e target/example-java-1.0-SNAPSHOT-fat-tests.jar dev.fuzzit.examplejava.hoursToMinutesTest fuzz
         # Define the project directory
-        project_dir = r"JQF-wsl\java-fuzzing-example"
+        project_dir = r"JQF\examples"
 
         try:
             # Change to the project directory
@@ -180,7 +187,7 @@ class JQF:
 
             # Run the Docker command and capture output
             result = subprocess.run(
-                docker_command,
+                command,
                 shell=True,
                 check=True,
                 stdout=subprocess.PIPE,
@@ -188,7 +195,7 @@ class JQF:
             )
 
             # Print output from the Docker command
-            print("Docker command output:")
+            print("Command output:")
             print(result.stdout.decode())
 
         except FileNotFoundError:
@@ -201,15 +208,19 @@ class JQF:
 
     def run_jqf(self,filename):
         # Define the Docker command
-        docker_command = (
-            "docker run -v %cd%:/app -it maven:3.6.1-jdk-12 /bin/bash -c "
-            f"\"cd /app && java -jar JQF/fuzz/target/jqf-fuzz-2.1-SNAPSHOT-zest-cli.jar --duration=60s "
-            f"-e target/example-java-1.0-SNAPSHOT-fat-tests.jar dev.fuzzit.examplejava.{filename} fuzz\""
+        # docker_command = (
+        #     "docker run -v %cd%:/app -it maven:3.6.1-jdk-12 /bin/bash -c "
+        #     f"\"cd /app && java  -jar JQF/fuzz/target/jqf-fuzz-2.1-SNAPSHOT-zest-cli.jar --duration=60s "
+        #     f"-e target/example-java-1.0-SNAPSHOT-fat-tests.jar dev.fuzzit.examplejava.{filename} fuzz\""
+        # )
+        command = (
+        f"mvn jqf:fuzz \"-Dclass=edu.berkeley.cs.jqf.examples.{filename}\" \"-Dmethod=fuzz\"  \"-Dtime=1m\""
         )
+
 
 # java -jar JQF/fuzz/target/jqf-fuzz-2.1-SNAPSHOT-zest-cli.jar --duration=60s -e target/example-java-1.0-SNAPSHOT-fat-tests.jar dev.fuzzit.examplejava.hoursToMinutesTest fuzz
         # Define the project directory
-        project_dir = r"JQF-wsl\java-fuzzing-example"
+        project_dir = r"JQF\examples"
 
         try:
             # Change to the project directory
@@ -217,7 +228,7 @@ class JQF:
 
             # Run the Docker command and capture output
             result = subprocess.run(
-                docker_command,
+                command,
                 shell=True,
                 check=True,
                 stdout=subprocess.PIPE,
@@ -225,7 +236,7 @@ class JQF:
             )
 
             # Print output from the Docker command
-            print("Docker command output:")
+            print("Command output:")
             print(result.stdout.decode())
 
         except FileNotFoundError:
@@ -282,7 +293,7 @@ class JQF:
 
 
     def generate_test_file(self,classname,params,method):
-        libraries="""package dev.fuzzit.examplejava;
+        libraries="""package edu.berkeley.cs.jqf.examples;
 import org.junit.runner.RunWith;
 import edu.berkeley.cs.jqf.fuzz.Fuzz;
 import edu.berkeley.cs.jqf.fuzz.JQF;
@@ -305,10 +316,25 @@ import edu.berkeley.cs.jqf.fuzz.JQF;
         
 
         file_content=libraries+test_class
-        write_file_name = os.path.join(os.getcwd(), f'JQF-wsl/java-fuzzing-example/src/test/java/dev/fuzzit/examplejava/{classname}Test.java')
+        write_file_name = os.path.join(os.getcwd(), f'JQF/examples/src/test/java/edu/berkeley/cs/jqf/examples/{classname}Test.java')
 
         with open(write_file_name, 'w') as file:
             file.write(file_content)
+    def compile_results_content(self,filename,folder):
         
+        parent_folder = f"JQF/examples/target/fuzz-results/edu.berkeley.cs.jqf.examples.{filename}Test/fuzz/{folder}"
         
-
+        os.chdir(self.maindir)
+        
+        file_contents = [] 
+        for entry in os.listdir(parent_folder):
+            file_path = os.path.join(parent_folder, entry)
+            if os.path.isfile(file_path):
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    file_contents.append(content)
+        return file_contents
+    def compile_results(self,filename):
+        valid_inputs=self.compile_results_content(filename,"corpus")
+        failure_inputs=self.compile_results_content(filename,"failures")
+        return valid_inputs,failure_inputs
