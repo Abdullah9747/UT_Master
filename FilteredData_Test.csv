@@ -1,0 +1,1394 @@
+Parameter,Function,Test Case,ExtractedInput
+(long x),"public class HashLongToIntRevised {
+public static int hashLongToIntRevised(long x) {
+        /*
+            This is actually what done in the Java API to
+            calculate Long.hashCode().
+
+            All bits of the inputs are used to calculate the hash.
+
+            x >>> 32 does shift all the bits in x by 32 positions to the right.
+            Once that is executed, the results will have the 32 leftmost bits
+            into the 32 rightmost (which are now discarded).
+
+            With the exclusive OR operation (^), we compare each bit between
+            ""x"" and ""x >>> 32"", and create a new value based on whether they
+            disagree on the 1s (only one of the two values has a 1).
+
+            Recall that the (int) will ignore the 32 leftmost bits.
+            So, the resulting integer from the 32 bits is based on a XOR
+            between the first and last 32 bits of the original input.
+
+            Why using a XOR? reason is, given any input value x, if we just
+            change one single bit, then necessarily we will end up with
+            a different hash value.
+            Changing 2 or more bits might result in same hash though.
+         */
+        return (int) (x ^ (x >>> 32));
+    }
+}","@Test
+    public void testHashLongToIntRevised(){
+
+        long x = 0b0001_0000_0000_0000_0000_0000_0000_0000_____0000_0000_0000_0000_0000_0000_0000_0000L;
+        long w = 0b0001_0000_0000_0000_0000_0000_0000_0000_____0000_0000_0000_0000_0000_0000_0001_0000L;
+        long z = 0b0001_0001_0000_0000_0000_0000_0000_0000_____0000_0000_0000_0000_0000_0000_0000_0000L;
+
+        assertNotEquals(HashFunctions.hashLongToInt(x),
+                HashFunctions.hashLongToInt(w));
+        //collision, as bit difference on left side
+        assertEquals(HashFunctions.hashLongToInt(x),
+                HashFunctions.hashLongToInt(z));
+
+        //revised
+        assertNotEquals(HashFunctions.hashLongToIntRevised(x),
+                HashFunctions.hashLongToIntRevised(w));
+        //no collision
+        assertNotEquals(HashFunctions.hashLongToIntRevised(x),
+                HashFunctions.hashLongToIntRevised(z));
+    }","Function: 0
+HashLongToIntRevised 
+Spf Results Inputs: x_1_SYMINT
+No path conditions for demo.HashLongToIntRevised.hashLongToIntRevised(0)"
+(long x),"public class HashLongToInt {
+public static int hashLongToInt(long x) {
+
+        /*
+            int are 32 bits.
+            long are 64 bits.
+
+            So, an approach is to only look at the last 32 bits of the long.
+            This can be achieved by doing a bitwise AND operation (&)
+            on a 32 bit values with only 1s (ie 0xFF_FF_FF_FF).
+            Note the ""0x"", this means representing a value in hexadecimal notations,
+            where each symbol has 16 values: {0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F}.
+            Being 16 values, can be represented with 16=2pow4 -> 4 bits, where F (15
+            in decimal notation) is 1111 in binary, ie 8+4+2+1=15
+            So, 32 bits of 1s is F 8 times, ie, 0xFFFFFFFF.
+            When doing computations at bit/byte level, using hexadecimal is
+            easier than decimal.
+
+            A further thing to consider: in a int, if you have 32 bits of 1s, because
+            the leftmost bit is a 1, then the value is negative, in particular:
+            0xFFFFFFFF == -1
+            however, in a long, that would be a:
+            0xFFFFFFFFl == 4294967295
+            ie (2pow32 - 1)
+
+            so we could return
+
+            (x & 0xFF_FF_FF_FFl)
+
+            but that would be a long value, and we need an int.
+            So we can cast it to an int with (int)
+
+            (int) (x & 0xFF_FF_FF_FFl)
+
+             but what does it mean to cast a long to int?
+             In java, that just takes the rightmost 32-bits...
+             so actually we do not need to do & bitmask
+         */
+
+        return (int) x;
+    }
+}","@Test
+    public void testHashLongToIntNegative(){
+
+        /*
+            A long with the last 32 bits being all 1s
+         */
+        long one32times = 0xFF_FF_FF_FFL;
+        assertTrue(one32times > 2_000_000_000); // at least 2 billions
+        /*
+            The fact that this turns into a -1 might be confusing at first...
+            however the first bit is for the sign. being 1, it means that the
+            int is going to be negative.
+            as int is represented with as ""two's complement"", all 1s in binary is
+            actually representing a -1 int.
+
+            A way to look at it, is to flip all bits, and then add 00..001.
+            So for example, in a 4 bit representation, the value ""1""
+            can be represented with 0001. If we want to represent the value ""-1"",
+            flipping it would give 1110, and adding 0001 will result in 1111,
+            ie all 1s in binary.
+            So, in a int, the value -1 in binary is represented with 32 bits all set
+            to 1.
+         */
+        assertEquals(-1, HashFunctions.hashLongToInt(one32times));
+
+        /*
+            Note 8 hex is 1000 in binary
+         */
+        long singleOne = 0x80_00_00_00L;
+        assertTrue(singleOne > 2_000_000_000);
+        int hashed = HashFunctions.hashLongToInt(singleOne);
+        /*
+            a 1 followed by 31 0s in binary is actually the smallest possilbe int
+         */
+        assertTrue(hashed < -2_000_000_000);
+        assertEquals(Integer.MIN_VALUE, hashed);
+    }","Function: 1  
+HashLongToInt
+Spf Results Inputs: x_1_SYMINT
+No path conditions for demo.HashLongToInt.hashLongToInt(0)"
+(int i),"public class IntToBytes {
+public static byte[] intToBytes(int i) {
+    return new byte[]{(byte) ((i >> 24) & 0xFF), (byte) ((i >> 16) & 0xFF),
+        (byte) ((i >> 8) & 0xFF),
+        (byte) (i & 0xFF)};
+  }
+}","@Test
+  public void testIntToBytes() {
+    int b = 123;
+    byte[] bb = BytesUtils.intToBytes(b);
+    int bf = BytesUtils.bytesToInt(bb);
+    assertEquals(""testBytesToFloat"", b, bf);
+  }","Function: 10
+IntToBytes
+Spf Results Inputs: i_1_SYMINT
+No path conditions for demo.IntToBytes.intToBytes(0)"
+(boolean x),"public class BoolToBytes {
+public static byte[] boolToBytes(boolean x) {
+    byte[] b = new byte[1];
+    if (x) {
+      b[0] = 1;
+    } else {
+      b[0] = 0;
+    }
+    return b;
+  }
+}","@Test
+  public void testBoolToBytes() throws Exception {
+    boolean b = true;
+    byte[] bb = BytesUtils.boolToBytes(b);
+    boolean bf = BytesUtils.bytesToBool(bb);
+    assertEquals(""testBoolToBytes"", b, bf);
+  }","Function: 11
+BoolToBytes
+Spf Results Inputs: x_1_SYMINT
+demo.BoolToBytes.boolToBytes(true)  --> Return Value: [B@1c8
+demo.BoolToBytes.boolToBytes(false)  --> Return Value: [B@1c8"
+(double data),"public class DoubleToBytes {
+public static byte[] doubleToBytes(double data) {
+    byte[] bytes = new byte[8];
+    long value = Double.doubleToLongBits(data);
+    for (int i = 7; i >= 0; i--) {
+      bytes[i] = new Long(value).byteValue();
+      value = value >> 8;
+    }
+    return bytes;
+  }
+}","@Test
+  public void testDoubleToBytes() {
+    double b1 = 2745687.1253123d;
+    byte[] ret = BytesUtils.doubleToBytes(b1);
+    double rb1 = BytesUtils.bytesToDouble(ret);
+    assertEquals(b1, rb1, CommonTestConstant.float_min_delta);
+  }","Function: 12
+DoubleToBytes
+Spf Results Inputs: data_1_SYMREAL
+No path conditions for demo.DoubleToBytes.doubleToBytes(0.0)"
+"(double lat1, double lat2, double lon1,
+                                  double lon2)","public class Distance {
+public static double distance(double lat1, double lat2, double lon1,
+                                  double lon2) {
+
+        final int R = 6371; // Radius of the earth
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+
+        distance = Math.pow(distance, 2);
+
+        return Math.sqrt(distance);
+    }
+}","@Test
+    public void testDistance() {
+        double distance = Contour.distance(1, 1, 1, 2);
+        assertEquals(111177.99068882648, distance, 1e-10);
+        double distance2 = Contour.distance(1, 1, 0.5, -0.5);
+        assertEquals(111177.99068882648, distance2, 1e-10);
+    }","Function: 17
+Distance
+Spf Results Inputs: lat1_1_SYMREAL,lat2_2_SYMREAL,lon1_3_SYMREAL,lon2_4_SYMREAL
+No path conditions for demo.Distance.distance(0.0,0.0,0.0,0.0)"
+"(int cat, int possibleMainCat)","public class CheckCategoryMatchingMainCategory {
+public static boolean checkCategoryMatchingMainCategory(int cat, int possibleMainCat) {
+        return possibleMainCat % 1000 == 0 && cat / 1000 == possibleMainCat / 1000;
+    }
+}","@Test
+    public void testcheckCategoryMatchingMainCategory() {
+        assertThat(testee.checkCategoryMatchingMainCategory(5030, 5000), is(true));
+        assertThat(testee.checkCategoryMatchingMainCategory(5000, 5000), is(true));
+        assertThat(testee.checkCategoryMatchingMainCategory(4030, 5000), is(false));
+        assertThat(testee.checkCategoryMatchingMainCategory(4000, 5000), is(false));
+        assertThat(testee.checkCategoryMatchingMainCategory(4030, 4030), is(false));
+    }","Function: 18
+CheckCategoryMatchingMainCategory
+Spf Results Inputs: cat_1_SYMINT,possibleMainCat_2_SYMINT
+demo.CheckCategoryMatchingMainCategory.checkCategoryMatchingMainCategory(0,0)  --> Return Value: 1
+demo.CheckCategoryMatchingMainCategory.checkCategoryMatchingMainCategory(-1000,0)  --> Return Value: 0
+demo.CheckCategoryMatchingMainCategory.checkCategoryMatchingMainCategory(-9223372036854775808(don't care),1)  --> Return Value: 0"
+(int daysRented),"public class GetFrequentRenterPoints {
+public int getFrequentRenterPoints(int daysRented) {
+        return daysRented > 0 ? 1 : 0;
+    }
+}","@Test
+    public void testGetFrequentRenterPoints() {
+        assertEquals(0, pc.getFrequentRenterPoints(-6));
+        assertEquals(0, pc.getFrequentRenterPoints(0));
+        assertEquals(1, pc.getFrequentRenterPoints(1));
+        assertEquals(1, pc.getFrequentRenterPoints(2));
+        assertEquals(1, pc.getFrequentRenterPoints(4000));
+    }","Function: 20
+GetFrequentRenterPoints
+Spf Results Inputs: daysRented_1_SYMINT
+demo.GetFrequentRenterPoints.getFrequentRenterPoints(1)  --> Return Value: 1
+demo.GetFrequentRenterPoints.getFrequentRenterPoints(0)  --> Return Value: 0"
+"(double logA, double logB)","public class LogSum {
+public static double logSum(double logA, double logB) {
+    if (Double.isInfinite(logA)) {
+      return logB;
+    }
+    if (Double.isInfinite(logB)) {
+      return logA;
+    }
+    if (logA > logB) {
+      double dif = logA - logB;
+      return dif >= 30d ? logA : logA + Math.log(1 + Math.exp(-dif));
+    } else {
+      double dif = logB - logA;
+      return dif >= 30d ? logB : logB + Math.log(1 + Math.exp(-dif));
+    }
+  }
+}","@Test
+  public void logSumTest() throws IOException {
+    double[] aLinear = new double[1000];
+    double[] bLinear = new double[1000];
+
+    for (int i = 0; i < bLinear.length; i++) {
+      aLinear[i] = (double) i / 1000d;
+      bLinear[i] = aLinear[i];
+    }
+
+    LogMath.LogSumLookup logSumE = LogMath.LOG_SUM;
+
+    for (double a : aLinear) {
+      for (double b : bLinear) {
+        double logSumExpected = Math.log(a + b);
+        Assert.assertEquals(logSumExpected, logSumE.lookup(Math.log(a), Math.log(b)), 0.001);
+      }
+    }
+  }","Function: 22
+LogSum
+Spf Results Inputs: logA_1_SYMREAL,logB_2_SYMREAL
+demo.LogSum.logSum(0.0,1.0)  --> Return Value: 1.3132616875182228
+demo.LogSum.logSum(0.0,30.0)  --> Return Value: 30.0
+demo.LogSum.logSum(0.0,31.0)  --> Return Value: 31.0
+demo.LogSum.logSum(0.0,0.0)  --> Return Value: 0.6931471805599453
+demo.LogSum.logSum(0.5,0.0)  --> Return Value: 0.9740769841801067
+demo.LogSum.logSum(30.0,0.0)  --> Return Value: 30.0
+demo.LogSum.logSum(31.0,0.0)  --> Return Value: 31.0"
+"(double d1, double d2, double range)","public class InRange {
+public static boolean inRange(double d1, double d2, double range) {
+    return Math.abs(d1 - d2) <= range;
+  }
+}","@Test
+  public void testInRange() {
+    double d = 3;
+    double d2 = 2.5;
+    double d3 = 7;
+    Assert.assertTrue(DoubleArrays.inRange(d, d2, 1));
+    Assert.assertFalse(DoubleArrays.inRange(d2, d3, 4));
+    Assert.assertTrue(DoubleArrays.inRange(d, d2, 0.5));
+  }","Function: 23
+InRange
+Spf Results Inputs: d1_1_SYMREAL,d2_2_SYMREAL,range_3_SYMREAL
+demo.InRange.inRange(0.0,0.0,0.0)  --> Return Value: 1
+demo.InRange.inRange(0.0,1.0,0.0)  --> Return Value: 0
+demo.InRange.inRange(0.0,0.0,-9223372036854775808(don't care))  --> Return Value: 1
+demo.InRange.inRange(0.5,0.0,0.0)  --> Return Value: 0"
+"(int g0, int g1, int g2)","public class EncodeTrigram {
+public long encodeTrigram(int g0, int g1, int g2) {
+    long encoded = g2;
+    encoded = (encoded << 21) | g1;
+    return (encoded << 21) | g0;
+  }
+}","@Test
+  public void encodedTrigramTest() throws IOException {
+    LmVocabulary vocabulary = new LmVocabulary(""a"", ""b"", ""c"", ""d"", ""e"");
+    long k = ((1L << 21 | 2L) << 21) | 3L;
+    Assert.assertEquals(k, vocabulary.encodeTrigram(3, 2, 1));
+    Assert.assertEquals(k, vocabulary.encodeTrigram(3, 2, 1));
+  }","Function: 24
+EncodeTrigram
+Spf Results Inputs: g0_1_SYMINT,g1_2_SYMINT,g2_3_SYMINT
+No path conditions for demo.EncodeTrigram.encodeTrigram(0,0,0)"
+"(long burstSizeInPackets, long packetSizeInBytes)","public class ConvertBurstSizeToKiloBits {
+public static long convertBurstSizeToKiloBits(long burstSizeInPackets, long packetSizeInBytes) {
+        return (burstSizeInPackets * packetSizeInBytes * 8) / 1024L;
+    }
+}","@Test
+    public void convertBurstSizeToKiloBitsTest() {
+        assertEquals(800, Meter.convertBurstSizeToKiloBits(100, 1024));
+        assertEquals(1, Meter.convertBurstSizeToKiloBits(8, 16));
+    }","Function: 28
+ConvertBurstSizeToKiloBits
+Spf Results Inputs: burstSizeInPackets_1_SYMINT,packetSizeInBytes_2_SYMINT
+No path conditions for demo.ConvertBurstSizeToKiloBits.convertBurstSizeToKiloBits(0,0)"
+"(long now, long deadlineMs)","public class CalcTimeoutMsRemainingAsInt {
+static int calcTimeoutMsRemainingAsInt(long now, long deadlineMs) {
+        long deltaMs = deadlineMs - now;
+        if (deltaMs > Integer.MAX_VALUE)
+            deltaMs = Integer.MAX_VALUE;
+        else if (deltaMs < Integer.MIN_VALUE)
+            deltaMs = Integer.MIN_VALUE;
+        return (int) deltaMs;
+    }
+}","@Test
+    public void testCalcTimeoutMsRemainingAsInt() {
+        assertEquals(0, KafkaAdminClient.calcTimeoutMsRemainingAsInt(1000, 1000));
+        assertEquals(100, KafkaAdminClient.calcTimeoutMsRemainingAsInt(1000, 1100));
+        assertEquals(Integer.MAX_VALUE, KafkaAdminClient.calcTimeoutMsRemainingAsInt(0, Long.MAX_VALUE));
+        assertEquals(Integer.MIN_VALUE, KafkaAdminClient.calcTimeoutMsRemainingAsInt(Long.MAX_VALUE, 0));
+    }","Function: 29
+CalcTimeoutMsRemainingAsInt
+Spf Results Inputs: now_1_SYMINT,deadlineMs_2_SYMINT
+demo.CalcTimeoutMsRemainingAsInt.calcTimeoutMsRemainingAsInt(0l,-2147483649l)  --> Return Value: -2147483649
+demo.CalcTimeoutMsRemainingAsInt.calcTimeoutMsRemainingAsInt(0l,-2147483648l)  --> Return Value: -2147483648
+demo.CalcTimeoutMsRemainingAsInt.calcTimeoutMsRemainingAsInt(0l,0l)  --> Return Value: 0
+demo.CalcTimeoutMsRemainingAsInt.calcTimeoutMsRemainingAsInt(0l,2147483647l)  --> Return Value: 2147483647
+demo.CalcTimeoutMsRemainingAsInt.calcTimeoutMsRemainingAsInt(-2147483648l,0l)  --> Return Value: 2147483648"
+(int n),"public class Abs {
+public static int abs(int n) {
+        return (n == Integer.MIN_VALUE) ? 0 : Math.abs(n);
+    }
+}","@Test
+    public void testAbs() {
+        assertEquals(0, Utils.abs(Integer.MIN_VALUE));
+        assertEquals(10, Utils.abs(-10));
+        assertEquals(10, Utils.abs(10));
+        assertEquals(0, Utils.abs(0));
+        assertEquals(1, Utils.abs(-1));
+    }","Function: 30
+Abs
+Spf Results Inputs: n_1_SYMINT
+demo.Abs.abs(-2147483648)  --> Return Value: 0
+demo.Abs.abs(-1)  --> Return Value: 1
+demo.Abs.abs(0)  --> Return Value: 0"
+"(int baseSequence, int increment)","public class IncrementSequence {
+static int incrementSequence(int baseSequence, int increment) {
+        if (baseSequence > Integer.MAX_VALUE - increment)
+            return increment - (Integer.MAX_VALUE - baseSequence) - 1;
+        return baseSequence + increment;
+    }
+}","@Test
+    public void testIncrementSequence() {
+        assertEquals(10, DefaultRecordBatch.incrementSequence(5, 5));
+        assertEquals(0, DefaultRecordBatch.incrementSequence(Integer.MAX_VALUE, 1));
+        assertEquals(4, DefaultRecordBatch.incrementSequence(Integer.MAX_VALUE - 5, 10));
+    }","Function: 31
+IncrementSequence
+Spf Results Inputs: baseSequence_1_SYMINT,increment_2_SYMINT
+demo.IncrementSequence.incrementSequence(2147483647,1)  --> Return Value: 0
+demo.IncrementSequence.incrementSequence(0,0)  --> Return Value: 0"
+(int c),"public class IsWhitespace {
+public static boolean isWhitespace(int c){
+        return c == ' ' || c == '\t' || c == '\n' || c == '\f' || c == '\r';
+    }
+}","@Test public void isWhitespace() {
+        assertTrue(StringUtil.isWhitespace('\t'));
+        assertTrue(StringUtil.isWhitespace('\n'));
+        assertTrue(StringUtil.isWhitespace('\r'));
+        assertTrue(StringUtil.isWhitespace('\f'));
+        assertTrue(StringUtil.isWhitespace(' '));
+        
+        assertFalse(StringUtil.isWhitespace('\u00a0'));
+        assertFalse(StringUtil.isWhitespace('\u2000'));
+        assertFalse(StringUtil.isWhitespace('\u3000'));
+    }","Function: 32
+IsWhitespace
+Spf Results Inputs: c_1_SYMINT
+demo.IsWhitespace.isWhitespace(13)  --> Return Value: 1
+demo.IsWhitespace.isWhitespace(0)  --> Return Value: 0
+demo.IsWhitespace.isWhitespace(12)  --> Return Value: 1
+demo.IsWhitespace.isWhitespace(10)  --> Return Value: 1
+demo.IsWhitespace.isWhitespace(9)  --> Return Value: 1
+demo.IsWhitespace.isWhitespace(32)  --> Return Value: 1"
+(long size),"public class EstimateSizeOverhead {
+public static long estimateSizeOverhead(long size) {
+      // We take 8 and add the number provided and then round up to 16 (& operator has higher precedence than +)
+      return (size + 8 + 15) & ~15;
+   }
+}","@Test(dataProvider = ""roundings"")
+   public void testRoundings(long original, long expected) {
+      // The estimate adds 8 and rounds up to 16
+      assertEquals(expected, UnpooledOffHeapMemoryAllocator.estimateSizeOverhead(original));
+   }","Function: 34
+EstimateSizeOverhead
+Spf Results Inputs: size_1_SYMINT
+No path conditions for demo.EstimateSizeOverhead.estimateSizeOverhead(0)"
+(int i),"public class Set {
+public void set(int i) {
+      throw new UnsupportedOperationException(""RangeSet is immutable"");
+   }
+}","@Test(expected = UnsupportedOperationException.class)
+   public void set() throws Exception {
+      RangeSet rs = new RangeSet(4);
+      rs.set(1);
+   }","Function: 35
+Set
+Spf Results Inputs: i_1_SYMINT
+No path conditions for demo.Set.set(0)"
+(int number),"public class IsOdd {
+public static boolean isOdd(int number) {
+		return number % 2 == 1;
+	}
+}","@Test
+	public void testOdd() {
+		assertTrue(MathUtil.isOdd(3));
+		assertFalse(MathUtil.isOdd(4));
+	}","Function: 36
+IsOdd
+Spf Results Inputs: number_1_SYMINT
+demo.IsOdd.isOdd(1)  --> Return Value: 1
+demo.IsOdd.isOdd(0)  --> Return Value: 0"
+"(int clipX, int clipY)","public class BackGroundPosition {
+protected static String backGroundPosition(int clipX, int clipY) {
+        return ""background-position: "" + clipX + ""px "" + clipY + ""px !important"";
+    }
+}","@Test
+    public void testBackGroundPosition() {
+        final String backGroundPosition = ImageStripDOMGlyphRenderer.backGroundPosition(123, 321);
+        assertEquals(backGroundPosition, ""background-position: 123px 321px !important"");
+    }","Function: 37
+BackGroundPosition
+Spf Results Inputs: clipX_1_SYMINT,clipY_2_SYMINT
+No path conditions for demo.BackGroundPosition.backGroundPosition(0,0)"
+(long value),"public class IsEven {
+public static boolean isEven(long value) {
+        return value % 2 == 0;
+    }
+}","@Test
+    public void testIsEven() throws Exception {
+        Assert.assertTrue(MathUtils.isEven(evenVal_EXPECTED));
+        Assert.assertFalse(MathUtils.isEven(oddVal_EXPECTED));
+    }","Function: 41
+IsEven
+Spf Results Inputs: value_1_SYMINT
+demo.IsEven.isEven(0l)  --> Return Value: 1
+demo.IsEven.isEven(1l)  --> Return Value: 1"
+(long value),"public class IsPower2 {
+public static boolean isPower2(long value) {
+        return value == 1 || value == 2 || value == 4 || value == 8 || value == 16 ||
+                value == 32 || value == 64 || value == 128 || value == 256 ||
+                value == 512 || value == 1024 || value == 2048 || value == 4096;
+    }
+}","@Test
+    public void testIsPower2() throws Exception {
+        Assert.assertTrue(MathUtils.isPower2((long) powerOfTwo_EXPECTED));
+        Assert.assertFalse(MathUtils.isPower2((long) notPowerOfTwo_EXPECTED));
+    }","Function: 42
+IsPower2
+Spf Results Inputs: value_1_SYMINT
+demo.IsPower2.isPower2(0l)  --> Return Value: 0
+demo.IsPower2.isPower2(1l)  --> Return Value: 0
+demo.IsPower2.isPower2(2l)  --> Return Value: 0
+demo.IsPower2.isPower2(3l)  --> Return Value: 0
+demo.IsPower2.isPower2(4l)  --> Return Value: 0
+demo.IsPower2.isPower2(5l)  --> Return Value: 0
+demo.IsPower2.isPower2(8l)  --> Return Value: 0
+demo.IsPower2.isPower2(9l)  --> Return Value: 0
+demo.IsPower2.isPower2(16l)  --> Return Value: 0
+demo.IsPower2.isPower2(17l)  --> Return Value: 0
+demo.IsPower2.isPower2(32l)  --> Return Value: 0
+demo.IsPower2.isPower2(33l)  --> Return Value: 0
+demo.IsPower2.isPower2(64l)  --> Return Value: 0
+demo.IsPower2.isPower2(65l)  --> Return Value: 0
+demo.IsPower2.isPower2(128l)  --> Return Value: 0
+demo.IsPower2.isPower2(129l)  --> Return Value: 0
+demo.IsPower2.isPower2(256l)  --> Return Value: 0
+demo.IsPower2.isPower2(257l)  --> Return Value: 0
+demo.IsPower2.isPower2(512l)  --> Return Value: 0
+demo.IsPower2.isPower2(513l)  --> Return Value: 0
+demo.IsPower2.isPower2(1024l)  --> Return Value: 0
+demo.IsPower2.isPower2(1025l)  --> Return Value: 0
+demo.IsPower2.isPower2(2048l)  --> Return Value: 0
+demo.IsPower2.isPower2(2049l)  --> Return Value: 0
+demo.IsPower2.isPower2(4096l)  --> Return Value: 0
+demo.IsPower2.isPower2(4097l)  --> Return Value: 0"
+(double value),"public class Sqr {
+@Deprecated
+    public static double sqr(double value) {
+        return Math.pow(value, 2);
+    }
+}","@Test
+    public void testSqr() throws Exception {
+        Assert.assertEquals(Math.pow(VALUE, 2), MathUtils.sqr(VALUE), DELTA);
+    }","Function: 44
+Sqr
+Spf Results Inputs: value_1_SYMREAL
+No path conditions for demo.Sqr.sqr(0.0)"
+(double value),"public class Sqrt {
+@Deprecated
+    public static double sqrt(double value) {
+        return Math.sqrt(value);
+    }
+}","@Test
+    public void testSqrt() throws Exception {
+        Assert.assertEquals(Math.sqrt(VALUE), MathUtils.sqrt(VALUE), DELTA);
+    }","Function: 45
+Sqrt
+Spf Results Inputs: value_1_SYMREAL
+No path conditions for demo.Sqrt.sqrt(0.0)"
+(int nDataUnits),"public class GetPackedLength {
+public int getPackedLength(int nDataUnits)
+    {
+        return (nDataUnits + 1) / 2;
+    }
+}","@Test
+    public void testGetPackedLength() throws Throwable {
+        int result = BCDInterpreter.LEFT_PADDED.getPackedLength(0);
+        assertEquals(0, result, ""result"");
+    }","Function: 49
+GetPackedLength
+Spf Results Inputs: nDataUnits_1_SYMINT
+No path conditions for demo.GetPackedLength.getPackedLength(0)"
+(long millis),"public class Sleep {
+public static void sleep (long millis) {
+        try {
+            Thread.sleep (millis);
+        } catch (InterruptedException ignored) { }
+    }
+}","@Test
+    public void testSleepThrowsIllegalArgumentException() throws Throwable {
+        try {
+            ISOUtil.sleep(-30L);
+            fail(""Expected IllegalArgumentException to be thrown"");
+        } catch (IllegalArgumentException ex) {
+            assertEquals(""timeout value is negative"", ex.getMessage(), ""ex.getMessage()"");
+        }
+    }","Function: 51
+Sleep
+Spf Results Inputs: millis_1_SYMINT
+No path conditions for demo.Sleep.sleep(0)"
+(long durationMs),"public class DurationToString {
+public static String durationToString(long durationMs) {
+    boolean negative = false;
+    if (durationMs < 0) {
+      negative = true;
+      durationMs = -durationMs;
+    }
+    // Chop off the milliseconds
+    long durationSec = durationMs / 1000;
+    final int secondsPerMinute = 60;
+    final int secondsPerHour = 60*60;
+    final int secondsPerDay = 60*60*24;
+    final long days = durationSec / secondsPerDay;
+    durationSec -= days * secondsPerDay;
+    final long hours = durationSec / secondsPerHour;
+    durationSec -= hours * secondsPerHour;
+    final long minutes = durationSec / secondsPerMinute;
+    durationSec -= minutes * secondsPerMinute;
+    final long seconds = durationSec;
+    final long milliseconds = durationMs % 1000;
+    String format = ""%03d:%02d:%02d:%02d.%03d"";
+    if (negative)  {
+      format = ""-"" + format;
+    }
+    return String.format(format, days, hours, minutes, seconds, milliseconds);
+  }
+}","@Test(timeout=1000)
+  public void testDurationToString() throws Exception {
+    assertEquals(""000:00:00:00.000"", DFSUtil.durationToString(0));
+    assertEquals(""001:01:01:01.000"",
+        DFSUtil.durationToString(((24*60*60)+(60*60)+(60)+1)*1000));
+    assertEquals(""000:23:59:59.999"",
+        DFSUtil.durationToString(((23*60*60)+(59*60)+(59))*1000+999));
+    assertEquals(""-001:01:01:01.000"",
+        DFSUtil.durationToString(-((24*60*60)+(60*60)+(60)+1)*1000));
+    assertEquals(""-000:23:59:59.574"",
+        DFSUtil.durationToString(-(((23*60*60)+(59*60)+(59))*1000+574)));
+  }","Function: 53
+DurationToString
+Spf Results Inputs: durationMs_1_SYMINT
+demo.DurationToString.durationToString(-1l)  --> Return Value: java.lang.String@2d2
+demo.DurationToString.durationToString(0l)  --> Return Value: java.lang.String@2d2
+demo.DurationToString.durationToString(1l)  --> Return Value: java.lang.String@2d2"
+"(int length, int batchSize)","public class GetBatchCount {
+public static int getBatchCount(int length, int batchSize) {
+    // Avoid negative numbers.
+    if ((batchSize < 1) || (length < 1)) {
+      return 0;
+    }
+    int remainder = length % batchSize;
+    return (remainder > 0) ? (length / batchSize) + 1 : (length / batchSize);
+  }
+}","@Test
+  public void testGetBatchCount() {
+    // Edge cases
+    assertEquals(0, BatchUtil.getBatchCount(0,0));
+    assertEquals(0, BatchUtil.getBatchCount(-1,0));
+    assertEquals(0, BatchUtil.getBatchCount(-2,4));
+    assertEquals(0, BatchUtil.getBatchCount(5,-7));
+
+
+    // One
+    assertEquals(1, BatchUtil.getBatchCount(9,9));
+    assertEquals(1, BatchUtil.getBatchCount(9,10));
+    assertEquals(1, BatchUtil.getBatchCount(9,11));
+    assertEquals(1, BatchUtil.getBatchCount(9,18));
+    assertEquals(1, BatchUtil.getBatchCount(9,19));
+    
+    // More
+    assertEquals(2, BatchUtil.getBatchCount(9,8));
+    assertEquals(2, BatchUtil.getBatchCount(9,7));
+    assertEquals(2, BatchUtil.getBatchCount(9,6));
+    assertEquals(2, BatchUtil.getBatchCount(9,5));
+    assertEquals(3, BatchUtil.getBatchCount(9,4));
+    assertEquals(3, BatchUtil.getBatchCount(9,3));
+    assertEquals(5, BatchUtil.getBatchCount(9,2));
+    assertEquals(9, BatchUtil.getBatchCount(9,1));
+  }","Function: 56
+GetBatchCount
+Spf Results Inputs: length_1_SYMINT,batchSize_2_SYMINT
+demo.GetBatchCount.getBatchCount(0,1)  --> Return Value: 0
+demo.GetBatchCount.getBatchCount(1,1)  --> ""java.lang.ArithmeticException: div by 0...""
+demo.GetBatchCount.getBatchCount(-9223372036854775808(don't care),0)  --> Return Value: 0"
+"(int i, int maxRetention, int length)","public class ShouldRetain {
+public static boolean shouldRetain(int i, int maxRetention, int length) {
+    // Files with a zero-based index greater or equal than the retentionCutoff
+    // should be retained.
+    int retentionCutoff = length - maxRetention;
+    boolean retain = (i >= retentionCutoff) ? true : false;
+    return retain;
+  }
+}","@Test
+  public void testShouldRetain() {
+    assertTrue(BatchUtil.shouldRetain(0, 1, 1));
+    assertTrue(BatchUtil.shouldRetain(5, 5, 10));
+    
+    assertFalse(BatchUtil.shouldRetain(0, 1, 2));
+    assertFalse(BatchUtil.shouldRetain(4, 5, 10));
+    assertFalse(BatchUtil.shouldRetain(4, 100000, 155690)); 
+  }","Function: 57
+ShouldRetain
+Spf Results Inputs: i_1_SYMINT,maxRetention_2_SYMINT,length_3_SYMINT
+demo.ShouldRetain.shouldRetain(0,0,0)  --> Return Value: 1
+demo.ShouldRetain.shouldRetain(-1,0,0)  --> Return Value: 0"
+(long now),"public class GetEncodedRunId {
+public static long getEncodedRunId(long now) {
+    // get top of the hour
+    long lastHour = now - (now % 3600);
+    // return inverted timestamp
+    return (Long.MAX_VALUE - lastHour);
+  }
+}","@Test
+  public void TestGetLastHourInvertedTimestamp() throws IOException {
+    long ts = 1391896800L;
+    long expectedTop = Long.MAX_VALUE - ts;
+    long actualTop = HdfsStatsService.getEncodedRunId(ts);
+    assertEquals(actualTop, expectedTop);
+  }","Function: 58
+GetEncodedRunId
+Spf Results Inputs: now_1_SYMINT
+No path conditions for demo.GetEncodedRunId.getEncodedRunId(0)"
+(long encodedRunId),"public class GetRunId {
+public static long getRunId(long encodedRunId) {
+    return Long.MAX_VALUE - encodedRunId;
+  }
+}","@Test
+  public void testGetRunId() {
+    long ts = 1392217200L;
+    HdfsStatsKey key1 = new HdfsStatsKey(cluster1, path1, (Long.MAX_VALUE - ts));
+    assertEquals(key1.getRunId(), ts);
+  }","Function: 59
+GetRunId
+Spf Results Inputs: encodedRunId_1_SYMINT
+No path conditions for demo.GetRunId.getRunId(0)"
+(int number),"public class GetNegativeLong {
+public static Long getNegativeLong(int number) {
+        return ( - (long) number);
+    }
+}","@Test
+    public void getNegativeLong_NegativeInt_PositiveLong() {
+        assertThat(CommonUtils.getNegativeLong(-2), is(2l));
+    }","Function: 62
+GetNegativeLong
+Spf Results Inputs: number_1_SYMINT
+No path conditions for demo.GetNegativeLong.getNegativeLong(0)"
+"(
+        int n, boolean isDirected, boolean createLoops, boolean createMultipleEdges)","public class ComputeMaximumAllowedEdges {
+static <V, E> int computeMaximumAllowedEdges(
+        int n, boolean isDirected, boolean createLoops, boolean createMultipleEdges)
+    {
+        if (n == 0) {
+            return 0;
+        }
+
+        int maxAllowedEdges;
+        try {
+            if (isDirected) {
+                maxAllowedEdges = Math.multiplyExact(n, n - 1);
+            } else {
+                // assume undirected
+                if (n % 2 == 0) {
+                    maxAllowedEdges = Math.multiplyExact(n / 2, n - 1);
+                } else {
+                    maxAllowedEdges = Math.multiplyExact(n, (n - 1) / 2);
+                }
+            }
+
+            if (createLoops) {
+                if (createMultipleEdges) {
+                    return Integer.MAX_VALUE;
+                } else {
+                    if (isDirected) {
+                        maxAllowedEdges = Math.addExact(maxAllowedEdges, Math.multiplyExact(2, n));
+                    } else {
+                        // assume undirected
+                        maxAllowedEdges = Math.addExact(maxAllowedEdges, n);
+                    }
+                }
+            } else {
+                if (createMultipleEdges) {
+                    if (n > 1) {
+                        return Integer.MAX_VALUE;
+                    }
+                }
+            }
+        } catch (ArithmeticException e) {
+            return Integer.MAX_VALUE;
+        }
+        return maxAllowedEdges;
+    }
+}","@Test
+    public void testMaximumAllowedEdges()
+    {
+        // undirected graphs
+        boolean isDirected = false;
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, true));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, true));
+
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, false));
+        assertEquals(
+            1, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, true));
+
+        assertEquals(
+            45, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, false));
+        assertEquals(
+            55, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, false));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, true));
+
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(200000, isDirected, false, false));
+
+        // directed graphs
+        isDirected = true;
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, true));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, true));
+
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, false));
+        assertEquals(
+            2, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, true));
+
+        assertEquals(
+            90, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, false));
+        assertEquals(
+            110, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, false));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, true));
+
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(200000, isDirected, false, false));
+    }","Function: 63
+ComputeMaximumAllowedEdges
+Spf Results Inputs: n_1_SYMINT,isDirected_2_SYMINT,createLoops_3_SYMINT,createMultipleEdges_4_SYMINT
+demo.ComputeMaximumAllowedEdges.computeMaximumAllowedEdges(0,-9223372036854775808(don't care),-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0
+demo.ComputeMaximumAllowedEdges.computeMaximumAllowedEdges(-1,true,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> ""java.lang.ClassNotFoundException: class not found: java.lang.NoSuchMethodException!!...""
+demo.ComputeMaximumAllowedEdges.computeMaximumAllowedEdges(-2,false,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> ""java.lang.ClassNotFoundException: class not found: java.lang.NoSuchMethodException!!...""
+demo.ComputeMaximumAllowedEdges.computeMaximumAllowedEdges(-1,false,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> ""java.lang.ClassNotFoundException: class not found: java.lang.NoSuchMethodException!!..."""
+"(int shardHash,
+														int totalNumberOfConsumerSubtasks,
+														int indexOfThisConsumerSubtask)","public class IsThisSubtaskShouldSubscribeTo {
+public static boolean isThisSubtaskShouldSubscribeTo(int shardHash,
+														int totalNumberOfConsumerSubtasks,
+														int indexOfThisConsumerSubtask) {
+		return (Math.abs(shardHash % totalNumberOfConsumerSubtasks)) == indexOfThisConsumerSubtask;
+	}
+}","@Test
+	public void testIsThisSubtaskShouldSubscribeTo() {
+		assertTrue(KinesisDataFetcher.isThisSubtaskShouldSubscribeTo(0, 2, 0));
+		assertFalse(KinesisDataFetcher.isThisSubtaskShouldSubscribeTo(1, 2, 0));
+		assertTrue(KinesisDataFetcher.isThisSubtaskShouldSubscribeTo(2, 2, 0));
+		assertFalse(KinesisDataFetcher.isThisSubtaskShouldSubscribeTo(0, 2, 1));
+		assertTrue(KinesisDataFetcher.isThisSubtaskShouldSubscribeTo(1, 2, 1));
+		assertFalse(KinesisDataFetcher.isThisSubtaskShouldSubscribeTo(2, 2, 1));
+	}","Function: 64
+IsThisSubtaskShouldSubscribeTo
+Spf Results Inputs: shardHash_1_SYMINT,totalNumberOfConsumerSubtasks_2_SYMINT,indexOfThisConsumerSubtask_3_SYMINT
+No path conditions for demo.IsThisSubtaskShouldSubscribeTo.isThisSubtaskShouldSubscribeTo(0,0,0)"
+"(boolean declarer,
+			int gameValue, int numberOfPlayers)","public class GetTournamentGameValue {
+public static final int getTournamentGameValue(boolean declarer,
+			int gameValue, int numberOfPlayers) {
+
+		int result = 0;
+
+		if (declarer) {
+			// calculation for declarer of the game
+			if (gameValue > 0) {
+
+				result = gameValue + 50;
+			} else {
+
+				result = gameValue - 50;
+			}
+		} else {
+			// calculation for opponents
+			if (gameValue < 0) {
+
+				if (numberOfPlayers == 3) {
+
+					result = 40;
+				} else if (numberOfPlayers == 4) {
+
+					result = 30;
+				}
+			}
+		}
+
+		return result;
+	}
+}","@Test
+    public void getTournamentGameValue001() {
+
+        assertThat(SkatConstants.getTournamentGameValue(true, 18, 3)).isEqualTo(68);
+        assertThat(SkatConstants.getTournamentGameValue(true, 18, 4)).isEqualTo(68);
+        assertThat(SkatConstants.getTournamentGameValue(true, -36, 3)).isEqualTo(-86);
+        assertThat(SkatConstants.getTournamentGameValue(true, -36, 4)).isEqualTo(-86);
+        assertThat(SkatConstants.getTournamentGameValue(true, 20, 3)).isEqualTo(70);
+        assertThat(SkatConstants.getTournamentGameValue(true, 20, 4)).isEqualTo(70);
+        assertThat(SkatConstants.getTournamentGameValue(true, -40, 3)).isEqualTo(-90);
+        assertThat(SkatConstants.getTournamentGameValue(true, -40, 4)).isEqualTo(-90);
+        assertThat(SkatConstants.getTournamentGameValue(false, 18, 3)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, 18, 4)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, -36, 3)).isEqualTo(40);
+        assertThat(SkatConstants.getTournamentGameValue(false, -36, 4)).isEqualTo(30);
+        assertThat(SkatConstants.getTournamentGameValue(false, 20, 3)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, 20, 4)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, -40, 3)).isEqualTo(40);
+        assertThat(SkatConstants.getTournamentGameValue(false, -40, 4)).isEqualTo(30);
+    }","Function: 65
+GetTournamentGameValue
+Spf Results Inputs: declarer_1_SYMINT,gameValue_2_SYMINT,numberOfPlayers_3_SYMINT
+demo.GetTournamentGameValue.getTournamentGameValue(true,1,-9223372036854775808(don't care))  --> Return Value: 51
+demo.GetTournamentGameValue.getTournamentGameValue(true,0,-9223372036854775808(don't care))  --> Return Value: -50
+demo.GetTournamentGameValue.getTournamentGameValue(false,-1,3)  --> Return Value: 40
+demo.GetTournamentGameValue.getTournamentGameValue(false,-1,4)  --> Return Value: 30
+demo.GetTournamentGameValue.getTournamentGameValue(false,-1,0)  --> Return Value: 0
+demo.GetTournamentGameValue.getTournamentGameValue(false,0,-9223372036854775808(don't care))  --> Return Value: 0"
+(int n),"public class Convert {
+public static String convert(int n) {
+        if (n <= 0) {
+            throw new IllegalArgumentException(""Argument is not positive"");
+        }
+        StringBuilder builder = new StringBuilder();
+        while (n > 0) {
+            n--;
+            int remainder = n % 26;
+            n /= 26;
+            builder.append((char) (remainder + 65));
+        }
+        return builder.reverse().toString();
+    }
+}","@Test(expected = IllegalArgumentException.class)
+    public void testConvertNegativeN() {
+        convert(-1);
+    }","Function: 80
+Convert
+Spf Results Inputs: n_1_SYMINT
+demo.Convert.convert(0)  --> ""java.lang.IllegalArgumentException: Argument is not positive...""
+demo.Convert.convert(321272407)  --> Return Value: java.lang.String@1e5
+demo.Convert.convert(12356631)  --> Return Value: java.lang.String@1e5
+demo.Convert.convert(475255)  --> Return Value: java.lang.String@1e5
+demo.Convert.convert(18279)  --> Return Value: java.lang.String@1e5
+demo.Convert.convert(703)  --> Return Value: java.lang.String@1e5
+demo.Convert.convert(27)  --> Return Value: java.lang.String@1e5
+demo.Convert.convert(1)  --> Return Value: java.lang.String@1e5"
+(boolean val),"public class GetHashCode {
+public static int getHashCode(boolean val)
+    {
+        return val ? 1231 : 1237;
+    }
+}","@Test
+    public void testGetHashCodeIntIntObject()
+    {
+        Object o1 = new HashCodeObject(67);
+        Object o2 = null;
+        Object o3 = new HashCodeObject(111);
+
+        int startHash = 37;
+        int prime = 31;
+        Assert.assertEquals(startHash, HashCodeHelper.getHashCode(startHash, prime));
+        Assert.assertEquals(1214, HashCodeHelper.getHashCode(startHash, prime, o1));
+        Assert.assertEquals(1147, HashCodeHelper.getHashCode(startHash, prime, o2));
+        Assert.assertEquals(37634, HashCodeHelper.getHashCode(startHash, prime, o1, o2));
+        Assert.assertEquals(1166765, HashCodeHelper.getHashCode(startHash, prime, o1, o2, o3));
+    }","Function: 86
+GetHashCode
+Spf Results Inputs: val_1_SYMINT
+demo.GetHashCode.getHashCode(true)  --> Return Value: 1231
+demo.GetHashCode.getHashCode(false)  --> Return Value: 1237"
+"(double a, double b)","public class Average {
+public static double average(double a, double b)
+    {
+        return (a + b) * 0.5;
+    }
+}","@Test
+    public void testAverage()
+    {
+        Assert.assertEquals(5., MathUtil.average(2, 4, 4, 4, 5, 5, 7, 9), 0.);
+        Assert.assertEquals(2., MathUtil.average(2), 0.);
+        Assert.assertTrue(Double.isNaN(MathUtil.average()));
+    }","Function: 91
+Average
+Spf Results Inputs: a_1_SYMREAL,b_2_SYMREAL
+No path conditions for demo.Average.average(0.0,0.0)"
+"(int i, int j)","public class Gcd {
+public static int gcd(int i, int j)
+    {
+        int a = i;
+        int b = j;
+        while (b != 0)
+        {
+            a ^= b;
+            b ^= a;
+            a ^= b;
+            b %= a;
+        }
+        return a >= 0 ? a : -a;
+    }
+}","@Test
+    public void testGcd()
+    {
+        Assert.assertEquals(0, MathUtil.gcd(0, 0));
+        Assert.assertEquals(1, MathUtil.gcd(1, 0));
+        Assert.assertEquals(1, MathUtil.gcd(0, 1));
+        Assert.assertEquals(1, MathUtil.gcd(1, 2));
+        Assert.assertEquals(1, MathUtil.gcd(2, 1));
+        Assert.assertEquals(1, MathUtil.gcd(2, 3));
+        Assert.assertEquals(1, MathUtil.gcd(3, 2));
+        Assert.assertEquals(2, MathUtil.gcd(2, 4));
+        Assert.assertEquals(2, MathUtil.gcd(4, 2));
+        Assert.assertEquals(1, MathUtil.gcd(2, 5));
+        Assert.assertEquals(1, MathUtil.gcd(5, 2));
+        Assert.assertEquals(2, MathUtil.gcd(2, 6));
+        Assert.assertEquals(2, MathUtil.gcd(6, 2));
+        Assert.assertEquals(2, MathUtil.gcd(6, 10));
+        Assert.assertEquals(2, MathUtil.gcd(10, 6));
+        Assert.assertEquals(3, MathUtil.gcd(6, 15));
+        Assert.assertEquals(3, MathUtil.gcd(15, 6));
+        Assert.assertEquals(3, MathUtil.gcd(6, -15));
+        Assert.assertEquals(3, MathUtil.gcd(-15, 6));
+        Assert.assertEquals(3, MathUtil.gcd(-6, -15));
+        Assert.assertEquals(3, MathUtil.gcd(-15, -6));
+        Assert.assertEquals(5, MathUtil.gcd((int)Math.pow(2, 28) * 5, (int)Math.pow(3, 18) * 5));
+
+        Assert.assertEquals(14, MathUtil.gcd(14, 28));
+        Assert.assertEquals(7, MathUtil.gcd(14, 28, 21));
+        Assert.assertEquals(7, MathUtil.gcd(21, 28, 14));
+        Assert.assertEquals(7, MathUtil.gcd(14, 28, 21));
+        Assert.assertEquals(7, MathUtil.gcd(new int[] { 14, 28, 21 }));
+        Assert.assertEquals(7, MathUtil.gcd(new int[] { 21, 28, 14 }));
+    }","Function: 94
+Gcd
+Spf Results Inputs: i_1_SYMINT,j_2_SYMINT
+demo.Gcd.gcd(-9223372036854775808(don't care),-1)  --> ""java.lang.ArithmeticException: div by 0...""
+demo.Gcd.gcd(0,0)  --> Return Value: 0
+demo.Gcd.gcd(-1,0)  --> Return Value: 1"
+"(long value, long min, long max)","public class GetModulatedFloat {
+public static float getModulatedFloat(long value, long min, long max)
+    {
+        // Don't use max floats because when the active span is big compared to
+        // the loop span the shader calculations would max out on the float
+        // type. This caused incorrect alpha calculations and all features would
+        // disappear.
+        float modulatedValue = Float.MAX_VALUE / 2;
+        if (value > min && value < max)
+        {
+            double range = max - min;
+            double floatRange = modulatedValue - 0;
+
+            double floatPerUnit = floatRange / range;
+            long deltaFromMin = value - min;
+            float floats = (float)(deltaFromMin * floatPerUnit);
+            modulatedValue = floats;
+        }
+        else if (value <= min)
+        {
+            modulatedValue = 0;
+        }
+
+        return modulatedValue;
+    }
+}","@Test
+    public void testGetModulatedFloat()
+    {
+//        Assert.assertEquals(-Float.MAX_VALUE, MathUtil.getModulatedFloat(Long.MIN_VALUE, Long.MIN_VALUE, Long.MAX_VALUE), 0f);
+//        Assert.assertEquals(0f, MathUtil.getModulatedFloat(0L, Long.MIN_VALUE, Long.MAX_VALUE), 0f);
+//        Assert.assertEquals(Float.MAX_VALUE, MathUtil.getModulatedFloat(Long.MAX_VALUE, Long.MIN_VALUE, Long.MAX_VALUE), 0f);
+
+        Assert.assertEquals(0, MathUtil.getModulatedFloat(0, 0, 1000), 0f);
+        Assert.assertEquals(Float.MAX_VALUE / 4, MathUtil.getModulatedFloat(500, 0, 1000), 0f);
+        Assert.assertEquals(Float.MAX_VALUE / 2, MathUtil.getModulatedFloat(1000, 0, 1000), 0f);
+
+        long min = 1370476800000L;
+        long max = min + Constants.MILLIS_PER_DAY;
+        long step = 1000L;
+        for (long test = min; test < max; test += step)
+        {
+            Assert.assertTrue(MathUtil.getModulatedFloat(test + step, min, max) != MathUtil.getModulatedFloat(test, min, max));
+        }
+    }","Function: 95
+GetModulatedFloat
+Spf Results Inputs: value_1_SYMINT,min_2_SYMINT,max_3_SYMINT
+demo.GetModulatedFloat.getModulatedFloat(-1l,0l,-9223372036854775808(don't care))  --> Return Value: 0.0
+demo.GetModulatedFloat.getModulatedFloat(0l,0l,-9223372036854775808(don't care))  --> Return Value: 0.0
+demo.GetModulatedFloat.getModulatedFloat(1l,0l,-9223372036854775808(don't care))  --> Return Value: 0.0"
+"(long inputVal, int shift)","public class BitShift {
+public static long bitShift(long inputVal, int shift)
+    {
+        return shift > 0 ? inputVal << shift : shift < 0 ? inputVal >> shift * -1 : inputVal;
+    }
+}","@Test
+    public void testBitShift()
+    {
+        Assert.assertEquals(4, MathUtil.bitShift(1, 2));
+        Assert.assertEquals(2, MathUtil.bitShift(1, 1));
+        Assert.assertEquals(1, MathUtil.bitShift(1, 0));
+        Assert.assertEquals(0, MathUtil.bitShift(1, -1));
+        Assert.assertEquals(0, MathUtil.bitShift(1, -2));
+
+        Assert.assertEquals(8, MathUtil.bitShift(2, 2));
+        Assert.assertEquals(4, MathUtil.bitShift(2, 1));
+        Assert.assertEquals(2, MathUtil.bitShift(2, 0));
+        Assert.assertEquals(1, MathUtil.bitShift(2, -1));
+        Assert.assertEquals(0, MathUtil.bitShift(2, -2));
+    }","Function: 96
+BitShift
+Spf Results Inputs: inputVal_1_SYMINT,shift_2_SYMINT
+demo.BitShift.bitShift(-9223372036854775808(don't care),1)  --> Return Value: 0
+demo.BitShift.bitShift(-9223372036854775808(don't care),-1)  --> Return Value: -4611686018427387904
+demo.BitShift.bitShift(-9223372036854775808(don't care),0)  --> Return Value: -9223372036854775808"
+"(int value, int modulus)","public class RoundDownTo {
+public static int roundDownTo(int value, int modulus)
+    {
+        return value >= 0 ? value - value % modulus : value + (value % modulus == 0 ? 0 : -modulus - value % modulus);
+    }
+}","@Test
+    public void testRoundDownToLongLong()
+    {
+        for (long i = 0L; i < 8L; ++i)
+        {
+            Assert.assertEquals(0L, MathUtil.roundDownTo(i, 8L));
+        }
+        for (long i = 8L; i < 16L; ++i)
+        {
+            Assert.assertEquals(8L, MathUtil.roundDownTo(i, 8L));
+        }
+        Assert.assertEquals(16L, MathUtil.roundDownTo(16L, 8L));
+    }","Function: 97
+RoundDownTo
+Spf Results Inputs: value_1_SYMINT,modulus_2_SYMINT
+demo.RoundDownTo.roundDownTo(0,-9223372036854775808(don't care))  --> ""java.lang.ArithmeticException: div by 0...""
+demo.RoundDownTo.roundDownTo(-1,-9223372036854775808(don't care))  --> ""java.lang.ArithmeticException: div by 0..."""
+"(int value, int modulus)","public class RoundUpTo {
+public static int roundUpTo(int value, int modulus)
+    {
+        return value > 0 ? value % modulus == 0 ? value : value + modulus - value % modulus : value - value % modulus;
+    }
+}","@Test
+    public void testRoundUpToIntInt()
+    {
+        Assert.assertEquals(-8, MathUtil.roundUpTo(-8, 8));
+        for (int i = -7; i <= 0; ++i)
+        {
+            Assert.assertEquals(0, MathUtil.roundUpTo(i, 8));
+        }
+        for (int i = 1; i <= 8; ++i)
+        {
+            Assert.assertEquals(8, MathUtil.roundUpTo(i, 8));
+        }
+        for (int i = 9; i <= 16; ++i)
+        {
+            Assert.assertEquals(16, MathUtil.roundUpTo(i, 8));
+        }
+    }","Function: 98
+RoundUpTo
+Spf Results Inputs: value_1_SYMINT,modulus_2_SYMINT
+demo.RoundUpTo.roundUpTo(1,-9223372036854775808(don't care))  --> ""java.lang.ArithmeticException: div by 0...""
+demo.RoundUpTo.roundUpTo(0,-9223372036854775808(don't care))  --> ""java.lang.ArithmeticException: div by 0..."""
+"(double val1, double val2)","public class EqualsOrBothNaN {
+public static boolean equalsOrBothNaN(double val1, double val2)
+    {
+        return val1 == val2 || Double.isNaN(val1) && Double.isNaN(val2);
+    }
+}","@Test
+    public void testEqualsOrBothNaN()
+    {
+        Assert.assertTrue(Utilities.equalsOrBothNaN(Double.NaN, Double.NaN));
+        Assert.assertFalse(Utilities.equalsOrBothNaN(Double.NaN, 0.));
+        Assert.assertFalse(Utilities.equalsOrBothNaN(0., Double.NaN));
+        Assert.assertTrue(Utilities.equalsOrBothNaN(0., 0.));
+
+        Assert.assertTrue(Utilities.equalsOrBothNaN(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY));
+        Assert.assertFalse(Utilities.equalsOrBothNaN(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY));
+        Assert.assertFalse(Utilities.equalsOrBothNaN(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
+        Assert.assertTrue(Utilities.equalsOrBothNaN(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY));
+
+        Assert.assertTrue(Utilities.equalsOrBothNaN(Float.NaN, Float.NaN));
+        Assert.assertFalse(Utilities.equalsOrBothNaN(Float.NaN, 0.));
+        Assert.assertFalse(Utilities.equalsOrBothNaN(0f, Float.NaN));
+        Assert.assertTrue(Utilities.equalsOrBothNaN(0f, 0f));
+
+        Assert.assertTrue(Utilities.equalsOrBothNaN(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
+        Assert.assertFalse(Utilities.equalsOrBothNaN(Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY));
+        Assert.assertFalse(Utilities.equalsOrBothNaN(Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY));
+        Assert.assertTrue(Utilities.equalsOrBothNaN(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY));
+    }","Function: 103
+EqualsOrBothNaN
+Spf Results Inputs: val1_1_SYMREAL,val2_2_SYMREAL
+demo.EqualsOrBothNaN.equalsOrBothNaN(0.0,1.0)  --> Return Value: 0
+demo.EqualsOrBothNaN.equalsOrBothNaN(0.0,0.0)  --> Return Value: 1
+demo.EqualsOrBothNaN.equalsOrBothNaN(0.5,0.0)  --> Return Value: 0"
+"(long a, long b)","public class SumOverflow {
+public static boolean sumOverflow(long a, long b)
+    {
+        return b > Long.MAX_VALUE - a;
+    }
+}","@Test
+    public void testSumOverflow()
+    {
+        Assert.assertFalse(Utilities.sumOverflow(0L, 0L));
+        Assert.assertFalse(Utilities.sumOverflow(Long.MAX_VALUE, 0L));
+        Assert.assertTrue(Utilities.sumOverflow(Long.MAX_VALUE, 1L));
+        Assert.assertFalse(Utilities.sumOverflow(Long.MAX_VALUE, -1L));
+    }","Function: 104
+SumOverflow
+Spf Results Inputs: a_1_SYMINT,b_2_SYMINT
+demo.SumOverflow.sumOverflow(0l,0l)  --> Return Value: 0
+demo.SumOverflow.sumOverflow(9223372036854775807l,0l)  --> Return Value: 0
+demo.SumOverflow.sumOverflow(9223372036854775807l,1l)  --> Return Value: 0"
+(long l),"public class Increment {
+public static long increment(long l) {
+		return l + 1;
+	}
+}","@Test
+	public void testIncrement() {
+		assertThat(MathUtils.increment(8L)).isEqualTo(9L);
+		assertThat(MathUtils.increment(0L)).isEqualTo(1L);
+		assertThat(MathUtils.increment(-8L)).isEqualTo(-7L);
+	}","Function: 106
+Increment
+Spf Results Inputs: l_1_SYMINT
+No path conditions for demo.Increment.increment(0)"
+"(long factor1, long factor2)","public class Multiply {
+public static long multiply(long factor1, long factor2) {
+		return factor1 * factor2;
+	}
+}","@Test
+	public void testMultiply() {
+		assertThat(MathUtils.multiply(8L, 2L)).isEqualTo(16L);
+		assertThat(MathUtils.multiply(0L, 2L)).isEqualTo(0L);
+		assertThat(MathUtils.multiply(8L, 0L)).isEqualTo(0L);
+	}","Function: 107
+Multiply
+Spf Results Inputs: factor1_1_SYMINT,factor2_2_SYMINT
+No path conditions for demo.Multiply.multiply(0,0)"
+(long timestamp),"public class ToMillis {
+static long toMillis(long timestamp) {
+    if (timestamp < 10000000000L) {
+      // in seconds
+      return timestamp * 1000;
+    } else if (timestamp < 10000000000000L) {
+      // in millis
+      return timestamp;
+    }
+    // in micros
+    return timestamp / 1000;
+  }
+}","@Test
+  public void testToMillis() {
+    long millis = 1542750947417L;
+    Assert.assertEquals(1542750947000L, toMillis(millis / 1000));
+    Assert.assertEquals(1542750947417L, toMillis(millis));
+    Assert.assertEquals(1542750947417L, toMillis(millis * 1000 + 918));
+  }","Function: 108
+ToMillis
+Spf Results Inputs: timestamp_1_SYMINT
+demo.ToMillis.toMillis(0l)  --> Return Value: 0
+demo.ToMillis.toMillis(10000000000l)  --> Return Value: 10000000000000
+demo.ToMillis.toMillis(1410065409l)  --> Return Value: 1410065409000"
+"(long fetchedLength, long contentLength)","public class IsCorrectFull {
+public static boolean isCorrectFull(long fetchedLength, long contentLength) {
+        return fetchedLength == contentLength;
+    }
+}","@Test
+    public void isCorrectFull() throws Exception {
+        assertThat(Util.isCorrectFull(1, 2)).isFalse();
+        assertThat(Util.isCorrectFull(2, 2)).isTrue();
+    }","Function: 110
+IsCorrectFull
+Spf Results Inputs: fetchedLength_1_SYMINT,contentLength_2_SYMINT
+demo.IsCorrectFull.isCorrectFull(-1l,0l)  --> Return Value: 1
+demo.IsCorrectFull.isCorrectFull(0l,0l)  --> Return Value: 1
+demo.IsCorrectFull.isCorrectFull(0l,-1l)  --> Return Value: 1"
+"(double baseOrientation, double orientation)","public class AlignOrientation {
+public double alignOrientation(double baseOrientation, double orientation) {
+        double resultOrientation;
+        if (baseOrientation >= 0) {
+            if (orientation < -Math.PI + baseOrientation)
+                resultOrientation = orientation + 2 * Math.PI;
+            else
+                resultOrientation = orientation;
+
+        } else if (orientation > +Math.PI + baseOrientation)
+            resultOrientation = orientation - 2 * Math.PI;
+        else
+            resultOrientation = orientation;
+        return resultOrientation;
+    }
+}","@Test
+    public void testAlignOrientation() {
+        assertEquals(90.0, Math.toDegrees(AC.alignOrientation(Math.toRadians(90), Math.toRadians(90))), 0.001);
+        assertEquals(225.0, Math.toDegrees(AC.alignOrientation(Math.toRadians(90), Math.toRadians(-135))), 0.001);
+        assertEquals(-45.0, Math.toDegrees(AC.alignOrientation(Math.toRadians(-135), Math.toRadians(-45))), 0.001);
+        assertEquals(-270.0, Math.toDegrees(AC.alignOrientation(Math.toRadians(-135), Math.toRadians(90))), 0.001);
+    }","Function: 111
+AlignOrientation
+Spf Results Inputs: baseOrientation_1_SYMREAL,orientation_2_SYMREAL
+demo.AlignOrientation.alignOrientation(4.1415926535,0.0)  --> Return Value: 6.283185307179586
+demo.AlignOrientation.alignOrientation(3.1415926535,0.0)  --> Return Value: 0.0
+demo.AlignOrientation.alignOrientation(0.0,0.0)  --> Return Value: 0.0"
+"(double value, double min, double max)","public class KeepIn {
+public static final double keepIn(double value, double min, double max) {
+        return Math.max(min, Math.min(value, max));
+    }
+}","@Test
+    public void testKeepIn() {
+        assertEquals(2, Helper.keepIn(2, 1, 4), 1e-2);
+        assertEquals(3, Helper.keepIn(2, 3, 4), 1e-2);
+        assertEquals(3, Helper.keepIn(-2, 3, 4), 1e-2);
+    }","Function: 114
+KeepIn
+Spf Results Inputs: value_1_SYMREAL,min_2_SYMREAL,max_3_SYMREAL
+
+demo.KeepIn.keepIn(0.0,0.0,0.5)  --> Return Value: 0.5
+demo.KeepIn.keepIn(0.0,1.0,1.0)  --> Return Value: 1.0
+demo.KeepIn.keepIn(0.0,2.0,1.0)  --> Return Value: 2.0
+demo.KeepIn.keepIn(0.5,0.0,0.5)  --> Return Value: 0.5
+demo.KeepIn.keepIn(0.0,0.0,0.0)  --> Return Value: 0.0
+demo.KeepIn.keepIn(0.0,1.0,0.0)  --> Return Value: 1.0
+demo.KeepIn.keepIn(0.5,0.0,0.0)  --> Return Value: 0.5
+demo.KeepIn.keepIn(0.5,0.5,0.0)  --> Return Value: 0.5
+demo.KeepIn.keepIn(0.5,1.0,0.0)  --> Return Value: 1.0"
+(boolean value),"public class BoolToInt {
+public static int boolToInt(boolean value)
+    {
+        if (value)
+        {
+            return 1;
+        }
+        return 0;
+    }
+}","@Test
+    void testBoolToInt()
+    {
+        assertEquals(0, UtilConversion.boolToInt(false));
+        assertEquals(1, UtilConversion.boolToInt(true));
+    }","Function: 120
+BoolToInt
+Spf Results Inputs: value_1_SYMINT
+demo.BoolToInt.boolToInt(true)  --> Return Value: 1
+demo.BoolToInt.boolToInt(false)  --> Return Value: 0"
+"(int value, int min, int max)","public class Clamp {
+public static int clamp(int value, int min, int max)
+    {
+        final int fixed;
+        if (value < min)
+        {
+            fixed = min;
+        }
+        else if (value > max)
+        {
+            fixed = max;
+        }
+        else
+        {
+            fixed = value;
+        }
+        return fixed;
+    }
+}","@Test
+    void testClamp()
+    {
+        assertEquals(0, UtilMath.clamp(-10, 0, 10));
+        assertEquals(10, UtilMath.clamp(50, 0, 10));
+        assertEquals(10, UtilMath.clamp(10, 0, 10));
+        assertEquals(0, UtilMath.clamp(0, 0, 10));
+
+        assertEquals(0L, UtilMath.clamp(-10L, 0L, 10L));
+        assertEquals(10L, UtilMath.clamp(50L, 0L, 10L));
+        assertEquals(10L, UtilMath.clamp(10L, 0L, 10L));
+        assertEquals(0L, UtilMath.clamp(0L, 0L, 10L));
+
+        assertEquals(0.0, UtilMath.clamp(-10.0, 0.0, 10.0));
+        assertEquals(10.0, UtilMath.clamp(50.0, 0.0, 10.0));
+        assertEquals(10.0, UtilMath.clamp(10.0, 0.0, 10.0));
+        assertEquals(0.0, UtilMath.clamp(0.0, 0.0, 10.0));
+    }","Function: 122
+Clamp
+Spf Results Inputs: value_1_SYMINT,min_2_SYMINT,max_3_SYMINT
+demo.Clamp.clamp(-1,0,-9223372036854775808(don't care))  --> Return Value: 0
+demo.Clamp.clamp(0,0,-1)  --> Return Value: -1
+demo.Clamp.clamp(0,0,0)  --> Return Value: 0"

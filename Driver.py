@@ -16,8 +16,25 @@ class Driver:
         valid,failures=self.jqf.driverjqf(function_code)
         model="gemini-1.5-flash"
         result=self.GTCJQF.gen_TC_Gemini(valid,failures,function_code,model)
-        print(result)
+        return valid,failures,result
 
+    def run_jqf_with_compile(self,df):
+        self.jqf.make_files(df)
+        model="gemini-1.5-flash"
+        i=True
+        df[['valid_jqf', 'failure_jqf', 'JUnit_jqf']] = None
+        for index, row in df.iterrows():
+            function_code = row['Function']
+            valid,failures=self.jqf.driver_all(function_code,i)
+            i=False
+            result=self.GTCJQF.gen_TC_Gemini(valid,failures,function_code,model)
+            df.at[index, 'valid_jqf'] = valid
+            df.at[index, 'failure_jqf'] = failures
+            df.at[index, 'JUnit_jqf'] = result
+            print("Index is",index)
+        df.to_csv("FilteredData_Test_Updated.csv", index=False)
+
+            
 
     def run_spf(self,function):
         result=self.spf.driverspf(function)
@@ -33,41 +50,12 @@ class Driver:
 
 
 def main():
-    # functionsno=[12,13,15,22,23,24,27,32,34,35,36,37,38,39,40,41,42,43,44,45,53,54]
-    # functionsno=[i-1 for i in functionsno]
-    # functions=pd.read_csv("ExtractedData.csv",usecols=["Function"],skiprows= lambda x: x not in functionsno and x!=0) 
-    # functions=functions.drop_duplicates()
-    # functions=functions.reset_index(drop=True)
-    # print(functions)
-    # with open("functions.csv","w") as f:
-
-    #     functions.to_csv(f)
-
-    # driver=Driver()
-    # for i in range(len(functions)):
-    #     function=functions.iloc[i][0]
-    #     driver.run_LLM(function)
-    #     print("Function "+str(functionsno[i])+" completed")
-    function2="""public class WaterUsage {
-    public static double calculateWaterUsage(int familyMembers, int appliances, boolean hasGarden, int dailyUseLiters) {
-        double baseUsage = familyMembers * dailyUseLiters;
-        if (hasGarden) {
-            baseUsage += 50; // Additional for garden
-        }
-        if (appliances > 0) {
-            baseUsage += appliances * 10; // Additional for appliances
-        }
-        if (familyMembers > 5) {
-            baseUsage *= 1.1; // Slight increase for larger families
-        }
-        return baseUsage;
-    }
-
-}"""
-
     driver=Driver()
-    driver.run_jqf(function2)
-
-
-
+    df=pd.read_csv("FilteredData_Test.csv")
+    df=df.drop(index=23)
+    df=df.drop(index=22)
+    df=df.drop(index=25)
+    # print(df['Function'])
+    df = df.reset_index(drop=True)
+    driver.run_jqf_with_compile(df)
 main()

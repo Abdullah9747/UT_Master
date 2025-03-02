@@ -23,12 +23,43 @@ class JQF:
     def driverjqf(self,function_code):
         file_name= self.prepare_JQf(function_code)
         jqf_file_name = f"{file_name}Test"
-        self.run_jqf(jqf_file_name)
+        self.run_jqf_with_compilig(jqf_file_name)
         valid_inputs,failure_inputs=self.compile_results(file_name)
         return valid_inputs,failure_inputs
+    
+    def make_files(self,df):
+        for function_code in df['Function']:
+            self.prepare_JQf(function_code)
+        
+    def driver_all(self,function_code,compile):
+        file_name,method,params=self.make_AST(function_code)
+        jqf_file_name = f"{file_name}Test"
+        if compile:
+            self.run_jqf_with_compilig(jqf_file_name)
+        else:
+            self.run_jqf(jqf_file_name)
+        valid_inputs,failure_inputs=self.compile_results(file_name)
+        return valid_inputs,failure_inputs
+    
+
+    
+    def make_method_static(self,file_content):
+        function_split=file_content.split("\n")
+        get_row=function_split[1].split(" ")   
+        if get_row[0]=="public" or get_row[0]=="private" or get_row[0]=="protected":
+            get_row.insert(1,"static")
+            function_split[1]=" ".join(get_row)
+            file_content="\n".join(function_split)
+        else:
+            get_row.insert(0,"static")
+            function_split[1]=" ".join(get_row)
+            file_content="\n".join(function_split)
+        return file_content
 
 
     def provide_main(self, file_content):
+        if "static" not in file_content:
+            file_content = self.make_method_static(file_content)
         temp = file_content[:-1]
         class_name, method, params = self.make_AST(file_content)
         main_content = "public static void main(String[] args) {\n"
@@ -168,7 +199,7 @@ class JQF:
         with open(file_path, 'w') as file:
             file.write(file_content)
     def run_jqf_with_compilig(self,filename):
-        command = (f"mvn clean install -DskipTests && mvn package &&" 
+        command = (f"mvn clean install -DskipTests && " 
             f"mvn jqf:fuzz \"-Dclass=edu.berkeley.cs.jqf.examples.{filename}\" \"-Dmethod=fuzz\"  \"-Dtime=1m\"")
 
 #         docker_command = (
@@ -225,6 +256,7 @@ class JQF:
         try:
             # Change to the project directory
             os.chdir(project_dir)
+            print(os.getcwd())
 
             # Run the Docker command and capture output
             result = subprocess.run(
@@ -242,7 +274,7 @@ class JQF:
         except FileNotFoundError:
             print(f"Error: The directory {project_dir} does not exist.")
         except subprocess.CalledProcessError as e:
-            print("Error running Docker command:")
+            print("Error running command:")
             print("Stdout:", e.stdout.decode() if e.stdout else "No output")
             print("Stderr:", e.stderr.decode() if e.stderr else "No errors")
 

@@ -1,0 +1,26 @@
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+
+public class LogSumTest {
+
+    @Test
+    public void testLogSumValid1() {
+        double logA = 0.3926678784071379;
+        double logB = 0.9183672317227607;
+        double expected = 0.9183672317227607 + Math.log(1 + Math.exp(-(0.9183672317227607 - 0.3926678784071379)));
+        assertEquals(expected, LogSum.logSum(logA, logB), 1e-10); 
+    }
+
+    @Test
+    public void testLogSumValid2() {
+        double logA = 0.3926965121015934;
+        double logB = 0.190371444681528;
+        double expected = 0.3926965121015934 + Math.log(1 + Math.exp(-(0.3926965121015934 - 0.190371444681528)));
+        assertEquals(expected, LogSum.logSum(logA, logB), 1e-10);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void testLogSumFailureEmpty(){
+        assertEquals(0,LogSum.logSum(0,0),1e-10);
+    }
+}
