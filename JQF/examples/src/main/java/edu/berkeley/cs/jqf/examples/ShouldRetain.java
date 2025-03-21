@@ -11,6 +11,6 @@ public static boolean shouldRetain(int i, int maxRetention, int length) {
 public static void main(String[] args) {
 
 
-shouldRetain(5, 1, 83);
+shouldRetain(28, 55, 96);
 }
 }

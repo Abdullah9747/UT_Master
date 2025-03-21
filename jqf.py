@@ -13,6 +13,7 @@ import numpy as np
 class JQF:
     def __init__(self):
         self.maindir=os.getcwd()
+        print("dir is",self.maindir)
     def prepare_JQf(self,function_code):
         class_name,method,params=self.make_AST(function_code)
         self.make_JQF_file(class_name,function_code)
@@ -238,18 +239,12 @@ class JQF:
 
 
     def run_jqf(self,filename):
-        # Define the Docker command
-        # docker_command = (
-        #     "docker run -v %cd%:/app -it maven:3.6.1-jdk-12 /bin/bash -c "
-        #     f"\"cd /app && java  -jar JQF/fuzz/target/jqf-fuzz-2.1-SNAPSHOT-zest-cli.jar --duration=60s "
-        #     f"-e target/example-java-1.0-SNAPSHOT-fat-tests.jar dev.fuzzit.examplejava.{filename} fuzz\""
-        # )
+      
         command = (
         f"mvn jqf:fuzz \"-Dclass=edu.berkeley.cs.jqf.examples.{filename}\" \"-Dmethod=fuzz\"  \"-Dtime=1m\""
         )
 
 
-# java -jar JQF/fuzz/target/jqf-fuzz-2.1-SNAPSHOT-zest-cli.jar --duration=60s -e target/example-java-1.0-SNAPSHOT-fat-tests.jar dev.fuzzit.examplejava.hoursToMinutesTest fuzz
         # Define the project directory
         project_dir = r"JQF\examples"
 
@@ -370,3 +365,5 @@ import edu.berkeley.cs.jqf.fuzz.JQF;
         valid_inputs=self.compile_results_content(filename,"corpus")
         failure_inputs=self.compile_results_content(filename,"failures")
         return valid_inputs,failure_inputs
+
+

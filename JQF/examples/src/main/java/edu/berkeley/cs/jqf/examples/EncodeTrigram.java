@@ -9,6 +9,6 @@ public static long encodeTrigram(int g0, int g1, int g2) {
 public static void main(String[] args) {
 
 
-encodeTrigram(39, 72, 62);
+encodeTrigram(72, 38, 34);
 }
 }

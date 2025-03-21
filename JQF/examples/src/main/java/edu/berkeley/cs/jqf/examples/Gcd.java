@@ -17,6 +17,6 @@ public static int gcd(int i, int j)
 public static void main(String[] args) {
 
 
-gcd(88, 29);
+gcd(8, 73);
 }
 }

@@ -7,6 +7,6 @@ public static long convertBurstSizeToKiloBits(long burstSizeInPackets, long pack
 public static void main(String[] args) {
 
 
-convertBurstSizeToKiloBits(207447L, 669926L);
+convertBurstSizeToKiloBits(465627L, 775580L);
 }
 }

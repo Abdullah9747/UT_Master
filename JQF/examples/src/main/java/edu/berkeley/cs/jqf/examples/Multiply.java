@@ -7,6 +7,6 @@ public static long multiply(long factor1, long factor2) {
 public static void main(String[] args) {
 
 
-multiply(687345L, 3615L);
+multiply(43633L, 392563L);
 }
 }

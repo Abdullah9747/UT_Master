@@ -7,6 +7,6 @@ public static boolean isCorrectFull(long fetchedLength, long contentLength) {
 public static void main(String[] args) {
 
 
-isCorrectFull(346883L, 683305L);
+isCorrectFull(600904L, 471516L);
 }
 }

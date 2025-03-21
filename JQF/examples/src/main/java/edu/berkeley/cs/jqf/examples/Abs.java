@@ -7,6 +7,6 @@ public static int abs(int n) {
 public static void main(String[] args) {
 
 
-abs(59);
+abs(54);
 }
 }

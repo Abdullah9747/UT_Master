@@ -8,6 +8,7 @@ from langchain_openai import ChatOpenAI as COAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain, SequentialChain
 from langchain.schema.runnable import RunnableLambda, RunnablePassthrough, RunnableSequence
+import pandas as pd
 
 class GenerateTestCasesLLM:
     def __init__(self):
@@ -96,8 +97,6 @@ class GenerateTestCasesLLM:
             print("No function information extracted.")
             return
         
-        # Initialize the test case generator
-        # test_gen = GenerateTestCasesLLM()
         
         # Generate test cases for each output
         outputs = {
@@ -123,10 +122,6 @@ class GenerateTestCasesLLM:
                 print(f"Error generating test cases for {key}:", result)
                 continue
             
-            # Write the generated test cases to a file
-            # filename = f"TestCases_{key}.java"
-            # with open(filename, "w") as f:
-            #     f.write(result)
             folder = "llmsresults"
             if not os.path.exists(folder):
                 os.makedirs(folder)
@@ -136,25 +131,10 @@ class GenerateTestCasesLLM:
 
             print(f"Test cases for {key} generated successfully in {filename}")
 
-    # def gen_TC_Gemini(self, func, model):
-    #     try:
-
-    #         llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
-    #         messages = [
-    #             ("system", "You are going to generate Junit4 file for the given Java function and do not write anything else like ```java or ```"),
-    #             ("human", "Just give me Junit directly I do not need any other information or code block elements"),
-    #             ("human", func)
-    #         ]
-    #         response = llm.invoke(messages)
-    #         cleaned_response = response.strip("```java").strip("```").strip()
-    #         return cleaned_response
-    #     except Exception as e:
-    #         print(e)
-    #         return e
-
     def gen_TC_Gemini(self, func, model):
         try:
             llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
+
             # Step 1: Analyze the Java function
             analysis_prompt = PromptTemplate(
                 input_variables=["func"],
@@ -163,41 +143,49 @@ class GenerateTestCasesLLM:
             analysis_chain = LLMChain(llm=llm, prompt=analysis_prompt, output_key="analysis")
 
             # Step 2: Generate test values for statement coverage
-            # can be branch cov.
             test_values_prompt = PromptTemplate(
                 input_variables=["analysis"],
                 template="Based on this function analysis, generate test values to ensure statement coverage:\n\n{analysis}"
             )
             test_values_chain = LLMChain(llm=llm, prompt=test_values_prompt, output_key="test_values")
 
-            # Step 3: Generate JUnit 4 test cases
+            # Step 3: Determine expected outputs
+            expected_prompt = PromptTemplate(
+                input_variables=["test_values", "analysis", "func"],
+                template="Based on the given test values: {test_values}, "
+                        "provide the expected outputs of the function.\n\nFunction Analysis:\n{analysis}\n\nFunction Code:\n{func}"
+            )
+            expected_chain = LLMChain(llm=llm, prompt=expected_prompt, output_key="expected_output")
+
+            # Step 4: Generate JUnit 4 test cases
             junit_prompt = PromptTemplate(
-                input_variables=["test_values", "func"],
+                input_variables=["test_values", "expected_output", "func"],
                 template="You are going to generate a JUnit 4 test file for the given Java function.\n"
-                        "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
-                        "While writing test make sure to give correct values for both input and what to expect as output."
-                        "Just return the JUnit 4 test code, no explanations and code block notations."
+                        "Use these test values: {test_values} and these are expected output values: {expected_output}\n\n"
+                        "Function:\n{func}\n\n"
+                        "While writing tests, make sure to give correct values for both input and expected output. "
+                        "Just return the JUnit 4 test code, no explanations and no code block notations."
             )
             junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
 
             # Create the sequential chain
             overall_chain = SequentialChain(
-                chains=[analysis_chain, test_values_chain, junit_chain],
+                chains=[analysis_chain, test_values_chain, expected_chain, junit_chain],
                 input_variables=["func"],
                 output_variables=["junit_code"]
             )
 
             # Run the chain
             result = overall_chain({"func": func})
-            if "```java" or "```"in result["junit_code"]:
 
-                result["junit_code"]=result["junit_code"].replace("```java","")
-                result["junit_code"]=result["junit_code"].replace("```","")
-                result["junit_code"]=result["junit_code"][1:]
-            return result["junit_code"]
+            # Remove code block notations if present
+            junit_code = result.get("junit_code", "").replace("```java", "").replace("```", "").strip()
+
+            return junit_code
+
         except Exception as e:
-            print(e)
-            return e
+            print(f"Error: {e}")
+            return str(e)
 
 
 
@@ -213,38 +201,47 @@ class GenerateTestCasesLLM:
             analysis_chain = LLMChain(llm=llm, prompt=analysis_prompt, output_key="analysis")
 
             # Step 2: Generate test values for statement coverage
-            # can be branch cov.
             test_values_prompt = PromptTemplate(
                 input_variables=["analysis"],
                 template="Based on this function analysis, generate test values to ensure statement coverage:\n\n{analysis}"
             )
             test_values_chain = LLMChain(llm=llm, prompt=test_values_prompt, output_key="test_values")
 
-            # Step 3: Generate JUnit 4 test cases
+            # Step 3: Determine expected outputs
+            expected_prompt = PromptTemplate(
+                input_variables=["test_values", "analysis", "func"],
+                template="Based on the given test values: {test_values}, "
+                        "provide the expected outputs of the function.\n\nFunction Analysis:\n{analysis}\n\nFunction Code:\n{func}"
+            )
+            expected_chain = LLMChain(llm=llm, prompt=expected_prompt, output_key="expected_output")
+
+            # Step 4: Generate JUnit 4 test cases
             junit_prompt = PromptTemplate(
-                input_variables=["test_values", "func"],
-                template="You are going to generate a JUnit 4 test file for the given Java function.\n"
-                        "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
-                        "While writing test make sure to give correct values for both input and what to expect as output."
-                        "Just return the JUnit 4 test code, no explanations and code block notations."
+                input_variables=["test_values", "expected_output", "func"],
+                template="Based on this function analysis, generate a JUnit 4 test file for the given Java function.\n"
+                            "I will be providing you with the valid  test values and the expected output values.\n"
+                            "Use only these test values: {test_values} for generating test cases and these are expected output values: {expected_output}\n\n"
+                            "Function:\n{func}\n\n"
+                            "Make sure to use only these test values to generate the test cases and do not make any extra test case except the given  test values. "
+                            "While writing tests, make sure to give correct values for both input and expected output. "
+                            "Just return the JUnit 4 test code, no explanations and no code block notations."
             )
             junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
 
             # Create the sequential chain
             overall_chain = SequentialChain(
-                chains=[analysis_chain, test_values_chain, junit_chain],
+                chains=[analysis_chain, test_values_chain, expected_chain, junit_chain],
                 input_variables=["func"],
                 output_variables=["junit_code"]
             )
 
             # Run the chain
             result = overall_chain({"func": func})
-            if "```java" or "```"in result["junit_code"]:
 
-                result["junit_code"]=result["junit_code"].replace("```java","")
-                result["junit_code"]=result["junit_code"].replace("```","")
-                result["junit_code"]=result["junit_code"][1:]
-            return result["junit_code"]
+            # Remove code block notations if present
+            junit_code = result.get("junit_code", "").replace("```java", "").replace("```", "").strip()
+
+            return junit_code
         except Exception as e:
             print(e)
             return e
@@ -264,19 +261,30 @@ class GenerateTestCasesSPF:
             )
             analysis_chain = LLMChain(llm=llm, prompt=analysis_prompt, output_key="analysis")
 
-            # Step 2: Generate JUnit test
+            # Step 2: Determine expected outputs
+            expected_prompt = PromptTemplate(
+                input_variables=["test_values", "analysis", "func"],
+                template="Based on the given test values: {test_values}, "
+                        "provide the expected outputs of the function.\n\nFunction Analysis:\n{analysis}\n\nFunction Code:\n{func}"
+            )
+            expected_chain = LLMChain(llm=llm, prompt=expected_prompt, output_key="expected_output")
+
+            # Step 3: Generate JUnit test
             junit_prompt = PromptTemplate(
-                input_variables=["analysis", "func", "test_values"],
-                template="Based on this function {analysis}, generate a JUnit 4 test file for the given Java function.\n"
-                        "Use these test values: {test_values}\n\nFunction:\n{func}\n\n"
-                        "While writing test make sure to give correct values for both input and what to expect as output."
-                        "Just return the JUnit 4 test code, no explanations and code block notations."
+                input_variables=["analysis", "func", "test_values", "expected_output"],
+                template="Based on this function analysis, generate a JUnit 4 test file for the given Java function.\n"
+                        "I will be providing you with test values and the expected output values.\n"
+                        "Use these test values: {test_values} for generating test cases and these are expected output values: {expected_output}\n\n"
+                        "Function:\n{func}\n\n"
+                        "Make sure to use test values to generate the test cases. "
+                        "While writing tests, make sure to give correct values for both input and expected output. "
+                        "Just return the JUnit 4 test code, no explanations and no code block notations."
             )
             junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
 
             # Create the sequential chain
             overall_chain = SequentialChain(
-                chains=[analysis_chain, junit_chain],
+                chains=[analysis_chain, expected_chain, junit_chain],
                 input_variables=["func", "test_values"],
                 output_variables=["junit_code"]
             )
@@ -285,39 +293,18 @@ class GenerateTestCasesSPF:
             result = overall_chain({"func": func, "test_values": test_values})
 
             # Remove code block notations if present
-            if "```java" in result["junit_code"] or "```" in result["junit_code"]:
-                result["junit_code"] = result["junit_code"].replace("```java", "").replace("```", "").strip()
+            junit_code = result.get("junit_code", "").replace("```java", "").replace("```", "").strip()
 
-            return result["junit_code"]
+            return junit_code
 
         except Exception as e:
-            print(e)
+            print(f"Error: {e}")
             return str(e)
+        
 
-    # def gen_TC_Gemini(self,output,func,model):
-    #     try:
-    #         llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
-    #         messages = [
-    #             ("system", "You are going to generate Junit4 file for the given Java function and do not write anything else like ```java or ```"),
-    #             ("human", "Just give me Junit directly I do not need any other information or code block elements"),
-    #             ("human", f"Function: {func}"),
-    #             ("human", f"Output: {output}")
-    #         ]
-    #         response = llm.invoke(messages)
-    #         cleaned_response = response.replace("```java","").replace("```","")
-    #         return cleaned_response
-    #     except Exception as e:
-    #         print(e)
-    #         return e
-    
-
-class GenerateTestCasesJQF:
-    def __init__(self):
-        load_dotenv()
-
-    def gen_TC_Gemini(self, valid, failures,func, model):
+    def gen_TC_GPT(self, func, test_values, model):
         try:
-            llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
+            llm = COAI(model=model, api_key=os.getenv("OPENAI_API_KEY"))
 
             # Step 1: Analyze the Java function
             analysis_prompt = PromptTemplate(
@@ -326,73 +313,185 @@ class GenerateTestCasesJQF:
             )
             analysis_chain = LLMChain(llm=llm, prompt=analysis_prompt, output_key="analysis")
 
-            # Step 2: Generate JUnit test
+            # Step 2: Determine expected outputs
+            expected_prompt = PromptTemplate(
+                input_variables=["test_values", "analysis", "func"],
+                template="Based on the given test values: {test_values}, "
+                        "provide the expected outputs of the function.\n\nFunction Analysis:\n{analysis}\n\nFunction Code:\n{func}"
+            )
+            expected_chain = LLMChain(llm=llm, prompt=expected_prompt, output_key="expected_output")
+
+            # Step 3: Generate JUnit test
             junit_prompt = PromptTemplate(
-                input_variables=["analysis", "func", "valid", "failures"],
+                input_variables=["analysis", "func", "test_values", "expected_output"],
                 template="Based on this function analysis, generate a JUnit 4 test file for the given Java function.\n"
-                        "I will be providing you with the valid and failure test values.\n"
-                        "Use these Valid values: {valid} and also these are test values in case of any failure : {failures}\n\nFunction:\n{func}\n\n"
-                        "While writing test make sure to give correct values for both input and what to expect as output."
-                        "Just return the JUnit 4 test code, no explanations and code block notations."
+                            "I will be providing you with the valid  test values and the expected output values.\n"
+                            "Use only these test values: {test_values} for generating test cases and these are expected output values: {expected_output}\n\n"
+                            "Function:\n{func}\n\n"
+                            "Make sure to use only valid and failure test values to generate the test cases and do not make any extra test case except the given valid and failure test values. "
+                            "If no Failure test values are provided, then generate test cases only for valid test values. "
+                            "While writing tests, make sure to give correct values for both input and expected output. "
+                            "Just return the JUnit 4 test code, no explanations and no code block notations."
             )
             junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
 
             # Create the sequential chain
             overall_chain = SequentialChain(
-                chains=[analysis_chain, junit_chain],
-                input_variables=["func", "valid", "failures"],
+                chains=[analysis_chain, expected_chain, junit_chain],
+                input_variables=["func", "test_values"],
                 output_variables=["junit_code"]
             )
 
             # Run the chain
-            result = overall_chain({"func": func, "valid": valid,"failures":failures})
+            result = overall_chain({"func": func, "test_values": test_values})
 
             # Remove code block notations if present
-            if "```java" in result["junit_code"] or "```" in result["junit_code"]:
-                result["junit_code"] = result["junit_code"].replace("```java", "").replace("```", "").strip()
+            junit_code = result.get("junit_code", "").replace("```java", "").replace("```", "").strip()
 
-            return result["junit_code"]
+            return junit_code
 
         except Exception as e:
-            print(e)
+            print(f"Error: {e}")
             return str(e)
 
-    # def gen_TC_Gemini(self,plot_data,fuzz_log,fun,model):
-    #     try:
-    #         llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
-    #         messages = [
-    #             ("system", "You are going to generate Junit4 file for the given Java function and do not write anything else like ```java or ```"),
-    #             ("human", "Just give me Junit directly I do not need any other information or code block elements"),
-    #             ("human", "I am going to give you the plot data and fuzz log from JQF containing the test values along with logs"),
-    #             ("human", f"Function: {fun}"),
-    #             ("human", f"Plot Data: {plot_data}"),
-    #             ("human", f"Fuzz Log: {fuzz_log}")
-    #         ]
-    #         response = llm.invoke(messages)
-    #         cleaned_response=response.replace("```java","").replace("```","")
-    #         return cleaned_response
-    #     except Exception as e:
-    #         print(e)
-    #         return e
-       
+    
+
+class GenerateTestCasesJQF:
+    def __init__(self):
+        load_dotenv()
+
+
+
+    def gen_TC_Gemini(self, valid, failures, func, model):
+            try:
+                llm = GGAI(model=model, api_key=os.getenv("Google_API_KEY"))
+
+                # Step 1: Analyze the Java function
+                analysis_prompt = PromptTemplate(
+                    input_variables=["func"],
+                    template="Analyze the following Java function and explain what it does in simple terms:\n\n{func}"
+                )
+                analysis_chain = LLMChain(llm=llm, prompt=analysis_prompt, output_key="analysis")
+
+                # Step 2: Determine expected outputs
+                expected_prompt = PromptTemplate(
+                    input_variables=["valid", "failures", "analysis", "func"],
+                    template="Based on the given valid test values: {valid} and failure test values: {failures}, "
+                            "provide the expected outputs of the function.\n\nFunction Analysis:\n{analysis}\n\nFunction Code:\n{func}"
+                )
+                expected_chain = LLMChain(llm=llm, prompt=expected_prompt, output_key="expected_output")
+
+                # Step 3: Generate JUnit test
+                junit_prompt = PromptTemplate(
+                    input_variables=["analysis", "func", "valid", "failures", "expected_output"],
+                    template="Based on this function analysis, generate a JUnit 4 test file for the given Java function.\n"
+                            "I will be providing you with the valid and failure test values and the expected output values.\n"
+                            "Use only these valid values: {valid} for generating test cases, also these are test values "
+                            "in case of any failure: {failures} and these are expected output values: {expected_output}\n\n"
+                            "Function:\n{func}\n\n"
+                            "Make sure to use only valid and failure test values to generate the test cases and do not make any extra test case except the given valid and failure test values. "
+                            "If no Failure test values are provided, then generate test cases only for valid test values. "
+                            "While writing tests, make sure to give correct values for both input and expected output. "
+                            "Just return the JUnit 4 test code, no explanations and no code block notations."
+                )
+                junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
+
+                # Create the sequential chain
+                overall_chain = SequentialChain(
+                    chains=[analysis_chain, expected_chain, junit_chain],
+                    input_variables=["func", "valid", "failures"],
+                    output_variables=["junit_code"]
+                )
+
+                # Run the chain
+                result = overall_chain({"func": func, "valid": valid, "failures": failures})
+
+                # Remove code block notations if present
+                junit_code = result.get("junit_code", "").replace("```java", "").replace("```", "").strip()
+
+                return junit_code
+
+            except Exception as e:
+                print(f"Error: {e}")
+                return str(e)
+
+
+
+
+
         
-    def gen_TC_GPT(self,plot_data,fuzz_log,fun,model):
-        try:
-            llm = COAI(model=model, api_key=os.getenv("OPENAI_API_KEY"))
-            messages = [
-                ("system", "You are going to generate Junit4 file for the given Java function and do not write anything else like ```java or ```"),
-                ("human", "Just give me Junit directly I do not need any other information or code block elements"),
-                ("human", "I am going to give you the plot data and fuzz log from JQF containing the test values along with logs"),
-                ("human", f"Function: {fun}"),
-                ("human", f"Plot Data: {plot_data}"),
-                ("human", f"Fuzz Log: {fuzz_log}")
-            ]
-            response = llm.invoke(messages)
-            cleaned_response=response.content.replace("```java","").replace("```","")
-            return cleaned_response
-        except Exception as e:
-            print(e)
-            return e
+    def gen_TC_GPT(self, valid, failures, func, model):
+            try:
+                llm = COAI(model=model, api_key=os.getenv("OPENAI_API_KEY"))
+
+                # Step 1: Analyze the Java function
+                analysis_prompt = PromptTemplate(
+                    input_variables=["func"],
+                    template="Analyze the following Java function and explain what it does in simple terms:\n\n{func}"
+                )
+                analysis_chain = LLMChain(llm=llm, prompt=analysis_prompt, output_key="analysis")
+
+                # Step 2: Determine expected outputs
+                expected_prompt = PromptTemplate(
+                    input_variables=["valid", "failures", "analysis", "func"],
+                    template="Based on the given valid test values: {valid} and failure test values: {failures}, "
+                            "provide the expected outputs of the function.\n\nFunction Analysis:\n{analysis}\n\nFunction Code:\n{func}"
+                )
+                expected_chain = LLMChain(llm=llm, prompt=expected_prompt, output_key="expected_output")
+
+                # Step 3: Generate JUnit test
+                junit_prompt = PromptTemplate(
+                    input_variables=["analysis", "func", "valid", "failures", "expected_output"],
+                    template="Based on this function analysis, generate a JUnit 4 test file for the given Java function.\n"
+                            "I will be providing you with the valid and failure test values and the expected output values.\n"
+                            "Use only these valid values: {valid} for generating test cases, also these are test values "
+                            "in case of any failure: {failures} and these are expected output values: {expected_output}\n\n"
+                            "Function:\n{func}\n\n"
+                            "Make sure to use only valid and failure test values to generate the test cases and do not make any extra test case except the given valid and failure test values. "
+                            "If no Failure test values are provided, then generate test cases only for valid test values. "
+                            "While writing tests, make sure to give correct values for both input and expected output. "
+                            "Just return the JUnit 4 test code, no explanations and no code block notations."
+                )
+                junit_chain = LLMChain(llm=llm, prompt=junit_prompt, output_key="junit_code")
+
+                # Create the sequential chain
+                overall_chain = SequentialChain(
+                    chains=[analysis_chain, expected_chain, junit_chain],
+                    input_variables=["func", "valid", "failures"],
+                    output_variables=["junit_code"]
+                )
+
+                # Run the chain
+                result = overall_chain({"func": func, "valid": valid, "failures": failures})
+
+                # Remove code block notations if present
+                junit_code = result.get("junit_code", "").replace("```java", "").replace("```", "").strip()
+
+                return junit_code
+
+            except Exception as e:
+                print(f"Error: {e}")
+                return str(e)
 
 
 
+def main():
+    jqf=GenerateTestCasesJQF()
+    df=pd.read_csv("FilteredData_Test_Updated_output5.csv")
+    df["jqf_junit"] = None
+    model="gpt-4o-mini-2024-07-18"
+    for index, row in df.iterrows():
+        df.at[index, "jqf_junit"] = jqf.gen_TC_GPT(
+            valid=row["valid_jqf"],
+            failures=row["failure_jqf"],
+            func=row["Function"],
+            model=model
+        )
+        print(f"Generated JQF test cases for row {index}")
+
+
+    df.to_csv("FilteredData_Test_Updated_output6.csv", index=False)
+
+
+
+main()

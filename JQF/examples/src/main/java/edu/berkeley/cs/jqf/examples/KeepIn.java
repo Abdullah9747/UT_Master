@@ -7,6 +7,6 @@ public static final double keepIn(double value, double min, double max) {
 public static void main(String[] args) {
 
 
-keepIn(69.01656163214759, 47.918676124952526, 32.63490836524625);
+keepIn(15.97406120952337, 77.03764114201087, 74.69001473565274);
 }
 }

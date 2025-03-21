@@ -12,6 +12,6 @@ public static int getBatchCount(int length, int batchSize) {
 public static void main(String[] args) {
 
 
-getBatchCount(91, 42);
+getBatchCount(45, 94);
 }
 }

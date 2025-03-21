@@ -17,6 +17,6 @@ public static String convert(int n) {
 public static void main(String[] args) {
 
 
-convert(95);
+convert(54);
 }
 }

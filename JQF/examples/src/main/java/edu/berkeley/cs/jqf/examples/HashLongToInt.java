@@ -44,6 +44,6 @@ public static int hashLongToInt(long x) {
 public static void main(String[] args) {
 
 
-hashLongToInt(667281L);
+hashLongToInt(692527L);
 }
 }

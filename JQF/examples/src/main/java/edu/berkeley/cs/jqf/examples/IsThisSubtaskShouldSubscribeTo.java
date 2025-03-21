@@ -9,6 +9,6 @@ public static boolean isThisSubtaskShouldSubscribeTo(int shardHash,
 public static void main(String[] args) {
 
 
-isThisSubtaskShouldSubscribeTo(97, 36, 24);
+isThisSubtaskShouldSubscribeTo(91, 29, 29);
 }
 }

@@ -18,6 +18,6 @@ public static double alignOrientation(double baseOrientation, double orientation
 public static void main(String[] args) {
 
 
-alignOrientation(87.29856125850598, 37.73163500171803);
+alignOrientation(91.34517800533548, 65.41249806709878);
 }
 }

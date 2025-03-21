@@ -8,6 +8,6 @@ public static int getHashCode(boolean val)
 public static void main(String[] args) {
 
 
-getHashCode(false);
+getHashCode(true);
 }
 }

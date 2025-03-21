@@ -21,6 +21,6 @@ public static int clamp(int value, int min, int max)
 public static void main(String[] args) {
 
 
-clamp(97, 74, 51);
+clamp(76, 82, 36);
 }
 }

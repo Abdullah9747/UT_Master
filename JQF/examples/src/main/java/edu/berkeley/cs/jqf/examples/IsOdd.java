@@ -7,6 +7,6 @@ public static boolean isOdd(int number) {
 public static void main(String[] args) {
 
 
-isOdd(42);
+isOdd(72);
 }
 }

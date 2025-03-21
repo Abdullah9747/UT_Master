@@ -21,6 +21,6 @@ public static double distance(double lat1, double lat2, double lon1,
 public static void main(String[] args) {
 
 
-distance(96.09497474393508, 42.14899142113584, 42.079442204749874, 7.853236272894616);
+distance(99.21085022535625, 88.34946094712679, 59.13680898256268, 12.756447569725344);
 }
 }

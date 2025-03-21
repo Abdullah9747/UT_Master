@@ -7,6 +7,6 @@ public static boolean inRange(double d1, double d2, double range) {
 public static void main(String[] args) {
 
 
-inRange(86.0086432817948, 54.1491267650758, 90.84295776446473);
+inRange(66.0821297121783, 66.8322839065841, 75.14653828203159);
 }
 }

@@ -19,6 +19,6 @@ public static double logSum(double logA, double logB) {
 public static void main(String[] args) {
 
 
-logSum(20.5037866039622, 57.779321751639166);
+logSum(80.07915246063017, 72.71976175039136);
 }
 }

@@ -7,6 +7,6 @@ public static int getFrequentRenterPoints(int daysRented) {
 public static void main(String[] args) {
 
 
-getFrequentRenterPoints(70);
+getFrequentRenterPoints(28);
 }
 }

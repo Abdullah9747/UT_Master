@@ -30,6 +30,6 @@ public static int hashLongToIntRevised(long x) {
 public static void main(String[] args) {
 
 
-hashLongToIntRevised(193451L);
+hashLongToIntRevised(715802L);
 }
 }

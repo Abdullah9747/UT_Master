@@ -10,6 +10,6 @@ public static long getEncodedRunId(long now) {
 public static void main(String[] args) {
 
 
-getEncodedRunId(973109L);
+getEncodedRunId(408322L);
 }
 }

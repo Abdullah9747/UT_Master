@@ -7,6 +7,6 @@ public static void set(int i) {
 public static void main(String[] args) {
 
 
-set(29);
+set(77);
 }
 }

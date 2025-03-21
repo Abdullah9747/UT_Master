@@ -8,6 +8,6 @@ public static int getPackedLength(int nDataUnits)
 public static void main(String[] args) {
 
 
-getPackedLength(70);
+getPackedLength(94);
 }
 }

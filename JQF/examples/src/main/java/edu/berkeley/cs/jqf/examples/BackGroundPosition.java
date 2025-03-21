@@ -7,6 +7,6 @@ protected static String backGroundPosition(int clipX, int clipY) {
 public static void main(String[] args) {
 
 
-backGroundPosition(38, 42);
+backGroundPosition(87, 45);
 }
 }

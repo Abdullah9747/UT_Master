@@ -12,6 +12,6 @@ public static int boolToInt(boolean value)
 public static void main(String[] args) {
 
 
-boolToInt(true);
+boolToInt(false);
 }
 }

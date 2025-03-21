@@ -1,0 +1,1858 @@
+Parameter,Function,Test Case,cyclomatic_complexity,SPF_Results
+(int c),"public class IsWhitespace {
+public static boolean isWhitespace(int c){
+        return c == ' ' || c == '\t' || c == '\n' || c == '\f' || c == '\r';
+    }
+}","@Test public void isWhitespace() {
+        assertTrue(StringUtil.isWhitespace('\t'));
+        assertTrue(StringUtil.isWhitespace('\n'));
+        assertTrue(StringUtil.isWhitespace('\r'));
+        assertTrue(StringUtil.isWhitespace('\f'));
+        assertTrue(StringUtil.isWhitespace(' '));
+        
+        assertFalse(StringUtil.isWhitespace('\u00a0'));
+        assertFalse(StringUtil.isWhitespace('\u2000'));
+        assertFalse(StringUtil.isWhitespace('\u3000'));
+    }",5,"Inputs: c_1_SYMINT
+
+demo.IsWhitespace.isWhitespace(32)  --> Return Value: 1
+demo.IsWhitespace.isWhitespace(9)  --> Return Value: 1
+demo.IsWhitespace.isWhitespace(10)  --> Return Value: 1
+demo.IsWhitespace.isWhitespace(12)  --> Return Value: 1
+demo.IsWhitespace.isWhitespace(13)  --> Return Value: 1
+demo.IsWhitespace.isWhitespace(0)  --> Return Value: 0
+"
+"(
+        int n, boolean isDirected, boolean createLoops, boolean createMultipleEdges)","public class ComputeMaximumAllowedEdges {
+static <V, E> int computeMaximumAllowedEdges(
+        int n, boolean isDirected, boolean createLoops, boolean createMultipleEdges)
+    {
+        if (n == 0) {
+            return 0;
+        }
+
+        int maxAllowedEdges;
+        try {
+            if (isDirected) {
+                maxAllowedEdges = Math.multiplyExact(n, n - 1);
+            } else {
+                // assume undirected
+                if (n % 2 == 0) {
+                    maxAllowedEdges = Math.multiplyExact(n / 2, n - 1);
+                } else {
+                    maxAllowedEdges = Math.multiplyExact(n, (n - 1) / 2);
+                }
+            }
+
+            if (createLoops) {
+                if (createMultipleEdges) {
+                    return Integer.MAX_VALUE;
+                } else {
+                    if (isDirected) {
+                        maxAllowedEdges = Math.addExact(maxAllowedEdges, Math.multiplyExact(2, n));
+                    } else {
+                        // assume undirected
+                        maxAllowedEdges = Math.addExact(maxAllowedEdges, n);
+                    }
+                }
+            } else {
+                if (createMultipleEdges) {
+                    if (n > 1) {
+                        return Integer.MAX_VALUE;
+                    }
+                }
+            }
+        } catch (ArithmeticException e) {
+            return Integer.MAX_VALUE;
+        }
+        return maxAllowedEdges;
+    }
+}","@Test
+    public void testMaximumAllowedEdges()
+    {
+        // undirected graphs
+        boolean isDirected = false;
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, true));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, true));
+
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, false));
+        assertEquals(
+            1, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, true));
+
+        assertEquals(
+            45, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, false));
+        assertEquals(
+            55, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, false));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, true));
+
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(200000, isDirected, false, false));
+
+        // directed graphs
+        isDirected = true;
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, true));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, true));
+
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, false));
+        assertEquals(
+            2, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, true));
+
+        assertEquals(
+            90, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, false));
+        assertEquals(
+            110, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, false));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, true));
+
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(200000, isDirected, false, false));
+    }",10,"Inputs: n_1_SYMINT,isDirected_2_SYMINT,createLoops_3_SYMINT,createMultipleEdges_4_SYMINT
+
+demo.ComputeMaximumAllowedEdges.computeMaximumAllowedEdges(0,-9223372036854775808(don't care),-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0
+demo.ComputeMaximumAllowedEdges.computeMaximumAllowedEdges(-1,true,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> ""java.lang.ClassNotFoundException: class not found: java.lang.NoSuchMethodException!!...""
+demo.ComputeMaximumAllowedEdges.computeMaximumAllowedEdges(-2,false,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> ""java.lang.ClassNotFoundException: class not found: java.lang.NoSuchMethodException!!...""
+demo.ComputeMaximumAllowedEdges.computeMaximumAllowedEdges(-1,false,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> ""java.lang.ClassNotFoundException: class not found: java.lang.NoSuchMethodException!!...""
+"
+"(boolean declarer,
+			int gameValue, int numberOfPlayers)","public class GetTournamentGameValue {
+public static final int getTournamentGameValue(boolean declarer,
+			int gameValue, int numberOfPlayers) {
+
+		int result = 0;
+
+		if (declarer) {
+			// calculation for declarer of the game
+			if (gameValue > 0) {
+
+				result = gameValue + 50;
+			} else {
+
+				result = gameValue - 50;
+			}
+		} else {
+			// calculation for opponents
+			if (gameValue < 0) {
+
+				if (numberOfPlayers == 3) {
+
+					result = 40;
+				} else if (numberOfPlayers == 4) {
+
+					result = 30;
+				}
+			}
+		}
+
+		return result;
+	}
+}","@Test
+    public void getTournamentGameValue001() {
+
+        assertThat(SkatConstants.getTournamentGameValue(true, 18, 3)).isEqualTo(68);
+        assertThat(SkatConstants.getTournamentGameValue(true, 18, 4)).isEqualTo(68);
+        assertThat(SkatConstants.getTournamentGameValue(true, -36, 3)).isEqualTo(-86);
+        assertThat(SkatConstants.getTournamentGameValue(true, -36, 4)).isEqualTo(-86);
+        assertThat(SkatConstants.getTournamentGameValue(true, 20, 3)).isEqualTo(70);
+        assertThat(SkatConstants.getTournamentGameValue(true, 20, 4)).isEqualTo(70);
+        assertThat(SkatConstants.getTournamentGameValue(true, -40, 3)).isEqualTo(-90);
+        assertThat(SkatConstants.getTournamentGameValue(true, -40, 4)).isEqualTo(-90);
+        assertThat(SkatConstants.getTournamentGameValue(false, 18, 3)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, 18, 4)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, -36, 3)).isEqualTo(40);
+        assertThat(SkatConstants.getTournamentGameValue(false, -36, 4)).isEqualTo(30);
+        assertThat(SkatConstants.getTournamentGameValue(false, 20, 3)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, 20, 4)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, -40, 3)).isEqualTo(40);
+        assertThat(SkatConstants.getTournamentGameValue(false, -40, 4)).isEqualTo(30);
+    }",6,"Inputs: declarer_1_SYMINT,gameValue_2_SYMINT,numberOfPlayers_3_SYMINT
+
+demo.GetTournamentGameValue.getTournamentGameValue(true,1,-9223372036854775808(don't care))  --> Return Value: 51
+demo.GetTournamentGameValue.getTournamentGameValue(true,0,-9223372036854775808(don't care))  --> Return Value: -50
+demo.GetTournamentGameValue.getTournamentGameValue(false,0,-9223372036854775808(don't care))  --> Return Value: 0
+demo.GetTournamentGameValue.getTournamentGameValue(false,-1,3)  --> Return Value: 40
+demo.GetTournamentGameValue.getTournamentGameValue(false,-1,4)  --> Return Value: 30
+demo.GetTournamentGameValue.getTournamentGameValue(false,-1,0)  --> Return Value: 0
+"
+(long millis),"public class ConvertMillisToMinSecFormat {
+public static String convertMillisToMinSecFormat(long millis) {
+        long ms = millis % 1000;
+        long s = (millis / 1000) % 60;
+        long m = ((millis / 1000) / 60) % 60;
+        if (s > 0 && m <= 0) {
+            return String.format(""%d sec %d ms"", s, ms);
+        } else if (s > 0 || m > 0) {
+            return String.format(""%d min %d sec %d ms"", m, s, ms);
+        } else {
+            return String.format(""%d ms"", ms);
+        }
+    }
+}","@Test
+    public void convertMillisToMinSecFormat() {
+        assertThat(TimeUtil.convertMillisToMinSecFormat(100), equalTo(""100 ms""));
+        assertThat(TimeUtil.convertMillisToMinSecFormat(1010), equalTo(""1 sec 10 ms""));
+        assertThat(TimeUtil.convertMillisToMinSecFormat(60010), equalTo(""1 min 0 sec 10 ms""));
+    }",5,"Inputs: millis_1_SYMINT
+
+demo.ConvertMillisToMinSecFormat.convertMillisToMinSecFormat(0l)  --> Return Value: java.lang.String@2d2
+demo.ConvertMillisToMinSecFormat.convertMillisToMinSecFormat(3660000l)  --> Return Value: java.lang.String@2d2
+demo.ConvertMillisToMinSecFormat.convertMillisToMinSecFormat(1000l)  --> Return Value: java.lang.String@2d2
+demo.ConvertMillisToMinSecFormat.convertMillisToMinSecFormat(61000l)  --> Return Value: java.lang.String@2d2
+"
+(long msec),"public class LongToTimePeriod {
+public static String longToTimePeriod(long msec) {
+        if (msec < 1000) {
+            return msec + ""ms"";
+        }
+        if (msec < 3000) {
+            return String.format(""%.2fs"", msec / 1000d);
+        }
+        if (msec < 60 * 1000) {
+            return (msec / 1000) + ""s"";
+        }
+        long sec = msec / 1000;
+        if (sec < 5 * 60) {
+            return (sec / 60) + ""m"" + (sec % 60) + ""s"";
+        }
+        long min = sec / 60;
+        if (min < 60) {
+            return min + ""m"";
+        }
+        long hour = min / 60;
+        if (min < 24 * 60) {
+            return hour + ""h"" + (min % 60) + ""m"";
+        }
+        long day = hour / 24;
+        return day + ""d"" + (day % 24) + ""h"";
+    }
+}","@Test
+    public void longToTimePeriod() {
+        Assert.assertEquals(""1ms"", Utils.longToTimePeriod(1));
+    }",7,"Inputs: msec_1_SYMINT
+
+demo.LongToTimePeriod.longToTimePeriod(0l)  --> Return Value: java.lang.String@1d2
+demo.LongToTimePeriod.longToTimePeriod(1000l)  --> Return Value: java.lang.String@1d2
+demo.LongToTimePeriod.longToTimePeriod(1001l)  --> Return Value: java.lang.String@1d2
+"
+(int value),"public class GetOrdinalFor {
+public static String getOrdinalFor(int value) {
+
+    String ordinal = String.valueOf(value);
+    if (ordinal.endsWith(""11"") || ordinal.endsWith(""12"") || ordinal.endsWith(""13"")) {
+      ordinal = ordinal + ""th"";
+    } else if (ordinal.endsWith(""1"")) {
+      ordinal = ordinal + ""st"";
+    } else if (ordinal.endsWith(""2"")) {
+      ordinal = ordinal + ""nd"";
+    } else if (ordinal.endsWith(""3"")) {
+      ordinal = ordinal + ""rd"";
+    } else {
+      ordinal = ordinal + ""th"";
+    }
+    return ordinal;
+  }
+}","@Test
+  public void testGetOrdinalFor() throws Exception {
+
+    // Test against all possible Trezor values just to be sure
+
+    assertThat(Languages.getOrdinalFor(1)).isEqualTo(""1st"");
+    assertThat(Languages.getOrdinalFor(2)).isEqualTo(""2nd"");
+    assertThat(Languages.getOrdinalFor(3)).isEqualTo(""3rd"");
+    assertThat(Languages.getOrdinalFor(4)).isEqualTo(""4th"");
+    assertThat(Languages.getOrdinalFor(5)).isEqualTo(""5th"");
+    assertThat(Languages.getOrdinalFor(6)).isEqualTo(""6th"");
+    assertThat(Languages.getOrdinalFor(7)).isEqualTo(""7th"");
+    assertThat(Languages.getOrdinalFor(8)).isEqualTo(""8th"");
+    assertThat(Languages.getOrdinalFor(9)).isEqualTo(""9th"");
+    assertThat(Languages.getOrdinalFor(10)).isEqualTo(""10th"");
+    assertThat(Languages.getOrdinalFor(11)).isEqualTo(""11th"");
+    assertThat(Languages.getOrdinalFor(12)).isEqualTo(""12th"");
+    assertThat(Languages.getOrdinalFor(13)).isEqualTo(""13th"");
+    assertThat(Languages.getOrdinalFor(14)).isEqualTo(""14th"");
+    assertThat(Languages.getOrdinalFor(15)).isEqualTo(""15th"");
+    assertThat(Languages.getOrdinalFor(16)).isEqualTo(""16th"");
+    assertThat(Languages.getOrdinalFor(17)).isEqualTo(""17th"");
+    assertThat(Languages.getOrdinalFor(18)).isEqualTo(""18th"");
+    assertThat(Languages.getOrdinalFor(19)).isEqualTo(""19th"");
+    assertThat(Languages.getOrdinalFor(20)).isEqualTo(""20th"");
+    assertThat(Languages.getOrdinalFor(21)).isEqualTo(""21st"");
+    assertThat(Languages.getOrdinalFor(22)).isEqualTo(""22nd"");
+    assertThat(Languages.getOrdinalFor(23)).isEqualTo(""23rd"");
+    assertThat(Languages.getOrdinalFor(24)).isEqualTo(""24th"");
+
+  }",7,"Inputs: value_1_SYMINT
+No path conditions for demo.GetOrdinalFor.getOrdinalFor(0)
+"
+(int factor),"public class DecreaseFactor {
+static int decreaseFactor(int factor) {
+        if (factor == 1) {
+            return 1;
+        }
+
+        int order = 1;
+        while (factor >= 10) {
+            factor /= 10;
+            order *= 10;
+        }
+
+        if (factor == 1) {
+            return order / 2;
+        }
+
+        if (factor == 5) {
+            return order * 2;
+        }
+
+        if (factor == 2) {
+            return order;
+        }
+
+        throw new IllegalStateException(""Logic error: this should be unreachable"");
+    }
+}","@Test
+    public void decreaseFactor1() {
+        assertThat(LogValueScale.decreaseFactor(200), equalTo(100));
+    }",6,"Inputs: factor_1_SYMINT
+
+demo.DecreaseFactor.decreaseFactor(1)  --> Return Value: 1
+demo.DecreaseFactor.decreaseFactor(5)  --> Return Value: 2
+demo.DecreaseFactor.decreaseFactor(10)  --> Return Value: 5
+demo.DecreaseFactor.decreaseFactor(2)  --> Return Value: 1
+demo.DecreaseFactor.decreaseFactor(0)  --> ""java.lang.IllegalStateException: Logic error: this should be unreachable...""
+demo.DecreaseFactor.decreaseFactor(100)  --> Return Value: 50
+demo.DecreaseFactor.decreaseFactor(50)  --> Return Value: 20
+demo.DecreaseFactor.decreaseFactor(1000)  --> Return Value: 500
+demo.DecreaseFactor.decreaseFactor(500)  --> Return Value: 200
+demo.DecreaseFactor.decreaseFactor(20)  --> Return Value: 10
+demo.DecreaseFactor.decreaseFactor(30)  --> ""java.lang.IllegalStateException: Logic error: this should be unreachable...""
+demo.DecreaseFactor.decreaseFactor(10000)  --> Return Value: 5000
+demo.DecreaseFactor.decreaseFactor(5000)  --> Return Value: 2000
+demo.DecreaseFactor.decreaseFactor(200)  --> Return Value: 100
+demo.DecreaseFactor.decreaseFactor(300)  --> ""java.lang.IllegalStateException: Logic error: this should be unreachable...""
+demo.DecreaseFactor.decreaseFactor(100000)  --> Return Value: 50000
+demo.DecreaseFactor.decreaseFactor(50000)  --> Return Value: 20000
+demo.DecreaseFactor.decreaseFactor(2000)  --> Return Value: 1000
+demo.DecreaseFactor.decreaseFactor(3000)  --> ""java.lang.IllegalStateException: Logic error: this should be unreachable...""
+demo.DecreaseFactor.decreaseFactor(1000000)  --> Return Value: 500000
+demo.DecreaseFactor.decreaseFactor(500000)  --> Return Value: 200000
+demo.DecreaseFactor.decreaseFactor(20000)  --> Return Value: 10000
+demo.DecreaseFactor.decreaseFactor(30000)  --> ""java.lang.IllegalStateException: Logic error: this should be unreachable...""
+"
+"(int A, int B,
+                           int C, int D,
+                           int E, int F,
+                           int G, int H)","public class ComputeArea {
+public int computeArea(int A, int B,
+                           int C, int D,
+                           int E, int F,
+                           int G, int H) {
+        int areaSum = (C-A)*(D-B) + (G-E)*(H-F);
+
+        if(E>=C || A>=G || B>=H || F>=D){
+            return areaSum;
+        }
+        int bX = Math.max(A, E);
+        int bY = Math.max(B, F);
+        int tX = Math.min(C, G);
+        int tY = Math.min(D, H);
+        int areaIntersect = (tX-bX)*(tY-bY);
+
+        return areaSum - areaIntersect;
+
+    }
+}","@Test
+    public void overlapAreaTest(){
+        rectangle=new OverlapRectangle();
+        //rectangle.computeArea(-3,0,3,4,0,-1,9,2);
+        int result=rectangle.computeArea(0,0,0,0,-1,-1,1,1);
+        //int result= rectangle.computeArea(-2,-2,2,2,3,3,4,4);
+        Assertions.assertEquals(4,result);
+
+
+    }",5,"Inputs: A_1_SYMINT,B_2_SYMINT,C_3_SYMINT,D_4_SYMINT,E_5_SYMINT,F_6_SYMINT,G_7_SYMINT,H_8_SYMINT
+
+demo.ComputeArea.computeArea(-9223372036854775808(don't care),-9223372036854775808(don't care),0,-9223372036854775808(don't care),0,-9223372036854775808(don't care),-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0
+demo.ComputeArea.computeArea(0,-9223372036854775808(don't care),1,-9223372036854775808(don't care),0,-9223372036854775808(don't care),0,-9223372036854775808(don't care))  --> Return Value: 0
+demo.ComputeArea.computeArea(0,0,1,-9223372036854775808(don't care),0,-9223372036854775808(don't care),1,0)  --> Return Value: 0
+demo.ComputeArea.computeArea(0,-1,0,0,-1,0,1,0)  --> Return Value: 0
+demo.ComputeArea.computeArea(-1,0,0,1,-1,0,0,1)  --> Return Value: 1
+demo.ComputeArea.computeArea(0,-2,0,0,-1,-2,1,-1)  --> Return Value: 2
+demo.ComputeArea.computeArea(-1,0,1,0,-1,-1,0,1)  --> Return Value: 2
+demo.ComputeArea.computeArea(-1,-1,1,1,-1,-1,0,0)  --> Return Value: 4
+demo.ComputeArea.computeArea(0,0,0,2,-1,1,1,2)  --> Return Value: 2
+demo.ComputeArea.computeArea(-1,-1,0,1,-1,0,0,0)  --> Return Value: 2
+demo.ComputeArea.computeArea(-2,0,0,2,-2,1,-1,2)  --> Return Value: 4
+demo.ComputeArea.computeArea(-1,-1,1,1,-1,0,0,0)  --> Return Value: 4
+demo.ComputeArea.computeArea(0,0,2,1,1,0,2,1)  --> Return Value: 2
+demo.ComputeArea.computeArea(0,-2,2,0,1,-2,2,-1)  --> Return Value: 4
+demo.ComputeArea.computeArea(-2,0,0,0,-1,-1,-1,1)  --> Return Value: 0
+demo.ComputeArea.computeArea(-1,-2,1,0,0,-2,0,-1)  --> Return Value: 4
+demo.ComputeArea.computeArea(0,-1,2,1,1,0,2,1)  --> Return Value: 4
+demo.ComputeArea.computeArea(-1,0,1,2,0,1,1,1)  --> Return Value: 4
+demo.ComputeArea.computeArea(-2,-1,0,1,-1,0,-1,1)  --> Return Value: 4
+demo.ComputeArea.computeArea(-2,-1,0,1,-1,0,-1,0)  --> Return Value: 4
+"
+"(boolean writtenByYourself,
+            boolean availableToOthers, boolean writtenAsCourseWork,
+            boolean citingYourSource, boolean implementationRequired)","public class MayUseCodeInAssignment {
+public static boolean mayUseCodeInAssignment(boolean writtenByYourself,
+            boolean availableToOthers, boolean writtenAsCourseWork,
+            boolean citingYourSource, boolean implementationRequired) {
+        
+        // TODO: Fill in this method, then remove the exception
+    	return writtenByYourself && !availableToOthers
+    			&& writtenAsCourseWork && citingYourSource
+    			&& implementationRequired;
+    }
+}","@Test
+    public void testMayUseCodeInAssignment() {
+        assertFalse(""Expected false: un-cited publicly-available code"",
+                RulesOf6005.mayUseCodeInAssignment(false, true, false, false, false));
+        assertTrue(""Expected true: self-written required code"",
+                RulesOf6005.mayUseCodeInAssignment(true, false, true, true, true));
+    }",5,"Inputs: writtenByYourself_1_SYMINT,availableToOthers_2_SYMINT,writtenAsCourseWork_3_SYMINT,citingYourSource_4_SYMINT,implementationRequired_5_SYMINT
+
+demo.MayUseCodeInAssignment.mayUseCodeInAssignment(false,-9223372036854775808(don't care),-9223372036854775808(don't care),-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0
+demo.MayUseCodeInAssignment.mayUseCodeInAssignment(true,true,-9223372036854775808(don't care),-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0
+demo.MayUseCodeInAssignment.mayUseCodeInAssignment(true,false,false,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0
+demo.MayUseCodeInAssignment.mayUseCodeInAssignment(true,false,true,false,-9223372036854775808(don't care))  --> Return Value: 0
+demo.MayUseCodeInAssignment.mayUseCodeInAssignment(true,false,true,true,true)  --> Return Value: 1
+demo.MayUseCodeInAssignment.mayUseCodeInAssignment(true,false,true,true,false)  --> Return Value: 0
+"
+(int number),"public class Ordinalize {
+public String ordinalize(int number)
+   {
+      int remainder = number % 100;
+      String numberStr = Integer.toString(number);
+      if (11 <= number && number <= 13)
+         return numberStr + ""th"";
+      remainder = number % 10;
+      if (remainder == 1)
+         return numberStr + ""st"";
+      if (remainder == 2)
+         return numberStr + ""nd"";
+      if (remainder == 3)
+         return numberStr + ""rd"";
+      return numberStr + ""th"";
+   }
+}","@Test
+   public void shouldOrdinalize()
+   {
+      ordinalize(1, ""1st"");
+      ordinalize(2, ""2nd"");
+      ordinalize(3, ""3rd"");
+      ordinalize(4, ""4th"");
+      ordinalize(5, ""5th"");
+      ordinalize(6, ""6th"");
+      ordinalize(7, ""7th"");
+      ordinalize(8, ""8th"");
+      ordinalize(9, ""9th"");
+      ordinalize(10, ""10th"");
+      ordinalize(11, ""11th"");
+      ordinalize(12, ""12th"");
+      ordinalize(13, ""13th"");
+      ordinalize(14, ""14th"");
+      ordinalize(15, ""15th"");
+      ordinalize(16, ""16th"");
+      ordinalize(17, ""17th"");
+      ordinalize(18, ""18th"");
+      ordinalize(19, ""19th"");
+      ordinalize(20, ""20th"");
+      ordinalize(21, ""21st"");
+      ordinalize(22, ""22nd"");
+      ordinalize(23, ""23rd"");
+      ordinalize(24, ""24th"");
+      ordinalize(25, ""25th"");
+      ordinalize(26, ""26th"");
+      ordinalize(27, ""27th"");
+      ordinalize(28, ""28th"");
+      ordinalize(29, ""29th"");
+      ordinalize(30, ""30th"");
+      ordinalize(31, ""31st"");
+      ordinalize(32, ""32nd"");
+      ordinalize(33, ""33rd"");
+      ordinalize(34, ""34th"");
+      ordinalize(35, ""35th"");
+      ordinalize(36, ""36th"");
+      ordinalize(37, ""37th"");
+      ordinalize(38, ""38th"");
+      ordinalize(39, ""39th"");
+      ordinalize(100, ""100th"");
+      ordinalize(101, ""101st"");
+      ordinalize(102, ""102nd"");
+      ordinalize(103, ""103rd"");
+      ordinalize(104, ""104th"");
+      ordinalize(200, ""200th"");
+      ordinalize(201, ""201st"");
+      ordinalize(202, ""202nd"");
+      ordinalize(203, ""203rd"");
+      ordinalize(204, ""204th"");
+      ordinalize(1000, ""1000th"");
+      ordinalize(1001, ""1001st"");
+      ordinalize(1002, ""1002nd"");
+      ordinalize(1003, ""1003rd"");
+      ordinalize(1004, ""1004th"");
+      ordinalize(10000, ""10000th"");
+      ordinalize(10001, ""10001st"");
+      ordinalize(10002, ""10002nd"");
+      ordinalize(10003, ""10003rd"");
+      ordinalize(10004, ""10004th"");
+      ordinalize(100000, ""100000th"");
+      ordinalize(100001, ""100001st"");
+      ordinalize(100002, ""100002nd"");
+      ordinalize(100003, ""100003rd"");
+      ordinalize(100004, ""100004th"");
+   }",6,"Inputs: number_1_SYMINT
+
+demo.Ordinalize.ordinalize(11)  --> Return Value: java.lang.String@1d4
+demo.Ordinalize.ordinalize(1)  --> Return Value: java.lang.String@1da
+demo.Ordinalize.ordinalize(21)  --> Return Value: java.lang.String@1da
+demo.Ordinalize.ordinalize(2)  --> Return Value: java.lang.String@1e0
+demo.Ordinalize.ordinalize(22)  --> Return Value: java.lang.String@1e0
+demo.Ordinalize.ordinalize(3)  --> Return Value: java.lang.String@1e6
+demo.Ordinalize.ordinalize(0)  --> Return Value: java.lang.String@1ec
+demo.Ordinalize.ordinalize(23)  --> Return Value: java.lang.String@1e6
+demo.Ordinalize.ordinalize(20)  --> Return Value: java.lang.String@1ec
+"
+"(long unsignedValue, long alignment)","public class GetUnsignedAlignedValue {
+public static long getUnsignedAlignedValue(long unsignedValue, long alignment) {
+		if (alignment == 0 || unsignedValue % alignment == 0) {
+			return unsignedValue;
+		}
+		boolean negative = unsignedValue < 0;
+		if (negative) {
+			unsignedValue = -(unsignedValue + alignment);
+		}
+		long alignedValue = ((unsignedValue + alignment - 1) / alignment) * alignment;
+		if (negative) {
+			alignedValue = -alignedValue;
+		}
+		return alignedValue;
+	}
+}","@Test
+	public void testGetUnsignedAlignedValue() {
+
+		assertEquals(0, NumericUtilities.getUnsignedAlignedValue(0xffffffffffffffffL, 8));
+		assertEquals(0xfffffffffffffff8L,
+			NumericUtilities.getUnsignedAlignedValue(0xfffffffffffffff8L, 8));
+		assertEquals(0xfffffffffffffff8L,
+			NumericUtilities.getUnsignedAlignedValue(0xfffffffffffffff3L, 8));
+		assertEquals(0xfffffffffffffff0L,
+			NumericUtilities.getUnsignedAlignedValue(0xffffffffffffffecL, 8));
+		assertEquals(0xffffffffffffffe8L,
+			NumericUtilities.getUnsignedAlignedValue(0xffffffffffffffe8L, 8));
+		assertEquals(0, NumericUtilities.getUnsignedAlignedValue(0, 8));
+		assertEquals(8, NumericUtilities.getUnsignedAlignedValue(3, 8));
+		assertEquals(8, NumericUtilities.getUnsignedAlignedValue(8, 8));
+
+		assertEquals(0, NumericUtilities.getUnsignedAlignedValue(0xffffffffffffffffL, 5));
+		assertEquals(0xfffffffffffffffbL,
+			NumericUtilities.getUnsignedAlignedValue(0xfffffffffffffff8L, 5));
+		assertEquals(0xfffffffffffffff6L,
+			NumericUtilities.getUnsignedAlignedValue(0xfffffffffffffff3L, 5));
+		assertEquals(0xffffffffffffffecL,
+			NumericUtilities.getUnsignedAlignedValue(0xffffffffffffffecL, 5));
+		assertEquals(0xffffffffffffffecL,
+			NumericUtilities.getUnsignedAlignedValue(0xffffffffffffffe8L, 5));
+		assertEquals(0, NumericUtilities.getUnsignedAlignedValue(0, 5));
+		assertEquals(5, NumericUtilities.getUnsignedAlignedValue(3, 5));
+		assertEquals(0xa, NumericUtilities.getUnsignedAlignedValue(8, 5));
+		assertEquals(0xa, NumericUtilities.getUnsignedAlignedValue(0xa, 0));
+
+	}",5,"Inputs: unsignedValue_1_SYMINT,alignment_2_SYMINT
+
+demo.GetUnsignedAlignedValue.getUnsignedAlignedValue(-9223372036854775808(don't care),-1l)  --> Return Value: -9223372036854775808
+demo.GetUnsignedAlignedValue.getUnsignedAlignedValue(-9223372036854775808(don't care),0l)  --> Return Value: -9223372036854775808
+demo.GetUnsignedAlignedValue.getUnsignedAlignedValue(-9223372036854775808(don't care),1l)  --> Return Value: -9223372036854775808
+"
+"(int x, int y)","public class HammingDistance {
+public int hammingDistance(int x, int y) {
+    String str1 = Integer.toBinaryString(x);
+    String str2 = Integer.toBinaryString(y);
+    int length1 = str1.length();
+    int length2 = str2.length();
+    int shortLength = Math.min(length1, length2);
+    int result = 0;
+    for (int i = 1; i <= shortLength; i++) {
+      if (str1.charAt(length1 - i) != str2.charAt(length2 - i)) {
+        result++;
+      }
+    }
+    while (shortLength < length1) {
+      shortLength ++;
+      if(str1.charAt(length1 - shortLength) != '0'){
+        result ++;
+      }
+    }
+    while (shortLength < length2) {
+      shortLength ++;
+      if(str2.charAt(length2 - shortLength) != '0'){
+        result ++;
+      }
+    }
+    return result;
+  }
+}","@Test
+  void go() {
+ HammingDistance t = new HammingDistance();
+    for (int i = 0; i < cases.size(); i++) {
+      Integer[] param = cases.get(i);
+      assertEquals((int) result.get(i), t.hammingDistance(param[0], param[1]));
+
+    }
+  }",7,"Inputs: x_1_SYMINT,y_2_SYMINT
+No path conditions for demo.HammingDistance.hammingDistance(0,0)
+"
+(int x),"public class Reverse {
+public int reverse(int x) {
+        String str = String.valueOf(x);
+        char[] chars = str.toCharArray();
+        char tmp;
+        int left = 0;
+        int right = chars.length - 1;
+        int start = 0;
+        int flag = 1;
+        if (chars[0] == '-') {
+            left = 1;
+            start = 1;
+            flag = -1;
+        }
+        while (left < right) {
+            tmp = chars[left];
+            chars[left] = chars[right];
+            chars[right] = tmp;
+            left++;
+            right--;
+        }
+        long resultLong = 0;
+        for (; start < chars.length; start++) {
+            resultLong = resultLong * 10 + (chars[start] - 48);
+        }
+        resultLong *= flag;
+        if (resultLong > Integer.MAX_VALUE || resultLong < Integer.MIN_VALUE) {
+            return 0;
+        } else {
+            return (int) resultLong;
+        }
+    }
+}","@Test
+    void go(){
+        Reverse reverse = new Reverse();
+        assertEquals(321,reverse.reverse(123));
+    }",6,"Inputs: x_1_SYMINT
+No path conditions for demo.Reverse.reverse(0)
+"
+"(int x, int m)","public class ReciprocalMod {
+public static int reciprocalMod(int x, int m) {
+		if (!(0 <= x && x < m))
+			throw new IllegalArgumentException();
+		
+		// Based on a simplification of the extended Euclidean algorithm
+		int y = x;
+		x = m;
+		int a = 0;
+		int b = 1;
+		while (y != 0) {
+			int z = x % y;
+			int c = a - x / y * b;
+			x = y;
+			y = z;
+			a = b;
+			b = c;
+		}
+		if (x == 1)
+			return a >= 0 ? a : a + m;
+		else
+			throw new IllegalArgumentException(""Reciprocal does not exist"");
+	}
+}","@Test public void testReciprocalMod() {
+		int[][] goodCases = {
+			{1, 2, 1},
+			{1, 3, 1},
+			{2, 3, 2},
+			{1, 4, 1},
+			{3, 4, 3},
+			{1, 5, 1},
+			{2, 5, 3},
+			{3, 5, 2},
+			{4, 5, 4},
+			{2, 7, 4},
+			{3, 7, 5},
+			{4, 7, 2},
+			{5, 7, 3},
+			{6, 7, 6},
+			{18585, 26128, 5705},
+			{4352341, 7559949, 3054661},
+			{290514683, 936234758, 903930729},
+			{735803087, 1384775511, 1321131185},
+			{1, 2147483647, 1},
+			{2, 2147483647, 1073741824},
+			{188080773, 2147483647, 1201032874},
+			{527995520, 2147483647, 1215591224},
+			{1154582780, 2147483647, 193267031},
+			{1321286464, 2147483647, 95844396},
+			{2147483645, 2147483647, 1073741823},
+			{2147483646, 2147483647, 2147483646},
+		};
+		for (int[] cs : goodCases)
+			assertEquals(cs[2], Library.reciprocalMod(cs[0], cs[1]));
+		
+		int[][] badCases = {
+			// Values out of range
+			{Integer.MIN_VALUE, Integer.MIN_VALUE},
+			{-1, -1},
+			{0, -1},
+			{-1, 0},
+			{0, 0},
+			{1, 1},
+			{3, 2},
+			{Integer.MAX_VALUE, 1},
+			// Values not coprime
+			{2, 4},
+			{2, 6},
+			{3, 6},
+			{44100, 48000},
+			{77, 2147483646},
+			{30783, 2147483646},
+		};
+		for (int[] cs : badCases) {
+			try {
+				Library.reciprocalMod(cs[0], cs[1]);
+				Assert.fail();
+			} catch (IllegalArgumentException e) {}  // Pass
+		}
+	}",5,"Inputs: x_1_SYMINT,m_2_SYMINT
+
+demo.ReciprocalMod.reciprocalMod(-1,-9223372036854775808(don't care))  --> ""java.lang.IllegalArgumentException...""
+demo.ReciprocalMod.reciprocalMod(0,0)  --> ""java.lang.IllegalArgumentException...""
+demo.ReciprocalMod.reciprocalMod(1,2)  --> ""java.lang.ArithmeticException: div by 0...""
+demo.ReciprocalMod.reciprocalMod(0,1)  --> Return Value: 0
+demo.ReciprocalMod.reciprocalMod(0,2)  --> ""java.lang.IllegalArgumentException: Reciprocal does not exist...""
+"
+(double price),"public class DeterminePriceCatForCPD {
+public static Integer determinePriceCatForCPD(double price)
+    {
+        if (price >= 0 && price <= 3)
+        {
+            return 1;
+        }
+        if (price > 3 && price <= 5)
+        {
+            return 2;
+        }
+        if (price > 5)
+        {
+            return 3;
+        }
+        return 3;
+    }
+}","@Test
+    public void determinePriceCatForCPD() {
+        double d = 10.456;
+        assertEquals(3, (int) CommonUtil.determinePriceCatForCPD(d));
+        d = 005D;
+        assertEquals(2, (int) CommonUtil.determinePriceCatForCPD(d));
+        d = 0.69999999999999;
+        assertEquals(1, (int) CommonUtil.determinePriceCatForCPD(d));
+        d = 7.123456789;
+        assertEquals(3, (int) CommonUtil.determinePriceCatForCPD(d));
+        d = -1D;
+        assertEquals(3, (int) CommonUtil.determinePriceCatForCPD(d));
+        d = 1.9633331;
+        assertEquals(1, (int) CommonUtil.determinePriceCatForCPD(d));
+    }",6,"Inputs: price_1_SYMREAL
+
+demo.DeterminePriceCatForCPD.determinePriceCatForCPD(0.0)  --> Return Value: java.lang.Integer@24d
+demo.DeterminePriceCatForCPD.determinePriceCatForCPD(3.0)  --> Return Value: java.lang.Integer@24d
+demo.DeterminePriceCatForCPD.determinePriceCatForCPD(4.0)  --> Return Value: java.lang.Integer@24e
+demo.DeterminePriceCatForCPD.determinePriceCatForCPD(5.0)  --> Return Value: java.lang.Integer@24e
+demo.DeterminePriceCatForCPD.determinePriceCatForCPD(6.0)  --> Return Value: java.lang.Integer@24f
+"
+(double price),"public class DeterminePriceCatForCPT {
+public static Integer determinePriceCatForCPT(double price)
+    {
+        if (price >= 0 && price <= 60000)
+        {
+            return 1;
+        }
+        if (price > 60000 && price <= 400000)
+        {
+            return 2;
+        }
+        if (price > 400000)
+        {
+            return 3;
+        }
+        return 3;
+    }
+}","@Test
+    public void determinePriceCatForCPT() {
+        double d = 10.456;
+        assertEquals(1, (int) CommonUtil.determinePriceCatForCPT(d));
+        d = 300000D;
+        assertEquals(2, (int) CommonUtil.determinePriceCatForCPT(d));
+        d = 69999999999999D;
+        assertEquals(3, (int) CommonUtil.determinePriceCatForCPT(d));
+        d = 123.456789;
+        assertEquals(1, (int) CommonUtil.determinePriceCatForCPT(d));
+        d = -1D;
+        assertEquals(3, (int) CommonUtil.determinePriceCatForCPT(d));
+
+    }",6,"Inputs: price_1_SYMREAL
+
+demo.DeterminePriceCatForCPT.determinePriceCatForCPT(0.0)  --> Return Value: java.lang.Integer@24d
+demo.DeterminePriceCatForCPT.determinePriceCatForCPT(60000.0)  --> Return Value: java.lang.Integer@24d
+demo.DeterminePriceCatForCPT.determinePriceCatForCPT(60001.0)  --> Return Value: java.lang.Integer@24e
+demo.DeterminePriceCatForCPT.determinePriceCatForCPT(400000.0)  --> Return Value: java.lang.Integer@24e
+demo.DeterminePriceCatForCPT.determinePriceCatForCPT(400001.0)  --> Return Value: java.lang.Integer@24f
+"
+(double price),"public class DeterminePriceCatForCPM {
+public static Integer determinePriceCatForCPM(double price)
+    {
+        if (price >= 0.0 && price <= 12)
+        {
+            return 1;
+        }
+        if (price > 12 && price <= 25)
+        {
+            return 2;
+        }
+        if (price > 25)
+        {
+            return 3;
+        }
+        return 3;
+    }
+}","@Test
+    public void determinePriceCatForCPM() {
+        double d = 123.456;
+        assertEquals(3, (int) CommonUtil.determinePriceCatForCPM(d));
+        d = 456789123456D;
+        assertEquals(3, (int) CommonUtil.determinePriceCatForCPM(d));
+        d = 11.9999999;
+        assertEquals(1, (int) CommonUtil.determinePriceCatForCPM(d));
+        d = 12.00001;
+        assertEquals(2, (int) CommonUtil.determinePriceCatForCPM(d));
+        d = 25.00001;
+        assertEquals(3, (int) CommonUtil.determinePriceCatForCPM(d));
+    }",6,"Inputs: price_1_SYMREAL
+
+demo.DeterminePriceCatForCPM.determinePriceCatForCPM(0.0)  --> Return Value: java.lang.Integer@24d
+demo.DeterminePriceCatForCPM.determinePriceCatForCPM(12.0)  --> Return Value: java.lang.Integer@24d
+demo.DeterminePriceCatForCPM.determinePriceCatForCPM(13.0)  --> Return Value: java.lang.Integer@24e
+demo.DeterminePriceCatForCPM.determinePriceCatForCPM(25.0)  --> Return Value: java.lang.Integer@24e
+demo.DeterminePriceCatForCPM.determinePriceCatForCPM(26.0)  --> Return Value: java.lang.Integer@24f
+"
+(double price),"public class DeterminePriceCatForCPC {
+public static Integer determinePriceCatForCPC(double price)
+    {
+        if (price >= 0.0 && price <= 0.7)
+        {
+            return 1;
+        }
+        if (price > 0.7 && price <= 2)
+        {
+            return 2;
+        }
+        if (price > 2)
+        {
+            return 3;
+        }
+        return 3;
+    }
+}","@Test
+    public void determinePriceCatForCPC() {
+        double d = 10.456;
+        assertEquals(3, (int) CommonUtil.determinePriceCatForCPC(d), 0);
+        d = 005D;
+        assertEquals(3, (int) CommonUtil.determinePriceCatForCPC(d), 0);
+        d = 0.69999999999999;
+        assertEquals(1, (int) CommonUtil.determinePriceCatForCPC(d), 0);
+        d = 0.70000001;
+        assertEquals(2, (int) CommonUtil.determinePriceCatForCPC(d), 0);
+        d = -1D;
+        assertEquals(3, (int) CommonUtil.determinePriceCatForCPC(d), 0);
+        d = 1.9633331;
+        assertEquals(2, (int) CommonUtil.determinePriceCatForCPC(d), 0);
+    }",6,"Inputs: price_1_SYMREAL
+
+demo.DeterminePriceCatForCPC.determinePriceCatForCPC(0.0)  --> Return Value: java.lang.Integer@24d
+demo.DeterminePriceCatForCPC.determinePriceCatForCPC(0.7)  --> Return Value: java.lang.Integer@24d
+demo.DeterminePriceCatForCPC.determinePriceCatForCPC(1.35)  --> Return Value: java.lang.Integer@24e
+demo.DeterminePriceCatForCPC.determinePriceCatForCPC(2.0)  --> Return Value: java.lang.Integer@24e
+demo.DeterminePriceCatForCPC.determinePriceCatForCPC(3.0)  --> Return Value: java.lang.Integer@24f
+"
+"(boolean implicit, double value, double currentValue)","public class ComputeTargetQui {
+public static double computeTargetQui(boolean implicit, double value, double currentValue) {
+    // We want Qui to change based on value. What's the target value, Qui'?
+    if (implicit) {
+      // Target is really 1, or 0, depending on whether value is positive or negative.
+      // This wouldn't account for the strength though. Instead the target is a function
+      // of the current value and strength. If the current value is c, and value is positive
+      // then the target is somewhere between c and 1 depending on the strength. If current
+      // value is already >= 1, there's no effect. Similarly for negative values.
+      if (value > 0.0f && currentValue < 1.0) {
+        double diff = 1.0 - Math.max(0.0, currentValue);
+        return currentValue + (value / (1.0 + value)) * diff;
+      }
+      if (value < 0.0f && currentValue > 0.0) {
+        double diff = -Math.min(1.0, currentValue);
+        return currentValue + (value / (value - 1.0)) * diff;
+      }
+      // No change
+      return Double.NaN;
+    } else {
+      // Non-implicit -- value is supposed to be the new value
+      return value;
+    }
+  }
+}","@Test
+  public void testImplicitQui() {
+    assertNaN(ALSUtils.computeTargetQui(true, 0.0, 1.0));
+    assertNaN(ALSUtils.computeTargetQui(true, 0.0, 0.0));
+    assertNaN(ALSUtils.computeTargetQui(true, 0.0, -1.0));
+    assertNaN(ALSUtils.computeTargetQui(true, 0.5, 1.0));
+    assertNaN(ALSUtils.computeTargetQui(true, -0.5, 0.0));
+    assertEquals(0.75, ALSUtils.computeTargetQui(true, 1.0, 0.5));
+    assertEquals(0.25, ALSUtils.computeTargetQui(true, -1.0, 0.5));
+    for (double d : new double[] { -1.0 , 0.0, 0.5, 1.0, 2.0 }) {
+      assertEquals(d, ALSUtils.computeTargetQui(false, d, 0.0));
+    }
+  }",6,"Inputs: implicit_1_SYMINT,value_2_SYMREAL,currentValue_3_SYMREAL
+
+demo.ComputeTargetQui.computeTargetQui(false,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 4.9E-324
+demo.ComputeTargetQui.computeTargetQui(true,-9223372036854775808(don't care),1.0)  --> Return Value: NaN
+demo.ComputeTargetQui.computeTargetQui(true,-9223372036854775808(don't care),2.0)  --> Return Value: NaN
+demo.ComputeTargetQui.computeTargetQui(true,0.0,0.0)  --> Return Value: 0.0
+"
+(long value),"public class Build_lenenc_int {
+public static byte[] build_lenenc_int(long value) {
+        byte[] packet = null;
+        if (value == 251) {
+            packet = new byte[1];
+            packet[0] = (byte) 0xFB;
+        } else if (value < 251) {
+            packet = new byte[1];
+            packet[0] = (byte) (value & 0xFF);
+        } else if (value < 65535) {
+            packet = new byte[3];
+            packet[0] = (byte) 0xFC;
+            packet[1] = (byte) (value & 0xFF);
+            packet[2] = (byte) ((value >> 8) & 0xFF);
+        } else if (value < 16777215) {
+            packet = new byte[4];
+            packet[0] = (byte) 0xFD;
+            packet[1] = (byte) (value & 0xFF);
+            packet[2] = (byte) ((value >> 8) & 0xFF);
+            packet[3] = (byte) ((value >> 16) & 0xFF);
+        } else {
+            packet = new byte[9];
+            packet[0] = (byte) 0xFE;
+            packet[1] = (byte) (value & 0xFF);
+            packet[2] = (byte) ((value >> 8) & 0xFF);
+            packet[3] = (byte) ((value >> 16) & 0xFF);
+            packet[4] = (byte) ((value >> 24) & 0xFF);
+            packet[5] = (byte) ((value >> 32) & 0xFF);
+            packet[6] = (byte) ((value >> 40) & 0xFF);
+            packet[7] = (byte) ((value >> 48) & 0xFF);
+            packet[8] = (byte) ((value >> 56) & 0xFF);
+        }
+
+        return packet;
+    }
+}","@Test public void test9() {
+        byte[] expected = new byte[] {(byte) 0x00,};
+        assertArrayEquals(expected, Proto.build_lenenc_int(0));
+    }",5,"Inputs: value_1_SYMINT
+
+demo.Build_lenenc_int.build_lenenc_int(0l)  --> Return Value: [B@1c8
+demo.Build_lenenc_int.build_lenenc_int(251l)  --> Return Value: [B@1c8
+demo.Build_lenenc_int.build_lenenc_int(252l)  --> Return Value: [B@1c8
+"
+(double z),"public class GaussCdf {
+public static double gaussCdf(double z) {
+        // input = z-value (-inf to +inf)
+        // output = p under Normal curve from -inf to z
+        // e.g., if z = 0.0, function returns 0.5000
+        // ACM Algorithm #209
+        double y; // 209 scratch variable
+        double p; // result. called ‘z’ in 209
+        double w; // 209 scratch variable
+
+        if (z == 0.0) {
+            p = 0.0;
+        }
+        else {
+            y = Math.abs(z) / 2.0;
+            if (y >= 3.0) {
+                p = 1.0;
+            }
+            else if (y < 1.0) {
+                w = y * y;
+                p = ((((((((0.000124818987 * w
+                  - 0.001075204047) * w + 0.005198775019) * w
+                  - 0.019198292004) * w + 0.059054035642) * w
+                  - 0.151968751364) * w + 0.319152932694) * w
+                  - 0.531923007300) * w + 0.797884560593) * y * 2.0;
+            }
+            else {
+                y = y - 2.0;
+                p = (((((((((((((-0.000045255659 * y
+                  + 0.000152529290) * y - 0.000019538132) * y
+                  - 0.000676904986) * y + 0.001390604284) * y
+                  - 0.000794620820) * y - 0.002034254874) * y
+                  + 0.006549791214) * y - 0.010557625006) * y
+                  + 0.011630447319) * y - 0.009279453341) * y
+                  + 0.005353579108) * y - 0.002141268741) * y
+                  + 0.000535310849) * y + 0.999936657524;
+            }
+        }
+
+        if (z > 0.0) {
+            return (p + 1.0) / 2.0;
+        }
+        
+        return (1.0 - p) / 2.0;
+    }
+}","@Test
+    public void testGaussCdf() {
+        logger.info(""GaussCdf"");
+        double z = 3.0;
+        double expResult = 0.9986501025724;
+        double result = ContinuousDistributions.gaussCdf(z);
+        assertEquals(expResult, result, Constants.DOUBLE_ACCURACY_HIGH);
+    }",5,"Inputs: z_1_SYMREAL
+
+demo.GaussCdf.gaussCdf(6.0)  --> Return Value: 1.0
+demo.GaussCdf.gaussCdf(7.0)  --> Return Value: 1.0
+demo.GaussCdf.gaussCdf(0.0)  --> Return Value: 0.5
+demo.GaussCdf.gaussCdf(2.0)  --> Return Value: 0.9772498670405
+demo.GaussCdf.gaussCdf(3.0)  --> Return Value: 0.9986501025724004
+"
+(int maxSmallBlind),"public class GetNextSmallBlind {
+public static int getNextSmallBlind(int maxSmallBlind)
+    {
+        if (maxSmallBlind == 0)
+        {
+            return 100;
+        }
+        int result = maxSmallBlind;
+        int exp = 0;
+        while(result % 10 == 0)
+        {
+            exp++;
+            result /= 10;
+        }
+        if (result == 2)
+        {
+            result = 5;
+        }
+        else
+        {
+            result *= 2;
+        }
+        while(exp > 0)
+        {
+            exp--;
+            result *= 10;
+        }
+        return result;
+    }
+}","@Test
+    public void testNextSmallBlind()
+    {
+        assertEquals(20, TournamentTools.getNextSmallBlind(10));
+        assertEquals(200, TournamentTools.getNextSmallBlind(100));
+        assertEquals(500, TournamentTools.getNextSmallBlind(200));
+        assertEquals(1000, TournamentTools.getNextSmallBlind(500));
+        assertEquals(2000, TournamentTools.getNextSmallBlind(1000));
+    }",5,"Inputs: maxSmallBlind_1_SYMINT
+
+demo.GetNextSmallBlind.getNextSmallBlind(0)  --> Return Value: 100
+demo.GetNextSmallBlind.getNextSmallBlind(2)  --> Return Value: 5
+demo.GetNextSmallBlind.getNextSmallBlind(-9)  --> Return Value: -18
+demo.GetNextSmallBlind.getNextSmallBlind(20)  --> Return Value: 50
+demo.GetNextSmallBlind.getNextSmallBlind(-10)  --> Return Value: -20
+demo.GetNextSmallBlind.getNextSmallBlind(200)  --> Return Value: 500
+demo.GetNextSmallBlind.getNextSmallBlind(-100)  --> Return Value: -200
+demo.GetNextSmallBlind.getNextSmallBlind(2000)  --> Return Value: 5000
+demo.GetNextSmallBlind.getNextSmallBlind(-1000)  --> Return Value: -2000
+demo.GetNextSmallBlind.getNextSmallBlind(20000)  --> Return Value: 50000
+demo.GetNextSmallBlind.getNextSmallBlind(-90000)  --> Return Value: -180000
+demo.GetNextSmallBlind.getNextSmallBlind(200000)  --> Return Value: 500000
+demo.GetNextSmallBlind.getNextSmallBlind(-100000)  --> Return Value: -200000
+demo.GetNextSmallBlind.getNextSmallBlind(2000000)  --> Return Value: 5000000
+demo.GetNextSmallBlind.getNextSmallBlind(-1000000)  --> Return Value: -2000000
+"
+"(long D, long gt, long S)","public class Hg {
+public static double hg(long D, long gt, long S) {
+
+		double dgt = 0;
+		for (int i = 1; i <= D - gt; i++) {
+			dgt += Math.log(i);
+		}
+
+		double ds = 0;
+		for (int i = 1; i <= D - S; i++) {
+			ds += Math.log(i);
+		}
+
+		double dgts = 0;
+		for (int i = 1; i <= D - gt - S; i++) {
+			dgts += Math.log(i);
+		}
+
+		double d = 0;
+		for (int i = 1; i <= D; i++) {
+			d += Math.log(i);
+		}
+
+		double P = Math.exp(dgt + ds - dgts - d);
+
+		return P;
+	}
+}","@Test
+	public final void testHg() {
+		System.out.println(Stat.hg(10, 10, 20));
+	}",5,"Inputs: D_1_SYMINT,gt_2_SYMINT,S_3_SYMINT
+
+demo.Hg.hg(2l,0l,0l)  --> Return Value: 1.0
+demo.Hg.hg(1l,-1l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(0l,-2l,-2l)  --> Return Value: 1.0
+demo.Hg.hg(3l,1l,1l)  --> Return Value: 1.0
+demo.Hg.hg(4l,2l,2l)  --> Return Value: 1.0
+demo.Hg.hg(2l,-1l,1l)  --> Return Value: 1.0
+demo.Hg.hg(1l,-1l,0l)  --> Return Value: 1.0
+demo.Hg.hg(0l,-2l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(2l,0l,1l)  --> Return Value: 1.0
+demo.Hg.hg(3l,1l,2l)  --> Return Value: 1.0
+demo.Hg.hg(2l,-2l,2l)  --> Return Value: 1.0
+demo.Hg.hg(1l,-2l,1l)  --> Return Value: 1.0
+demo.Hg.hg(0l,-2l,0l)  --> Return Value: 1.0
+demo.Hg.hg(2l,-1l,2l)  --> Return Value: 1.0
+demo.Hg.hg(1l,-1l,1l)  --> Return Value: 1.0
+demo.Hg.hg(0l,-2l,1l)  --> Return Value: 1.0
+demo.Hg.hg(2l,0l,2l)  --> Return Value: 1.0
+demo.Hg.hg(1l,-1l,2l)  --> Return Value: 1.0
+demo.Hg.hg(0l,-2l,2l)  --> Return Value: 1.0
+demo.Hg.hg(2l,1l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(1l,0l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(0l,-1l,-2l)  --> Return Value: 1.0
+demo.Hg.hg(2l,1l,0l)  --> Return Value: 1.0
+demo.Hg.hg(3l,2l,1l)  --> Return Value: 1.0
+demo.Hg.hg(0l,-1l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(1l,0l,0l)  --> Return Value: 1.0
+demo.Hg.hg(2l,1l,1l)  --> Return Value: 1.0
+demo.Hg.hg(-1l,-2l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(0l,-1l,0l)  --> Return Value: 1.0
+demo.Hg.hg(2l,1l,2l)  --> Return Value: 1.0
+demo.Hg.hg(1l,0l,1l)  --> Return Value: 1.0
+demo.Hg.hg(0l,-1l,1l)  --> Return Value: 1.0
+demo.Hg.hg(2l,2l,-2l)  --> Return Value: 1.0
+demo.Hg.hg(1l,1l,-2l)  --> Return Value: 1.0
+demo.Hg.hg(0l,0l,-2l)  --> Return Value: 1.0
+demo.Hg.hg(2l,2l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(1l,1l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(0l,1l,-2l)  --> Return Value: 1.0
+demo.Hg.hg(2l,2l,0l)  --> Return Value: 1.0
+demo.Hg.hg(1l,2l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(0l,2l,-2l)  --> Return Value: 1.0
+demo.Hg.hg(-1l,-1l,-2l)  --> Return Value: 1.0
+demo.Hg.hg(0l,0l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(2l,2l,1l)  --> Return Value: 1.0
+demo.Hg.hg(1l,1l,0l)  --> Return Value: 1.0
+demo.Hg.hg(0l,1l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(-2l,-2l,-2l)  --> Return Value: 1.0
+demo.Hg.hg(-1l,-1l,-1l)  --> Return Value: 1.0
+demo.Hg.hg(2l,2l,2l)  --> Return Value: 1.0
+demo.Hg.hg(1l,1l,1l)  --> Return Value: 1.0
+demo.Hg.hg(0l,0l,0l)  --> Return Value: 1.0
+"
+"(int d1, int d2, int d3, int d4, int d5)","public class Threes {
+public static int threes(int d1, int d2, int d3, int d4, int d5) {
+        int s;
+        s = 0;
+        if (d1 == 3) s += 3;
+        if (d2 == 3) s += 3;
+        if (d3 == 3) s += 3;
+        if (d4 == 3) s += 3;
+        if (d5 == 3) s += 3;
+        return s;
+    }
+}","@Test
+    public void test_threes() {
+        assertEquals(6, Yatzy.threes(1,2,3,2,3));
+        assertEquals(12, Yatzy.threes(2,3,3,3,3));
+    }",6,"Inputs: d1_1_SYMINT,d2_2_SYMINT,d3_3_SYMINT,d4_4_SYMINT,d5_5_SYMINT
+
+demo.Threes.threes(3,3,3,3,3)  --> Return Value: 15
+demo.Threes.threes(3,3,3,3,0)  --> Return Value: 12
+demo.Threes.threes(3,3,3,0,3)  --> Return Value: 12
+demo.Threes.threes(3,3,3,0,0)  --> Return Value: 9
+demo.Threes.threes(3,3,0,3,3)  --> Return Value: 12
+demo.Threes.threes(3,3,0,3,0)  --> Return Value: 9
+demo.Threes.threes(3,3,0,0,3)  --> Return Value: 9
+demo.Threes.threes(3,3,0,0,0)  --> Return Value: 6
+demo.Threes.threes(3,0,3,3,3)  --> Return Value: 12
+demo.Threes.threes(3,0,3,3,0)  --> Return Value: 9
+demo.Threes.threes(3,0,3,0,3)  --> Return Value: 9
+demo.Threes.threes(3,0,3,0,0)  --> Return Value: 6
+demo.Threes.threes(3,0,0,3,3)  --> Return Value: 9
+demo.Threes.threes(3,0,0,3,0)  --> Return Value: 6
+demo.Threes.threes(3,0,0,0,3)  --> Return Value: 6
+demo.Threes.threes(3,0,0,0,0)  --> Return Value: 3
+demo.Threes.threes(0,3,3,3,3)  --> Return Value: 12
+demo.Threes.threes(0,3,3,3,0)  --> Return Value: 9
+demo.Threes.threes(0,3,3,0,3)  --> Return Value: 9
+demo.Threes.threes(0,3,3,0,0)  --> Return Value: 6
+demo.Threes.threes(0,3,0,3,3)  --> Return Value: 9
+demo.Threes.threes(0,3,0,3,0)  --> Return Value: 6
+demo.Threes.threes(0,3,0,0,3)  --> Return Value: 6
+demo.Threes.threes(0,3,0,0,0)  --> Return Value: 3
+demo.Threes.threes(0,0,3,3,3)  --> Return Value: 9
+demo.Threes.threes(0,0,3,3,0)  --> Return Value: 6
+demo.Threes.threes(0,0,3,0,3)  --> Return Value: 6
+demo.Threes.threes(0,0,3,0,0)  --> Return Value: 3
+demo.Threes.threes(0,0,0,3,3)  --> Return Value: 6
+demo.Threes.threes(0,0,0,3,0)  --> Return Value: 3
+demo.Threes.threes(0,0,0,0,3)  --> Return Value: 3
+demo.Threes.threes(0,0,0,0,0)  --> Return Value: 0
+"
+"(int d1, int d2, int d3, int d4, int d5)","public class Twos {
+public static int twos(int d1, int d2, int d3, int d4, int d5) {
+        int sum = 0;
+        if (d1 == 2) sum += 2;
+        if (d2 == 2) sum += 2;
+        if (d3 == 2) sum += 2;
+        if (d4 == 2) sum += 2;
+        if (d5 == 2) sum += 2;
+        return sum;
+    }
+}","@Test
+    public void test_2s() {
+        assertEquals(4, Yatzy.twos(1,2,3,2,6));
+        assertEquals(10, Yatzy.twos(2,2,2,2,2));
+    }",6,"Inputs: d1_1_SYMINT,d2_2_SYMINT,d3_3_SYMINT,d4_4_SYMINT,d5_5_SYMINT
+
+demo.Twos.twos(2,2,2,2,2)  --> Return Value: 10
+demo.Twos.twos(2,2,2,2,0)  --> Return Value: 8
+demo.Twos.twos(2,2,2,0,2)  --> Return Value: 8
+demo.Twos.twos(2,2,2,0,0)  --> Return Value: 6
+demo.Twos.twos(2,2,0,2,2)  --> Return Value: 8
+demo.Twos.twos(2,2,0,2,0)  --> Return Value: 6
+demo.Twos.twos(2,2,0,0,2)  --> Return Value: 6
+demo.Twos.twos(2,2,0,0,0)  --> Return Value: 4
+demo.Twos.twos(2,0,2,2,2)  --> Return Value: 8
+demo.Twos.twos(2,0,2,2,0)  --> Return Value: 6
+demo.Twos.twos(2,0,2,0,2)  --> Return Value: 6
+demo.Twos.twos(2,0,2,0,0)  --> Return Value: 4
+demo.Twos.twos(2,0,0,2,2)  --> Return Value: 6
+demo.Twos.twos(2,0,0,2,0)  --> Return Value: 4
+demo.Twos.twos(2,0,0,0,2)  --> Return Value: 4
+demo.Twos.twos(2,0,0,0,0)  --> Return Value: 2
+demo.Twos.twos(0,2,2,2,2)  --> Return Value: 8
+demo.Twos.twos(0,2,2,2,0)  --> Return Value: 6
+demo.Twos.twos(0,2,2,0,2)  --> Return Value: 6
+demo.Twos.twos(0,2,2,0,0)  --> Return Value: 4
+demo.Twos.twos(0,2,0,2,2)  --> Return Value: 6
+demo.Twos.twos(0,2,0,2,0)  --> Return Value: 4
+demo.Twos.twos(0,2,0,0,2)  --> Return Value: 4
+demo.Twos.twos(0,2,0,0,0)  --> Return Value: 2
+demo.Twos.twos(0,0,2,2,2)  --> Return Value: 6
+demo.Twos.twos(0,0,2,2,0)  --> Return Value: 4
+demo.Twos.twos(0,0,2,0,2)  --> Return Value: 4
+demo.Twos.twos(0,0,2,0,0)  --> Return Value: 2
+demo.Twos.twos(0,0,0,2,2)  --> Return Value: 4
+demo.Twos.twos(0,0,0,2,0)  --> Return Value: 2
+demo.Twos.twos(0,0,0,0,2)  --> Return Value: 2
+demo.Twos.twos(0,0,0,0,0)  --> Return Value: 0
+"
+"(int d1, int d2, int d3, int d4, int d5)","public class Ones {
+public static int ones(int d1, int d2, int d3, int d4, int d5) {
+        int sum = 0;
+        if (d1 == 1) sum++;
+        if (d2 == 1) sum++;
+        if (d3 == 1) sum++;
+        if (d4 == 1) sum++;
+        if (d5 == 1)
+            sum++;
+
+        return sum;
+    }
+}","@Test public void test_1s() {
+        assertTrue(Yatzy.ones(1,2,3,4,5) == 1);
+        assertEquals(2, Yatzy.ones(1,2,1,4,5));
+        assertEquals(0, Yatzy.ones(6,2,2,4,5));
+        assertEquals(4, Yatzy.ones(1,2,1,1,1));
+    }",6,"Inputs: d1_1_SYMINT,d2_2_SYMINT,d3_3_SYMINT,d4_4_SYMINT,d5_5_SYMINT
+
+demo.Ones.ones(1,1,1,1,1)  --> Return Value: 5
+demo.Ones.ones(1,1,1,1,0)  --> Return Value: 4
+demo.Ones.ones(1,1,1,0,1)  --> Return Value: 4
+demo.Ones.ones(1,1,1,0,0)  --> Return Value: 3
+demo.Ones.ones(1,1,0,1,1)  --> Return Value: 4
+demo.Ones.ones(1,1,0,1,0)  --> Return Value: 3
+demo.Ones.ones(1,1,0,0,1)  --> Return Value: 3
+demo.Ones.ones(1,1,0,0,0)  --> Return Value: 2
+demo.Ones.ones(1,0,1,1,1)  --> Return Value: 4
+demo.Ones.ones(1,0,1,1,0)  --> Return Value: 3
+demo.Ones.ones(1,0,1,0,1)  --> Return Value: 3
+demo.Ones.ones(1,0,1,0,0)  --> Return Value: 2
+demo.Ones.ones(1,0,0,1,1)  --> Return Value: 3
+demo.Ones.ones(1,0,0,1,0)  --> Return Value: 2
+demo.Ones.ones(1,0,0,0,1)  --> Return Value: 2
+demo.Ones.ones(1,0,0,0,0)  --> Return Value: 1
+demo.Ones.ones(0,1,1,1,1)  --> Return Value: 4
+demo.Ones.ones(0,1,1,1,0)  --> Return Value: 3
+demo.Ones.ones(0,1,1,0,1)  --> Return Value: 3
+demo.Ones.ones(0,1,1,0,0)  --> Return Value: 2
+demo.Ones.ones(0,1,0,1,1)  --> Return Value: 3
+demo.Ones.ones(0,1,0,1,0)  --> Return Value: 2
+demo.Ones.ones(0,1,0,0,1)  --> Return Value: 2
+demo.Ones.ones(0,1,0,0,0)  --> Return Value: 1
+demo.Ones.ones(0,0,1,1,1)  --> Return Value: 3
+demo.Ones.ones(0,0,1,1,0)  --> Return Value: 2
+demo.Ones.ones(0,0,1,0,1)  --> Return Value: 2
+demo.Ones.ones(0,0,1,0,0)  --> Return Value: 1
+demo.Ones.ones(0,0,0,1,1)  --> Return Value: 2
+demo.Ones.ones(0,0,0,1,0)  --> Return Value: 1
+demo.Ones.ones(0,0,0,0,1)  --> Return Value: 1
+demo.Ones.ones(0,0,0,0,0)  --> Return Value: 0
+"
+"(double d, double direction)","public class NextAfter {
+public static double nextAfter(double d, double direction) {
+
+        // handling of some important special cases
+        if (Double.isNaN(d) || Double.isNaN(direction)) {
+            return Double.NaN;
+        } else if (d == direction) {
+            return direction;
+        } else if (Double.isInfinite(d)) {
+            return (d < 0) ? -Double.MAX_VALUE : Double.MAX_VALUE;
+        } else if (d == 0) {
+            return (direction < 0) ? -Double.MIN_VALUE : Double.MIN_VALUE;
+        }
+        // special cases MAX_VALUE to infinity and  MIN_VALUE to 0
+        // are handled just as normal numbers
+        // can use raw bits since already dealt with infinity and NaN
+        final long bits = Double.doubleToRawLongBits(d);
+        final long sign = bits & 0x8000000000000000L;
+        if ((direction < d) ^ (sign == 0L)) {
+            return Double.longBitsToDouble(sign | ((bits & 0x7fffffffffffffffL) + 1));
+        } else {
+            return Double.longBitsToDouble(sign | ((bits & 0x7fffffffffffffffL) - 1));
+        }
+
+    }
+}","@Test
+    public void testNextAfter() {
+        // 0x402fffffffffffff 0x404123456789abcd -> 4030000000000000
+        Assert.assertEquals(16.0, FastMath.nextUp(15.999999999999998), 0.0);
+
+        // 0xc02fffffffffffff 0x404123456789abcd -> c02ffffffffffffe
+        Assert.assertEquals(-15.999999999999996, FastMath.nextAfter(-15.999999999999998, 34.27555555555555), 0.0);
+
+        // 0x402fffffffffffff 0x400123456789abcd -> 402ffffffffffffe
+        Assert.assertEquals(15.999999999999996, FastMath.nextDown(15.999999999999998), 0.0);
+
+        // 0xc02fffffffffffff 0x400123456789abcd -> c02ffffffffffffe
+        Assert.assertEquals(-15.999999999999996, FastMath.nextAfter(-15.999999999999998, 2.142222222222222), 0.0);
+
+        // 0x4020000000000000 0x404123456789abcd -> 4020000000000001
+        Assert.assertEquals(8.000000000000002, FastMath.nextAfter(8.0, 34.27555555555555), 0.0);
+
+        // 0xc020000000000000 0x404123456789abcd -> c01fffffffffffff
+        Assert.assertEquals(-7.999999999999999, FastMath.nextAfter(-8.0, 34.27555555555555), 0.0);
+
+        // 0x4020000000000000 0x400123456789abcd -> 401fffffffffffff
+        Assert.assertEquals(7.999999999999999, FastMath.nextAfter(8.0, 2.142222222222222), 0.0);
+
+        // 0xc020000000000000 0x400123456789abcd -> c01fffffffffffff
+        Assert.assertEquals(-7.999999999999999, FastMath.nextAfter(-8.0, 2.142222222222222), 0.0);
+
+        // 0x3f2e43753d36a223 0x3f2e43753d36a224 -> 3f2e43753d36a224
+        Assert.assertEquals(2.308922399667661E-4, FastMath.nextAfter(2.3089223996676606E-4, 2.308922399667661E-4), 0.0);
+
+        // 0x3f2e43753d36a223 0x3f2e43753d36a223 -> 3f2e43753d36a223
+        Assert.assertEquals(2.3089223996676606E-4, FastMath.nextAfter(2.3089223996676606E-4, 2.3089223996676606E-4), 0.0);
+
+        // 0x3f2e43753d36a223 0x3f2e43753d36a222 -> 3f2e43753d36a222
+        Assert.assertEquals(2.3089223996676603E-4, FastMath.nextAfter(2.3089223996676606E-4, 2.3089223996676603E-4), 0.0);
+
+        // 0x3f2e43753d36a223 0xbf2e43753d36a224 -> 3f2e43753d36a222
+        Assert.assertEquals(2.3089223996676603E-4, FastMath.nextAfter(2.3089223996676606E-4, -2.308922399667661E-4), 0.0);
+
+        // 0x3f2e43753d36a223 0xbf2e43753d36a223 -> 3f2e43753d36a222
+        Assert.assertEquals(2.3089223996676603E-4, FastMath.nextAfter(2.3089223996676606E-4, -2.3089223996676606E-4), 0.0);
+
+        // 0x3f2e43753d36a223 0xbf2e43753d36a222 -> 3f2e43753d36a222
+        Assert.assertEquals(2.3089223996676603E-4, FastMath.nextAfter(2.3089223996676606E-4, -2.3089223996676603E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0x3f2e43753d36a224 -> bf2e43753d36a222
+        Assert.assertEquals(-2.3089223996676603E-4, FastMath.nextAfter(-2.3089223996676606E-4, 2.308922399667661E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0x3f2e43753d36a223 -> bf2e43753d36a222
+        Assert.assertEquals(-2.3089223996676603E-4, FastMath.nextAfter(-2.3089223996676606E-4, 2.3089223996676606E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0x3f2e43753d36a222 -> bf2e43753d36a222
+        Assert.assertEquals(-2.3089223996676603E-4, FastMath.nextAfter(-2.3089223996676606E-4, 2.3089223996676603E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0xbf2e43753d36a224 -> bf2e43753d36a224
+        Assert.assertEquals(-2.308922399667661E-4, FastMath.nextAfter(-2.3089223996676606E-4, -2.308922399667661E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0xbf2e43753d36a223 -> bf2e43753d36a223
+        Assert.assertEquals(-2.3089223996676606E-4, FastMath.nextAfter(-2.3089223996676606E-4, -2.3089223996676606E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0xbf2e43753d36a222 -> bf2e43753d36a222
+        Assert.assertEquals(-2.3089223996676603E-4, FastMath.nextAfter(-2.3089223996676606E-4, -2.3089223996676603E-4), 0.0);
+
+    }",7,"Inputs: d_1_SYMREAL,direction_2_SYMREAL
+
+demo.NextAfter.nextAfter(0.0,1.0)  --> Return Value: 4.9E-324
+demo.NextAfter.nextAfter(0.0,0.0)  --> Return Value: 0.0
+demo.NextAfter.nextAfter(0.5,0.0)  --> Return Value: NaN
+"
+(int len),"public class EncodeLength {
+static byte[] encodeLength(int len) {
+        if (len < 0) {
+            throw new IllegalArgumentException(""length is negative"");
+        } else if (len >= 16777216) {
+            throw new IllegalArgumentException(""length is too big: "" + len);
+        }
+        byte[] res;
+        if (len < 128) {
+            res = new byte[1];
+            res[0] = (byte) len;
+        } else if (len < 256) {
+            res = new byte[2];
+            res[0] = -127;
+            res[1] = (byte) len;
+        } else if (len < 65536) {
+            res = new byte[3];
+            res[0] = -126;
+            res[1] = (byte) (len / 256);
+            res[2] = (byte) (len % 256);
+        } else {
+            res = new byte[4];
+
+            res[0] = -125;
+            res[1] = (byte) (len / 65536);
+            res[2] = (byte) (len / 256);
+            res[3] = (byte) (len % 256);
+        }
+        return res;
+    }
+}","@Test
+    public void testEncodeLength() throws Exception {
+        // One byte
+        Assert.assertArrayEquals(new byte[]{0x00}, SecurityTokenUtils.encodeLength(0));
+        Assert.assertArrayEquals(new byte[]{0x01}, SecurityTokenUtils.encodeLength(1));
+        Assert.assertArrayEquals(new byte[]{0x7f}, SecurityTokenUtils.encodeLength(127));
+
+        // Two bytes
+        Assert.assertArrayEquals(new byte[]{(byte) 0x81, (byte) 0x80},
+                SecurityTokenUtils.encodeLength(128));
+        Assert.assertArrayEquals(new byte[]{(byte) 0x81, (byte) 0xFF},
+                SecurityTokenUtils.encodeLength(255));
+
+        // Three bytes
+        Assert.assertArrayEquals(new byte[]{(byte) 0x82, (byte) 0x01, 0x00},
+                SecurityTokenUtils.encodeLength(256));
+        Assert.assertArrayEquals(new byte[]{(byte) 0x82, (byte) 0xFF, (byte) 0xFF},
+                SecurityTokenUtils.encodeLength(65535));
+
+        // Four bytes
+        Assert.assertArrayEquals(new byte[]{(byte) 0x83, (byte) 0x01, (byte) 0x00, (byte) 0x00},
+                SecurityTokenUtils.encodeLength(65536));
+        Assert.assertArrayEquals(new byte[]{(byte) 0x83, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF},
+                SecurityTokenUtils.encodeLength(16777215));
+    }",6,"Inputs: len_1_SYMINT
+
+demo.EncodeLength.encodeLength(-1)  --> ""java.lang.IllegalArgumentException: length is negative...""
+demo.EncodeLength.encodeLength(16777216)  --> ""java.lang.IllegalArgumentException: length is too big: 0...""
+demo.EncodeLength.encodeLength(0)  --> Return Value: [B@1ee
+demo.EncodeLength.encodeLength(128)  --> Return Value: [B@1ef
+demo.EncodeLength.encodeLength(256)  --> Return Value: [B@1f0
+demo.EncodeLength.encodeLength(65536)  --> Return Value: [B@1f1
+"
+"(int year, int month)","public class DaysInMonth {
+protected static int daysInMonth(int year, int month) {
+        int daysInMonth;
+        switch (month) {
+            case 1:
+            case 3:
+            case 5:
+            case 7:
+            case 8:
+            case 10:
+            case 12:
+                daysInMonth = 31;
+                break;
+            case 2:
+                if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
+                    daysInMonth = 29;
+                } else {
+                    daysInMonth = 28;
+                }
+                break;
+            default:
+                // returns 30 even for nonexistant months 
+                daysInMonth = 30;
+        }
+        return daysInMonth;
+    }
+}","@Test
+    public void testDaysInMonths_standardMonths_31() throws Exception {
+        assertThat(Utilities.daysInMonth(2400, 1), is(31));
+        assertThat(Utilities.daysInMonth(2400, 3), is(31));
+        assertThat(Utilities.daysInMonth(2400, 5), is(31));
+        assertThat(Utilities.daysInMonth(2400, 7), is(31));
+        assertThat(Utilities.daysInMonth(2400, 8), is(31));
+        assertThat(Utilities.daysInMonth(2400, 10), is(31));
+        assertThat(Utilities.daysInMonth(2400, 12), is(31));
+
+        assertThat(Utilities.daysInMonth(2003, 1), is(31));
+        assertThat(Utilities.daysInMonth(2003, 3), is(31));
+        assertThat(Utilities.daysInMonth(2003, 5), is(31));
+        assertThat(Utilities.daysInMonth(2003, 7), is(31));
+        assertThat(Utilities.daysInMonth(2003, 8), is(31));
+        assertThat(Utilities.daysInMonth(2003, 10), is(31));
+        assertThat(Utilities.daysInMonth(2003, 12), is(31));
+    }",5,"Inputs: year_1_SYMINT,month_2_SYMINT
+
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),1)  --> Return Value: 31
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),3)  --> Return Value: 31
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),4)  --> Return Value: 30
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),5)  --> Return Value: 31
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),6)  --> Return Value: 30
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),7)  --> Return Value: 31
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),8)  --> Return Value: 31
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),9)  --> Return Value: 30
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),10)  --> Return Value: 31
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),11)  --> Return Value: 30
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),12)  --> Return Value: 31
+demo.DaysInMonth.daysInMonth(-9223372036854775808(don't care),0)  --> Return Value: 30
+demo.DaysInMonth.daysInMonth(1,2)  --> Return Value: 28
+demo.DaysInMonth.daysInMonth(-4,2)  --> Return Value: 29
+demo.DaysInMonth.daysInMonth(0,2)  --> Return Value: 29
+demo.DaysInMonth.daysInMonth(500,2)  --> Return Value: 28
+"
+"(int objectCount, int count, int index)","public class RoundRobinPart {
+public static int[] roundRobinPart(int objectCount, int count, int index) {
+        if (objectCount < 0 || index < 0 || count < 1 || index >= count) {
+            throw new IllegalArgumentException(""objectCount="" + objectCount + "", count="" + count + "", index="" + index);
+        }
+
+        int[] res = new int[objectCount / count + (objectCount % count > index ? 1 : 0)];
+        for (int i = 0, j = index; j < objectCount; i++, j += count) {
+            res[i] = j;
+        }
+        return res;
+    }
+}","@Test
+    public void test_roundRobinPart() {
+        assertArrayEquals(new int[] {},
+                roundRobinPart(0, 2, 0));
+        assertArrayEquals(new int[] {0},
+                roundRobinPart(1, 1, 0));
+        assertArrayEquals(new int[] {0},
+                roundRobinPart(1, 2, 0));
+        assertArrayEquals(new int[] {},
+                roundRobinPart(1, 2, 1));
+        assertArrayEquals(new int[] {0, 1},
+                roundRobinPart(2, 1, 0));
+        assertArrayEquals(new int[] {0},
+                roundRobinPart(2, 2, 0));
+        assertArrayEquals(new int[] {1},
+                roundRobinPart(2, 2, 1));
+        assertArrayEquals(new int[] {0, 2},
+                roundRobinPart(3, 2, 0));
+        assertArrayEquals(new int[] {1},
+                roundRobinPart(3, 2, 1));
+    }",6,"Inputs: objectCount_1_SYMINT,count_2_SYMINT,index_3_SYMINT
+
+demo.RoundRobinPart.roundRobinPart(-1,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> ""java.lang.IllegalArgumentException: objectCount=0, count=0, index=0...""
+demo.RoundRobinPart.roundRobinPart(0,-9223372036854775808(don't care),-1)  --> ""java.lang.IllegalArgumentException: objectCount=0, count=0, index=0...""
+demo.RoundRobinPart.roundRobinPart(0,0,0)  --> ""java.lang.IllegalArgumentException: objectCount=0, count=0, index=0...""
+demo.RoundRobinPart.roundRobinPart(0,1,1)  --> ""java.lang.IllegalArgumentException: objectCount=0, count=0, index=0...""
+demo.RoundRobinPart.roundRobinPart(0,1,0)  --> ""java.lang.ArithmeticException: div by 0...""
+"
+(long milliseconds),"public class AsHoursMinutesSeconds {
+public static String asHoursMinutesSeconds(long milliseconds) {
+
+        if (milliseconds < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        long seconds = 0;
+        long minutes = 0;
+        long hours = 0;
+
+        if (milliseconds > 1000) {
+            seconds = milliseconds / 1000;
+        }
+
+        if (seconds > 60) {
+            minutes = seconds / 60;
+            seconds = seconds % 60;
+        }
+
+        if (minutes > 60) {
+            hours = minutes / 60;
+            minutes = minutes % 60;
+        }
+
+        StringBuilder res = new StringBuilder();
+        if (hours > 0) {
+            res.append(hours).append(""h "");
+        }
+        if (hours > 0 || minutes > 0) {
+            res.append(minutes).append(""m "");
+        }
+        res.append(seconds).append('s');
+        return res.toString();
+    }
+}","@Test
+    public void testConversions() {
+
+        Collection<Object[]> stringNumberPairs = ReadableDurationTest.data();
+
+        for (Object[] stringAndNumber : stringNumberPairs) {
+            String result = (String) stringAndNumber[0];
+            Integer milliseconds = (Integer) stringAndNumber[1];
+
+            assertEquals(result, DateTimeUtil.asHoursMinutesSeconds(milliseconds));
+        }
+
+    }",8,"Inputs: milliseconds_1_SYMINT
+
+demo.AsHoursMinutesSeconds.asHoursMinutesSeconds(-1l)  --> Return Value: java.lang.String@1d0
+demo.AsHoursMinutesSeconds.asHoursMinutesSeconds(0l)  --> Return Value: java.lang.String@1d0
+demo.AsHoursMinutesSeconds.asHoursMinutesSeconds(1l)  --> Return Value: java.lang.String@1d0
+demo.AsHoursMinutesSeconds.asHoursMinutesSeconds(1000l)  --> Return Value: java.lang.String@1d0
+demo.AsHoursMinutesSeconds.asHoursMinutesSeconds(1001l)  --> Return Value: java.lang.String@1d0
+"
+(int n),"public class Ordinalize {
+public static String ordinalize(int n) {
+    int mod100 = n % 100;
+    if (mod100 == 11 || mod100 == 12 || mod100 == 13) {
+      return String.valueOf(n) + ""th"";
+    }
+    switch (n % 10) {
+      case 1:
+        return String.valueOf(n) + ""st"";
+      case 2:
+        return String.valueOf(n) + ""nd"";
+      case 3:
+        return String.valueOf(n) + ""rd"";
+      default:
+        return String.valueOf(n) + ""th"";
+    }
+  }
+}","@Test
+  public void testOrdinal() {
+    for (Map.Entry<Integer, String> entry : ordinalNumbers_.entrySet()) {
+      assertEquals(entry.getValue(), Strings.ordinalize(entry.getKey()));
+      assertEquals(entry.getValue(), Strings.ordinalize(entry.getKey()));
+    }
+  }",5,"Inputs: n_1_SYMINT
+
+demo.Ordinalize.ordinalize(11)  --> Return Value: java.lang.String@1d4
+demo.Ordinalize.ordinalize(12)  --> Return Value: java.lang.String@1d4
+demo.Ordinalize.ordinalize(13)  --> Return Value: java.lang.String@1d4
+demo.Ordinalize.ordinalize(1)  --> Return Value: java.lang.String@1dc
+demo.Ordinalize.ordinalize(2)  --> Return Value: java.lang.String@1e4
+demo.Ordinalize.ordinalize(3)  --> Return Value: java.lang.String@1ec
+demo.Ordinalize.ordinalize(0)  --> Return Value: java.lang.String@1f4
+"
+( long nanosecondCount ),"public class GetTimeIncrementFromDivision {
+public static String getTimeIncrementFromDivision( long nanosecondCount ) {
+        String timeUnit = ""second increment"";
+        if ( nanosecondCount >= 24l * 60l * 60l * 1000l * 1000l * 1000l ) {
+            timeUnit = nanosecondCount / ( 24l * 60l * 60l * 1000l * 1000l * 1000l ) + "" day increment"";
+        } else if ( nanosecondCount >= 60l * 60l * 1000l * 1000l * 1000l ) {
+            timeUnit = nanosecondCount / ( 60l * 60l * 1000l * 1000l * 1000l ) + "" hour increment"";
+        } else if ( nanosecondCount >= 60l * 1000l * 1000l * 1000l ) {
+            timeUnit = nanosecondCount / ( 60l * 1000l * 1000l * 1000l ) + "" minute increment"";
+        } else if ( nanosecondCount >= 1000l * 1000l * 1000l ) {
+            timeUnit = nanosecondCount / ( 1000l * 1000l * 1000l ) + "" second increment"";
+        } else if ( nanosecondCount >= 1000l * 1000l ) {
+            timeUnit = nanosecondCount / ( 1000l * 1000l ) + "" millisecond increment"";
+        } else if ( nanosecondCount >= 1000l ) {
+            timeUnit = nanosecondCount / 1000l + "" microsecond increment"";
+        } else {
+            timeUnit = nanosecondCount + "" nanosecond increment"";
+        }
+        return timeUnit;
+    }
+}","@Test
+    public void getTimeIncrementFromDivision() {
+        assertEquals( ""3 nanosecond increment"", AnalyzeMetricFile.getTimeIncrementFromDivision( 3 ) );
+        assertEquals( ""3 microsecond increment"", AnalyzeMetricFile.getTimeIncrementFromDivision( 3000 ) );
+        assertEquals( ""3 millisecond increment"", AnalyzeMetricFile.getTimeIncrementFromDivision( 3000000 ) );
+        assertEquals( ""3 second increment"", AnalyzeMetricFile.getTimeIncrementFromDivision( 3000000000l ) );
+        assertEquals( ""3 second increment"", AnalyzeMetricFile.getTimeIncrementFromDivision( 3000000000l ) );
+        assertEquals( ""3 minute increment"", AnalyzeMetricFile.getTimeIncrementFromDivision( 180000000000l ) );
+        assertEquals( ""3 hour increment"", AnalyzeMetricFile.getTimeIncrementFromDivision( 10800000000000l ) );
+        assertEquals( ""3 day increment"", AnalyzeMetricFile.getTimeIncrementFromDivision( 259200000000000l ) );
+    }",7,"Inputs: nanosecondCount_1_SYMINT
+
+demo.GetTimeIncrementFromDivision.getTimeIncrementFromDivision(0l)  --> Return Value: java.lang.String@1d5
+demo.GetTimeIncrementFromDivision.getTimeIncrementFromDivision(1000l)  --> Return Value: java.lang.String@1d5
+demo.GetTimeIncrementFromDivision.getTimeIncrementFromDivision(1001l)  --> Return Value: java.lang.String@1d5
+demo.GetTimeIncrementFromDivision.getTimeIncrementFromDivision(1000000l)  --> Return Value: java.lang.String@1d5
+demo.GetTimeIncrementFromDivision.getTimeIncrementFromDivision(1000001l)  --> Return Value: java.lang.String@1d5
+demo.GetTimeIncrementFromDivision.getTimeIncrementFromDivision(1000000000l)  --> Return Value: java.lang.String@1d5
+demo.GetTimeIncrementFromDivision.getTimeIncrementFromDivision(1000000001l)  --> Return Value: java.lang.String@1d5
+demo.GetTimeIncrementFromDivision.getTimeIncrementFromDivision(60000000000l)  --> Return Value: java.lang.String@1d5
+demo.GetTimeIncrementFromDivision.getTimeIncrementFromDivision(3600000000000l)  --> Return Value: java.lang.String@1d5
+demo.GetTimeIncrementFromDivision.getTimeIncrementFromDivision(817405953l)  --> Return Value: java.lang.String@1d5
+demo.GetTimeIncrementFromDivision.getTimeIncrementFromDivision(86400000000000l)  --> Return Value: java.lang.String@1d5
+"
+(long time_ms),"public class GetReadableTime {
+public static String getReadableTime(long time_ms) {
+        StringBuilder output = new StringBuilder();
+        long time_delta = time_ms;
+
+        int milliseconds = (int) (time_delta % 1000);
+        time_delta /= 1000;
+        int seconds = (int) (time_delta % 60);
+        time_delta /= 60;
+        int minutes = (int) (time_delta % 60);
+        time_delta /= 60;
+        int hours = (int) (time_delta % 24);
+        int days = (int) (time_delta / 24);
+
+        if (days != 0) {
+            output.append(days);
+            output.append("" day"");
+            if (days > 1) {
+                output.append(""s"");
+            }
+        }
+        if ((hours != 0) || (minutes != 0)) {
+            if (output.length() > 0) {
+                // Use zero-padded hours here as it's longer than a day.
+                output.append(String.format("" %02d:%02d:%02d"", hours, minutes, seconds));
+            } else {
+                // Don't pad hours if less than a day.
+                output.append(String.format(""%d:%02d:%02d"", hours, minutes, seconds));
+            }
+        } else if (output.length() > 0) {
+            /*
+             * If a day+ with zero hours and zero minutes, just report the days.
+             * E.g. ""1 day"", and not ""1 day 35 ms"".
+             */
+            return output.toString();
+        } else if (seconds != 0) {
+            output.append(String.format(""%d.%d seconds"", seconds, milliseconds));
+        } else if (milliseconds != 0) {
+            output.append(String.format(""%d ms"", milliseconds));
+        }
+
+        return (output.length() == 0 ? ""0 ms"" : output.toString());
+    }
+}","@Test
+    public void testValues() {
+        int i;
+        long[] values = {
+            0, 100, 1000, 1500, 64000, 124531, 3651782, 86400000, 86434349,
+            1075634299, 86480001, 86400001
+        };
+        String[] expected = {
+            ""0 ms"", ""100 ms"", ""1.0 seconds"", ""1.500 seconds"", ""0:01:04"",
+            ""0:02:04"", ""1:00:51"", ""1 day"", ""1 day"",
+            ""12 days 10:47:14"", ""1 day 00:01:20"", ""1 day""
+        };
+
+        for (i = 0; i < values.length; i++) {
+            assertEquals(expected[i], StringUtils.getReadableTime(values[i]));
+        }
+    }",9,"Inputs: time_ms_1_SYMINT
+
+demo.GetReadableTime.getReadableTime(3600000l)  --> Return Value: java.lang.String@1df
+demo.GetReadableTime.getReadableTime(176400000l)  --> Return Value: java.lang.String@1df
+demo.GetReadableTime.getReadableTime(-1000l)  --> Return Value: java.lang.String@1df
+demo.GetReadableTime.getReadableTime(60000l)  --> Return Value: java.lang.String@1df
+demo.GetReadableTime.getReadableTime(172860000l)  --> Return Value: java.lang.String@1df
+demo.GetReadableTime.getReadableTime(172800000l)  --> Return Value: java.lang.String@1e9
+demo.GetReadableTime.getReadableTime(-86340000l)  --> Return Value: java.lang.String@1df
+demo.GetReadableTime.getReadableTime(-86341000l)  --> Return Value: java.lang.String@1e9
+demo.GetReadableTime.getReadableTime(1000l)  --> Return Value: java.lang.String@1df
+demo.GetReadableTime.getReadableTime(1l)  --> Return Value: java.lang.String@1df
+demo.GetReadableTime.getReadableTime(0l)  --> Return Value: java.lang.String@1f8
+"
+"(int a, int b, int c)","public class Triangle {
+public static int triangle(int a, int b, int c) {
+        if (a <= 0 || b <= 0 || c <= 0) {
+            return 0;
+        }
+
+        // If sum of any two edges is greater than the length of the third edge
+        if (a == b && b == c) {
+            return 1;
+        } else if (a + b > c && b + c > a && a + c > b) {
+            return 2;
+        }
+        return 0;
+    }
+}","@Test
+    public void testTriangle() {
+        Map<int[], Integer> mapIO = new HashMap<int[], Integer>() {{
+            put(new int[]{3, 3, 3}, 1);
+            put(new int[]{3, 5, 4}, 2);
+        }};
+
+        for (Map.Entry<int[], Integer> io : mapIO.entrySet()) {
+            int[] i = io.getKey();
+            int ret = Triangle.triangle(i[0], i[1], i[2]);
+            Assert.assertEquals(io.getValue().intValue(), ret);
+        }
+    }",9,"Inputs: a_1_SYMINT,b_2_SYMINT,c_3_SYMINT
+
+demo.Triangle.triangle(0,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0
+demo.Triangle.triangle(1,0,-9223372036854775808(don't care))  --> Return Value: 0
+demo.Triangle.triangle(1,1,0)  --> Return Value: 0
+demo.Triangle.triangle(1,1,1)  --> Return Value: 1
+demo.Triangle.triangle(1,2,3)  --> Return Value: 0
+demo.Triangle.triangle(2,2,3)  --> Return Value: 2
+demo.Triangle.triangle(1,1,2)  --> Return Value: 0
+demo.Triangle.triangle(2,1,1)  --> Return Value: 0
+demo.Triangle.triangle(1,2,2)  --> Return Value: 2
+demo.Triangle.triangle(1,2,1)  --> Return Value: 0
+"

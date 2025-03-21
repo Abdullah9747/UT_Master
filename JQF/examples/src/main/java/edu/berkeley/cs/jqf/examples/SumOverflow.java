@@ -8,6 +8,6 @@ public static boolean sumOverflow(long a, long b)
 public static void main(String[] args) {
 
 
-sumOverflow(427742L, 33561L);
+sumOverflow(35421L, 458328L);
 }
 }

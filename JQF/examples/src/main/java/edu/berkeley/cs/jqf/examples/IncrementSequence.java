@@ -9,6 +9,6 @@ static int incrementSequence(int baseSequence, int increment) {
 public static void main(String[] args) {
 
 
-incrementSequence(1, 85);
+incrementSequence(33, 44);
 }
 }

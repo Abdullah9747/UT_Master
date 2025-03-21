@@ -8,6 +8,6 @@ public static double average(double a, double b)
 public static void main(String[] args) {
 
 
-average(82.24224279044124, 73.75621021139256);
+average(74.58545446777947, 72.94972523574333);
 }
 }

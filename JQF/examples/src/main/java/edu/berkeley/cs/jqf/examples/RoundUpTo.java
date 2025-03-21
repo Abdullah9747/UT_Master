@@ -8,6 +8,6 @@ public static int roundUpTo(int value, int modulus)
 public static void main(String[] args) {
 
 
-roundUpTo(77, 1);
+roundUpTo(35, 43);
 }
 }

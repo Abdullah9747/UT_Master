@@ -28,6 +28,6 @@ public static float getModulatedFloat(long value, long min, long max)
 public static void main(String[] args) {
 
 
-getModulatedFloat(434374L, 256343L, 895361L);
+getModulatedFloat(246948L, 684443L, 900124L);
 }
 }

@@ -8,6 +8,6 @@ public static boolean equalsOrBothNaN(double val1, double val2)
 public static void main(String[] args) {
 
 
-equalsOrBothNaN(23.037622069003277, 42.56689673474058);
+equalsOrBothNaN(55.32394205933874, 46.233644760997464);
 }
 }

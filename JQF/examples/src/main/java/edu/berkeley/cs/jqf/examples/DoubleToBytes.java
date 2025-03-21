@@ -13,6 +13,6 @@ public static byte[] doubleToBytes(double data) {
 public static void main(String[] args) {
 
 
-doubleToBytes(94.8172878779329);
+doubleToBytes(54.956333591932456);
 }
 }

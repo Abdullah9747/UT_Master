@@ -7,6 +7,6 @@ public static boolean checkCategoryMatchingMainCategory(int cat, int possibleMai
 public static void main(String[] args) {
 
 
-checkCategoryMatchingMainCategory(73, 17);
+checkCategoryMatchingMainCategory(65, 37);
 }
 }

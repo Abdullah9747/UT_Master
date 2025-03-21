@@ -7,6 +7,6 @@ public static boolean isEven(long value) {
 public static void main(String[] args) {
 
 
-isEven(231352L);
+isEven(354049L);
 }
 }

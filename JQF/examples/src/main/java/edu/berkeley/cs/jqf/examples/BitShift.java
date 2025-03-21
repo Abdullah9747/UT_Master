@@ -8,6 +8,6 @@ public static long bitShift(long inputVal, int shift)
 public static void main(String[] args) {
 
 
-bitShift(36905L, 1);
+bitShift(737065L, 36);
 }
 }

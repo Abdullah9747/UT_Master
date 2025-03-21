@@ -34,6 +34,6 @@ public static final int getTournamentGameValue(boolean declarer,
 public static void main(String[] args) {
 
 
-getTournamentGameValue(true, 73, 65);
+getTournamentGameValue(false, 91, 52);
 }
 }

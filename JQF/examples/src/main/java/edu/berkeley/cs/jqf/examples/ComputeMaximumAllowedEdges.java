@@ -47,6 +47,6 @@ static <V, E> int computeMaximumAllowedEdges(
 public static void main(String[] args) {
 
 
-computeMaximumAllowedEdges(92, true, true, true);
+computeMaximumAllowedEdges(21, true, true, true);
 }
 }

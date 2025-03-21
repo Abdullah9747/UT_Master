@@ -29,6 +29,6 @@ public static String durationToString(long durationMs) {
 public static void main(String[] args) {
 
 
-durationToString(934070L);
+durationToString(923369L);
 }
 }

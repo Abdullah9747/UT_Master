@@ -7,6 +7,6 @@ public static Long getNegativeLong(int number) {
 public static void main(String[] args) {
 
 
-getNegativeLong(22);
+getNegativeLong(80);
 }
 }

@@ -9,6 +9,6 @@ public static boolean isPower2(long value) {
 public static void main(String[] args) {
 
 
-isPower2(591675L);
+isPower2(331805L);
 }
 }
