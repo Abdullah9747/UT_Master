@@ -1,0 +1,10 @@
+target=demo.IntLog2
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method = demo.IntLog2.IntLog2(sym)
+
+symbolic.dp=z3
+listener = .symbc.SymbolicListener
+
+search.multiple_errors=true
+

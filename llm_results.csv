@@ -1,0 +1,385 @@
+Function,cyclomatic_complexity,LLM_Results,LLM_Time
+"public class DEHEXCHAR {
+/**
+     * Get the hex value of a character (base16).
+     * @param c A character between '0' and '9' or between 'A' and 'F' or
+     * between 'a' and 'f'.
+     * @return  An int between 0 and 15, or -1 if c was not a hex digit.
+     */
+    public static int dehexchar(char c) {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        if (c >= 'A' && c <= 'F') {
+            return c - ('A' - 10);
+        }
+        if (c >= 'a' && c <= 'f') {
+            return c - ('a' - 10);
+        }
+        return -1;
+    }
+}",7,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 49
+}
+]",32.753392457962036
+"public class HEXCHARTONIBBLE {
+/**
+     * Internal method to turn a hex char into a nibble.
+     */
+    private static int hexCharToNibble(char ch) {
+        if ((ch >= '0') && (ch <= '9')) {
+            return ch - '0';
+        } else if ((ch >= 'a') && (ch <= 'f')) {
+            return ch - 'a' + 10;
+        } else if ((ch >= 'A') && (ch <= 'F')) {
+            return ch - 'A' + 10;
+        } else {
+            throw new IllegalArgumentException(""Not a hex char - '"" + ch + ""'"");
+        }
+    }
+}",7,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 17
+}
+]",31.926053047180176
+"public class SHORTTOULAW {
+/**
+     * Convert a short to ulaw format
+     * 
+     * @param sample the short to convert
+     *
+     * @return a short containing an unsigned 8-bit quantity
+     *          representing the ulaw
+     */
+    public static byte shortToUlaw(short sample) {
+        final int[] exp_lut = {0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,
+                                   4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+                                   5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+                                   5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7};
+
+        int sign, exponent, mantissa;
+        short ulawbyte;
+
+        final short CLIP = 32635;
+        final short BIAS = 0x0084;
+
+        /* Get the sample into sign-magnitude. */
+        sign = (sample >> 8) & 0x80; /* set aside the sign */
+        if ( sign != 0 ) {
+            sample = (short) -sample; /* get magnitude */
+        }
+        if ( sample > CLIP ) sample = CLIP; /* clip the magnitude */
+
+        /* Convert from 16 bit linear to ulaw. */
+        sample = (short) (sample + BIAS);
+        exponent = exp_lut[( sample >> 7 ) & 0xFF];
+        mantissa = ( sample >> ( exponent + 3 ) ) & 0x0F;
+        ulawbyte = (short)
+            ((~ ( sign | ( exponent << 4 ) | mantissa)) & 0x00FF);
+        if ( ulawbyte == 0 ) ulawbyte = 0x02; /* optional CCITT trap */
+        // Now ulawbyte is an unsigned 8-bit entity.
+        // Return as a (signed) byte:
+        return (byte) (ulawbyte-128);
+    }
+}",4,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 45
+}
+]",32.02756452560425
+"public class CLAMP {
+/**
+	 * Clamp a value to an interval.
+	 * @param a the lower clamp threshold
+	 * @param b the upper clamp threshold
+	 * @param x the input parameter
+	 * @return the clamped value
+	 */
+	public static float clamp(float x, float a, float b) {
+		return (x < a) ? a : (x > b) ? b : x;
+	}
+}",1,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 13
+}
+]",31.951252698898315
+"public class COST {
+/** Cost computation: a simple absolute value of
+         * a subtraction. */
+        public double cost( double a, double b ) {
+            return( a > b ? (a-b) : (b-a) );
+            /* (Measuring which one is bigger replaces
+             *  a costly Math.abs() operation.) */
+        }
+}",1,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 41
+}
+]",31.932143449783325
+"public class ISSTATUSERROR {
+/**
+     * Returns whether the status is an error (i.e. 4xx or 5xx).
+     * @hide
+     */
+    public static boolean isStatusError(int status) {
+        return (status >= 400 && status < 600);
+    }
+}",2,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 9
+}
+]",31.96624255180359
+"public class ISMARKUP {
+/**
+     * Returns true if the specified character can be considered markup.
+     * Markup characters include '&lt;', '&amp;', and '%'.
+     *
+     * @param c The character to check.
+     */
+    public static boolean isMarkup(int c) {
+        return c == '<' || c == '&' || c == '%';
+    }
+}",3,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 37
+}
+]",32.044755697250366
+"public class ISLEAP {
+/**
+     * Returns whether this field is 'leap' for the specified instant.
+     * <p>
+     * For example, a leap year would return true, a non leap year would return
+     * false.
+     * <p>
+     * This implementation returns false.
+     * 
+     * @return true if the field is 'leap'
+     */
+    public boolean isLeap(long instant) {
+        return false;
+    }
+}",1,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 5
+}
+]",32.54876661300659
+"public class GETBLOCKTEXTUREFROMSIDEANDMETADATA {
+/**
+     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     */
+    public int getBlockTextureFromSideAndMetadata(int par1, int par2)
+    {
+        if (par1 == 1)
+        {
+            return 0;
+        }
+
+        return par1 != 0 ? 3 : 2;
+    }
+}",2,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 33
+}
+]",31.953837633132935
+"public class TRANSMITRDSGROUPCONTROL {
+/**
+    *  Pause/Resume RDS/RBDS group transmission, or stop and clear
+    *  all RDS groups.
+    *  <p>
+    *  This is a function used to used to pause/resume RDS/RBDS
+    *  group transmission, or stop and clear all RDS groups. This
+    *  function can be used with to control continuous and
+    *  non-continuous RDS/RBDS group transmissions.
+    *  <p>
+    *  @param ctrlCmd The Tx RDS group control.
+    *
+    *  @return true if RDS Group Control command was
+    *             successfully sent to the driver, false if RDS
+    *             Group Control command could not be sent to the
+    *             driver.
+    *
+    *  @see #transmitRdsGroups
+    */
+   public boolean transmitRdsGroupControl(int ctrlCmd){
+      boolean bStatus = false;
+
+      return bStatus;
+   }
+}",1,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+}
+]",32.65597891807556
+"public class BITOR {
+/**
+     * BITOR( ) Performs a bitwise OR of two integers.
+     * 
+     * {talendTypes} int | Integer
+     * 
+     * {Category} Mathematical
+     * 
+     * {param} int(10) a: integer
+     * 
+     * {param} int(10) b: integer
+     * 
+     * {example} BITOR(10,10)
+     * 
+     * 
+     */
+    public static int BITOR(int a, int b) {
+        return a | b;
+    }
+}",1,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 26
+}
+]",33.97381806373596
+"public class GETBLOCKTEXTUREFROMSIDEANDMETADATA {
+/**
+     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     */
+    public int getBlockTextureFromSideAndMetadata(int par1, int par2)
+    {
+        switch (par2)
+        {
+            default:
+                return 54;
+
+            case 1:
+                return 100;
+
+            case 2:
+                return 101;
+
+            case 3:
+                return 213;
+        }
+    }
+}",2,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 54
+}
+]",31.936150312423706
+"public class ACCEPTNUMPARAM {
+/**
+	Returns true only for 2 parameters, false otherwise.
+	*/
+	public boolean acceptNumParam(int numParam) {
+		return numParam == 2;
+	}
+}",1,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 22
+}
+]",31.96074914932251
+"public class CALCULATECELESTIALANGLE {
+/**
+     * Calculates the angle of sun and moon in the sky relative to a specified time (usually worldTime)
+     */
+    public float calculateCelestialAngle(long par1, float par3)
+    {
+        return 0.0F;
+    }
+}",1,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 49
+}
+]",32.86554527282715
+"public class ISSTATUSSUCCESS {
+/**
+     * Returns whether the status is a success (i.e. 2xx).
+     */
+    public static boolean isStatusSuccess(int status) {
+        return (status >= 200 && status < 300);
+    }
+}",2,"429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 17
+}
+]",32.1567645072937

@@ -1,0 +1,1396 @@
+Class Name,stderr,stdout,Function
+GREATESTCOMMONDIVISOR,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.and(ProblemZ3.java:971) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:179) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:730) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:490) at gov.nasa.jpf.symbc.bytecode.optimization.IFNE.execute(IFNE.java:67) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class GREATESTCOMMONDIVISOR {
+/**
+     * Gets the greatest common divisor of the absolute value of
+     * two numbers, using the ""binary gcd"" method which avoids
+     * division and modulo operations.  See Knuth 4.5.2 algorithm B.
+     * This algorithm is due to Josef Stein (1961).
+     *
+     * @param u  a non-zero number
+     * @param v  a non-zero number
+     * @return the greatest common divisor, never zero
+     */
+    public static int greatestCommonDivisor(int u, int v) {
+        // From Commons Math:
+        if (u == 0 || v == 0) {
+            if (u == Integer.MIN_VALUE || v == Integer.MIN_VALUE) {
+                throw new ArithmeticException(""overflow: gcd is 2^31"");
+            }
+            return Math.abs(u) + Math.abs(v);
+        }
+        // if either operand is abs 1, return 1:
+        if (Math.abs(u) == 1 || Math.abs(v) == 1) {
+            return 1;
+        }
+        // keep u and v negative, as negative integers range down to
+        // -2^31, while positive numbers can only be as large as 2^31-1
+        // (i.e. we can't necessarily negate a negative number without
+        // overflow)
+        if (u > 0) {
+            u = -u;
+        } // make u negative
+        if (v > 0) {
+            v = -v;
+        } // make v negative
+        // B1. [Find power of 2]
+        int k = 0;
+        while ((u & 1) == 0 && (v & 1) == 0 && k < 31) { // while u and v are both even...
+            u /= 2;
+            v /= 2;
+            k++; // cast out twos.
+        }
+        if (k == 31) {
+            throw new ArithmeticException(""overflow: gcd is 2^31"");
+        }
+        // B2. Initialize: u and v have been divided by 2^k and at least
+        // one is odd.
+        int t = (u & 1) == 1 ? v : -(u / 2)/* B3 */;
+        // t negative: u was odd, v may be even (t replaces v)
+        // t positive: u was even, v is odd (t replaces u)
+        do {
+            /* assert u<0 && v<0; */
+            // B4/B3: cast out twos from t.
+            while ((t & 1) == 0) { // while t is even.
+                t /= 2; // cast out twos
+            }
+            // B5 [reset max(u,v)]
+            if (t > 0) {
+                u = -t;
+            } else {
+                v = t;
+            }
+            // B6/B3. at this point both u and v should be odd.
+            t = (v - u) / 2;
+            // |u| larger: t positive (replace u)
+            // |v| larger: t negative (replace v)
+        } while (t != 0);
+        return -u * (1 << k); // gcd is u*2^k
+    }
+}"
+GETHIGHBIT,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.shiftR(ProblemZ3.java:1036) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:206) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:746) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:574) at gov.nasa.jpf.symbc.bytecode.optimization.IF_ICMPLT.execute(IF_ICMPLT.java:64) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class GETHIGHBIT {
+/**
+     * Returns the index of the high bit in value (assuming le, actually
+     * power of 2 >= value). value must be positive.
+     */
+    public static int getHighBit(int value) {
+        if (value <= 0) {
+            return -32;
+        }
+
+        int bit = 0;
+
+        if (value >= 1 << 16) {
+            value >>= 16;
+            bit += 16;
+        }
+
+        if (value >= 1 << 8) {
+            value >>= 8;
+            bit += 8;
+        }
+
+        if (value >= 1 << 4) {
+            value >>= 4;
+            bit += 4;
+        }
+
+        if (value >= 1 << 2) {
+            value >>= 2;
+            bit += 2;
+        }
+
+        if (value >= 1 << 1) {
+            bit += 1;
+        }
+
+        return bit;
+    }
+}"
+SFEXACT,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.mixed(ProblemZ3.java:1062) at gov.nasa.jpf.symbc.numeric.PCParser.createDPMixedConstraint(PCParser.java:370) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1110) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.I2D.execute(I2D.java:77) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class SFEXACT {
+/**
+         * Calculates exact cases for the complementary probability
+         * {@code P[D_n^+ >= x]} the one-sided one-sample Kolmogorov-Smirnov distribution.
+         *
+         * <p>Exact cases handle x not in [0, 1]. It is assumed n is positive.
+         *
+         * @param x Statistic.
+         * @param n Sample size (assumed to be positive).
+         * @return \(P(D_n^+ &ge; x)\)
+         */
+        public static double sfExact(double x, int n) {
+            if (n * x * x >= 372.5 || x >= 1) {
+                // p would underflow, or x is out of the domain
+                return 0;
+            }
+            if (x <= 0) {
+                // edge-of, or out-of, the domain
+                return 1;
+            }
+            if (n == 1) {
+                return x;
+            }
+            // x <= 1/n
+            // [1] Equation (33)
+            final double nx = n * x;
+            if (nx <= 1) {
+                // 1 - x (1+x)^(n-1): here x may be small so use log1p
+                return 1 - x * Math.exp((n - 1) * Math.log1p(x));
+            }
+            // 1 - 1/n <= x < 1
+            // [1] Equation (16)
+            if (n - 1 <= nx) {
+                // (1-x)^n: here x > 0.5 and 1-x is exact
+                return Math.pow(1 - x, n);
+            }
+            return -1;
+        }
+}"
+BINROOT,ASSERTION VIOLATION File: ..\..\src\api\api_ast.cpp Line: 906 UNREACHABLE CODE WAS REACHED. Z3 4.8.9.0 Please file an issue with this message and more detail about how you encountered it at https://github.com/Z3Prover/z3/issues/new,symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class BINROOT {
+/**
+     * Bin root - a binary search for a square root.
+     * I wrote this purely to check my recollection
+     * of how this kind of search can be used to invert
+     * functions.
+     */
+
+    public static double binRoot(double x) {
+        double eps = 0.0001; // accuracy
+        // do a binary search for it
+        // find the square root of x using a binary search
+        double lower = 0.0;
+        double upper = x;
+        double mid = 0.0;
+
+
+        for (int i = 0; i < 100; i++) {
+            mid = (lower + upper) / 2;
+            // each time, if mid is too big
+            // fix lower to mid
+            // else fix upper to mid
+
+            double cur = mid * mid;
+            if (Math.abs(x - cur) < eps) {
+                // System.out.println(""Converged to "" + cur + "" in "" + i + "" iterations"");
+                return mid;
+            }
+
+            if (cur < x) // mid too small
+                lower = mid;
+            else // mid too big
+                upper = mid;
+        }
+        return mid;
+    }
+}"
+CHECKDOUBLEPRECISE,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.mixed(ProblemZ3.java:1062) at gov.nasa.jpf.symbc.numeric.PCParser.createDPMixedConstraint(PCParser.java:370) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1110) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.D2I.execute(D2I.java:80) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class CHECKDOUBLEPRECISE {
+/**
+	 * Checks a double value is double precise. If value is 2.1, then return
+	 * true; if value is 2.1000000001 or 2.099999999999, then return false.
+	 * 
+	 * @param dValue
+	 * @return if precise
+	 */
+	public static boolean checkDoublePrecise( double dValue )
+	{
+		if ( dValue - (int) dValue == 0 )
+		{
+			return true;
+		}
+		String sValue = String.valueOf( dValue );
+		if ( sValue.length( ) < 8 )
+		{
+			return true;
+		}
+		int iPoint = sValue.indexOf( '.' );
+		int iZero = sValue.lastIndexOf( ""00000000"" ); //$NON-NLS-1$
+		if ( iZero >= iPoint )
+		{
+			return false;
+		}
+		int iNine = sValue.lastIndexOf( ""99999999"" ); //$NON-NLS-1$
+		if ( iNine >= iPoint )
+		{
+			return false;
+		}
+		return true;
+	}
+}"
+VALIDATELENGTHS,java.lang.ClassCastException: gov.nasa.jpf.util.ObjectList$Node cannot be cast to gov.nasa.jpf.symbc.numeric.IntegerExpression at gov.nasa.jpf.symbc.bytecode.optimization.IF_ICMPGE.execute(IF_ICMPGE.java:59) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:189) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class VALIDATELENGTHS {
+/**
+     * Validate the parameter array lengths are either 1 or n. Returns the maximum length (n).
+     *
+     * <p>Note: It is assumed lengths of 1 can be expanded to length n using an array fill
+     * operation.
+     *
+     * @param lengths the lengths
+     * @return n
+     * @throws IllegalArgumentException If a length is between 1 and n.
+     */
+    static int validateLengths(int... lengths) {
+        int max = 0;
+        for (final int l : lengths) {
+            max = max < l ? l : max;
+        }
+        // Validate
+        for (final int l : lengths) {
+            if (l != 1 && l != max) {
+                throw new IllegalArgumentException(
+                    ""Invalid parameter array length: "" + l +
+                    "". Lengths must by either 1 or the maximum ("" + max + "")."");
+            }
+        }
+        return max;
+    }
+}"
+GETDEVIANCEPART,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.mixed(ProblemZ3.java:1062) at gov.nasa.jpf.symbc.numeric.PCParser.createDPMixedConstraint(PCParser.java:370) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1110) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.I2D.execute(I2D.java:77) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class GETDEVIANCEPART {
+/**
+     * A part of the deviance portion of the saddle point approximation.
+     * <p>
+     * References:
+     * <ol>
+     * <li>Catherine Loader (2000). ""Fast and Accurate Computation of Binomial
+     * Probabilities."". <a target=""_blank""
+     * href=""http://www.herine.net/stat/papers/dbinom.pdf"">
+     * http://www.herine.net/stat/papers/dbinom.pdf</a></li>
+     * </ol>
+     *
+     * <p>Note: This function has been modified for integer {@code x}.</p>
+     *
+     * @param x Value at which the function is evaluated.
+     * @param mu Average.
+     * @return a part of the deviance.
+     */
+    static double getDeviancePart(int x, double mu) {
+        if (Math.abs(x - mu) < 0.1 * (x + mu)) {
+            final double d = x - mu;
+            double v = d / (x + mu);
+            double s1 = v * d;
+            double s = Double.NaN;
+            double ej = 2.0 * x * v;
+            v *= v;
+            int j = 1;
+            while (s1 != s) {
+                s = s1;
+                ej *= v;
+                s1 = s + ej / ((j * 2) + 1);
+                ++j;
+            }
+            return s1;
+        } else if (x == 0) {
+            return mu;
+        }
+        return x * Math.log(x / mu) + mu - x;
+    }
+}"
+GETWRAPPEDVALUE,java.lang.RuntimeException: ## Error: BinaryNonLinearSolution solution: l 0 op % r 2 at gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression.solution(BinaryNonLinearIntegerExpression.java:73) at gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression.solution(BinaryNonLinearIntegerExpression.java:61) at gov.nasa.jpf.symbc.SymbolicListener.instructionExecuted(SymbolicListener.java:307) at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:808) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1922) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116) ---------------------- JPF error stack trace --------------------- gov.nasa.jpf.JPFListenerException: exception during instructionExecuted() notification at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:815) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1922) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116) Caused by: java.lang.RuntimeException: ## Error: BinaryNonLinearSolution solution: l 0 op % r 2 at gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression.solution(BinaryNonLinearIntegerExpression.java:73) at gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression.solution(BinaryNonLinearIntegerExpression.java:61) at gov.nasa.jpf.symbc.SymbolicListener.instructionExecuted(SymbolicListener.java:307) at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:808) ... 15 more,symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class GETWRAPPEDVALUE {
+/**
+     * Utility method that ensures the given value lies within the field's
+     * legal value range.
+     * 
+     * @param value  the value to fit into the wrapped value range
+     * @param minValue the wrap range minimum value.
+     * @param maxValue the wrap range maximum value.  This must be
+     *  greater than minValue (checked by the method).
+     * @return the wrapped value
+     * @throws IllegalArgumentException if minValue is greater
+     *  than or equal to maxValue
+     */
+    public static int getWrappedValue(int value, int minValue, int maxValue) {
+        if (minValue >= maxValue) {
+            throw new IllegalArgumentException(""MIN > MAX"");
+        }
+
+        int wrapRange = maxValue - minValue + 1;
+        value -= minValue;
+
+        if (value >= 0) {
+            return (value % wrapRange) + minValue;
+        }
+
+        int remByRange = (-value) % wrapRange;
+
+        if (remByRange == 0) {
+            return 0 + minValue;
+        }
+        return (wrapRange - remByRange) + minValue;
+    }
+}"
+GETDATAMASKBIT,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.and(ProblemZ3.java:971) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:179) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:730) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:490) at gov.nasa.jpf.symbc.bytecode.optimization.IFNE.execute(IFNE.java:67) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class GETDATAMASKBIT {
+/**
+   * Return the mask bit for ""getMaskPattern"" at ""x"" and ""y"". See 8.8 of JISX0510:2004 for mask
+   * pattern conditions.
+   */
+  static boolean getDataMaskBit(int maskPattern, int x, int y) {
+    int intermediate;
+    int temp;
+    switch (maskPattern) {
+      case 0:
+        intermediate = (y + x) & 0x1;
+        break;
+      case 1:
+        intermediate = y & 0x1;
+        break;
+      case 2:
+        intermediate = x % 3;
+        break;
+      case 3:
+        intermediate = (y + x) % 3;
+        break;
+      case 4:
+        intermediate = ((y >>> 1) + (x / 3)) & 0x1;
+        break;
+      case 5:
+        temp = y * x;
+        intermediate = (temp & 0x1) + (temp % 3);
+        break;
+      case 6:
+        temp = y * x;
+        intermediate = ((temp & 0x1) + (temp % 3)) & 0x1;
+        break;
+      case 7:
+        temp = y * x;
+        intermediate = ((temp % 3) + ((y + x) & 0x1)) & 0x1;
+        break;
+      default:
+        throw new IllegalArgumentException(""Invalid mask pattern: "" + maskPattern);
+    }
+    return intermediate == 0;
+  }
+}"
+GCDLONGADAPTEDFORINT,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.shiftL(ProblemZ3.java:1021) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:224) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:714) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:490) at gov.nasa.jpf.symbc.bytecode.optimization.IFEQ.execute(IFEQ.java:67) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class GCDLONGADAPTEDFORINT {
+/**
+     * This is a copy of the GCD method for longs, but adapted for ints.
+     *
+     * @param p an int.
+     * @param q an int.
+     * @return the GCD of p and q.
+     */
+    public static int gcdLongAdaptedForInt(int p, int q) {
+        // Perform the gcd algorithm on negative numbers, so that -2^31 does not
+        // need to be handled separately
+        int a = p > 0 ? -p : p;
+        int b = q > 0 ? -q : q;
+
+        int negatedGcd;
+        if (a == 0) {
+            negatedGcd = b;
+        } else if (b == 0) {
+            negatedGcd = a;
+        } else {
+            // Make ""a"" and ""b"" odd, keeping track of common power of 2.
+            final int aTwos = Integer.numberOfTrailingZeros(a);
+            final int bTwos = Integer.numberOfTrailingZeros(b);
+            a >>= aTwos;
+            b >>= bTwos;
+            final int shift = Math.min(aTwos, bTwos);
+
+            // ""a"" and ""b"" are negative and odd.
+            // If a < b then ""gdc(a, b)"" is equal to ""gcd(a - b, b)"".
+            // If a > b then ""gcd(a, b)"" is equal to ""gcd(b - a, a)"".
+            // Hence, in the successive iterations:
+            //  ""a"" becomes the negative absolute difference of the current values,
+            //  ""b"" becomes that value of the two that is closer to zero.
+            while (true) {
+                final int delta = a - b;
+
+                if (delta == 0) {
+                    break;
+                }
+
+                b = Math.max(a, b);
+                a = delta > 0 ? -delta : delta;
+
+                // Remove any power of 2 in ""a"" (""b"" is guaranteed to be odd).
+                a >>= Integer.numberOfTrailingZeros(a);
+            }
+
+            // Recover the common power of 2.
+            negatedGcd = a << shift;
+        }
+        if (negatedGcd == Integer.MIN_VALUE) {
+            throw new ArithmeticException();
+        }
+        return -negatedGcd;
+    }
+}"
+ISLATINCHAR,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.shiftUR(ProblemZ3.java:1051) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:215) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:762) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:574) at gov.nasa.jpf.symbc.bytecode.optimization.IF_ICMPGE.execute(IF_ICMPGE.java:65) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class ISLATINCHAR {
+/**
+     * Returns true if the specified character is within one of the Latin
+     * unicode character blocks.
+     *
+     * @param c The char to test.
+     *
+     * @return True if c is latin.
+     */
+    public boolean isLatinChar(char c) {
+
+        if ( c < 255 && Character.isLetterOrDigit( c )){
+            // cheap quick check, should catch most lation-chars
+            return true;
+        }
+
+        Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
+
+        if (block == Character.UnicodeBlock.BASIC_LATIN ||
+            block == Character.UnicodeBlock.LATIN_1_SUPPLEMENT ||
+            block == Character.UnicodeBlock.LATIN_EXTENDED_ADDITIONAL ||
+            block == Character.UnicodeBlock.LATIN_EXTENDED_A ||
+            block == Character.UnicodeBlock.LATIN_EXTENDED_B ||
+            block == Character.UnicodeBlock.ARABIC ||
+            block == Character.UnicodeBlock.ARABIC_PRESENTATION_FORMS_A ||
+            block == Character.UnicodeBlock.ARABIC_PRESENTATION_FORMS_B) {
+            return true;
+        }
+        return false;
+    }
+}"
+VOLTAGE_TO_INTENSITY_SRGB,,symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 [SEVERE] cannot load application class demo.Distance,"public class VOLTAGE_TO_INTENSITY_SRGB {
+/**
+     * Returns the intensity of an RGB component using the
+     * sRGB gamma function.
+     * 
+     * @param val Value to convert.
+     * @return Light intensity of the component.
+     */
+    double voltage_to_intensity_srgb(double val) {
+        /* Handle invalid values before doing a gamma transform. */
+        if (val < 0.0) {
+			return 0.0;
+		}
+        if (val > 1.0) {
+			return 1.0;
+		}
+
+        if (val <= 0.04045) {
+            return val / 12.92;
+        }
+        return Math.pow((val + 0.055) / 1.055, 2.4);
+    }
+}"
+GETROLLEDVALUE,java.lang.RuntimeException: ## Error: BinaryNonLinearSolution solution: l 1 op % r 2 at gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression.solution(BinaryNonLinearIntegerExpression.java:73) at gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression.solution(BinaryNonLinearIntegerExpression.java:60) at gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression.solution(BinaryNonLinearIntegerExpression.java:60) at gov.nasa.jpf.symbc.SymbolicListener.instructionExecuted(SymbolicListener.java:307) at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:808) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1922) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116) ---------------------- JPF error stack trace --------------------- gov.nasa.jpf.JPFListenerException: exception during instructionExecuted() notification at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:815) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1922) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116) Caused by: java.lang.RuntimeException: ## Error: BinaryNonLinearSolution solution: l 1 op % r 2 at gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression.solution(BinaryNonLinearIntegerExpression.java:73) at gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression.solution(BinaryNonLinearIntegerExpression.java:60) at gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression.solution(BinaryNonLinearIntegerExpression.java:60) at gov.nasa.jpf.symbc.SymbolicListener.instructionExecuted(SymbolicListener.java:307) at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:808) ... 15 more,symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class GETROLLEDVALUE {
+/**
+     * Returns the new value after 'roll'ing the specified value and amount.
+     */
+    public static int getRolledValue(int value, int amount, int min, int max) {
+        assert value >= min && value <= max;
+        int range = max - min + 1;
+        amount %= range;
+        int n = value + amount;
+        if (n > max) {
+            n -= range;
+        } else if (n < min) {
+            n += range;
+        }
+        assert n >= min && n <= max;
+        return n;
+    }
+}"
+CONVERTTEMPO,java.lang.AssertionError at gov.nasa.jpf.symbc.numeric.BinaryRealExpression.solution(BinaryRealExpression.java:63) at gov.nasa.jpf.symbc.SymbolicListener.instructionExecuted(SymbolicListener.java:329) at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:808) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1922) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116) ---------------------- JPF error stack trace --------------------- gov.nasa.jpf.JPFListenerException: exception during instructionExecuted() notification at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:815) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1922) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116) Caused by: java.lang.AssertionError at gov.nasa.jpf.symbc.numeric.BinaryRealExpression.solution(BinaryRealExpression.java:63) at gov.nasa.jpf.symbc.SymbolicListener.instructionExecuted(SymbolicListener.java:329) at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:808) ... 15 more,symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class CONVERTTEMPO {
+/**
+     * converts<br>
+     * 1 - MPQ-Tempo to BPM tempo<br>
+     * 2 - BPM tempo to MPQ tempo<br>
+     */
+    public static double convertTempo(double tempo) {
+        if (tempo <= 0) {
+            tempo = 1;
+        }
+        return ((double) 60000000l) / tempo;
+    }
+}"
+SUBTRACTEXACT,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.xor(ProblemZ3.java:1011) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:199) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:181) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:746) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.LCMP.execute(LCMP.java:98) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class SUBTRACTEXACT {
+/**
+     * Returns the difference of the arguments,
+     * throwing an exception if the result overflows a {@code long}.
+     *
+     * @param x the first value
+     * @param y the second value to subtract from the first
+     * @return the result
+     * @throws ArithmeticException if the result overflows a long
+     * @since 1.8
+     */
+    public static long subtractExact(long x, long y) {
+        long r = x - y;
+        // HD 2-12 Overflow iff the arguments have different signs and
+        // the sign of the result is different than the sign of x
+        if (((x ^ y) & (x ^ r)) < 0) {
+            throw new ArithmeticException(""long overflow"");
+        }
+        return r;
+    }
+}"
+GETCOMPONENTINDEX,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.and(ProblemZ3.java:971) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:179) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:730) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:490) at gov.nasa.jpf.symbc.bytecode.optimization.IFNE.execute(IFNE.java:67) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:189) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class GETCOMPONENTINDEX {
+/** Given one of the constants for a component, determine the corresponding array index. */
+
+  public int getComponentIndex(int component)
+  {
+    int index = 0;
+    while (((component>>index)&1) == 0)
+      index++;
+    return index;
+  }
+}"
+GETSTANDARDBOLDERFONTWEIGHT,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.mixed(ProblemZ3.java:1062) at gov.nasa.jpf.symbc.numeric.PCParser.createDPMixedConstraint(PCParser.java:389) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1110) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.F2I.execute(F2I.java:74) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class GETSTANDARDBOLDERFONTWEIGHT {
+/**
+     * Returns a bolder font-weight.
+     */
+    public static float getStandardBolderFontWeight(float f) {
+        // Round f to nearest 100...
+        int weight = ((int)((f+50)/100))*100;
+        switch (weight) {
+        case 100: return 600;
+        case 200: return 600;
+        case 300: return 600;
+        case 400: return 600;
+        case 500: return 600;
+        case 600: return 700;
+        case 700: return 800;
+        case 800: return 900;
+        case 900: return 900;
+        default:
+            throw new IllegalArgumentException(""Bad Font Weight: "" + f);
+        }
+    }
+}"
+GETBOLDERFONTWEIGHT,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.mixed(ProblemZ3.java:1062) at gov.nasa.jpf.symbc.numeric.PCParser.createDPMixedConstraint(PCParser.java:389) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1110) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.F2I.execute(F2I.java:74) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class GETBOLDERFONTWEIGHT {
+/**
+     * Returns a bolder font-weight.
+     */
+    public float getBolderFontWeight(float f) {
+        // Round f to nearest 100...
+        int weight = ((int)((f+50)/100))*100;
+        switch (weight) {
+        case 100: return 600;
+        case 200: return 600;
+        case 300: return 600;
+        case 400: return 600;
+        case 500: return 600;
+        case 600: return 700;
+        case 700: return 800;
+        case 800: return 900;
+        case 900: return 900;
+        default:
+            throw new IllegalArgumentException(""Bad Font Weight: "" + f);
+        }
+    }
+}"
+BILINEARINTERPOLATE,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.shiftR(ProblemZ3.java:1036) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:206) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:179) at gov.nasa.jpf.symbc.numeric.PCParser.createDPMixedConstraint(PCParser.java:377) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1110) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.I2F.execute(I2F.java:77) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class BILINEARINTERPOLATE {
+/**
+	 * Bilinear interpolation of ARGB values.
+	 * @param x the X interpolation parameter 0..1
+	 * @param y the y interpolation parameter 0..1
+	 * @param rgb array of four ARGB values in the order NW, NE, SW, SE
+	 * @return the interpolated value
+	 */
+	public static int bilinearInterpolate(float x, float y, int nw, int ne, int sw, int se) {
+		float m0, m1;
+		int a0 = (nw >> 24) & 0xff;
+		int r0 = (nw >> 16) & 0xff;
+		int g0 = (nw >> 8) & 0xff;
+		int b0 = nw & 0xff;
+		int a1 = (ne >> 24) & 0xff;
+		int r1 = (ne >> 16) & 0xff;
+		int g1 = (ne >> 8) & 0xff;
+		int b1 = ne & 0xff;
+		int a2 = (sw >> 24) & 0xff;
+		int r2 = (sw >> 16) & 0xff;
+		int g2 = (sw >> 8) & 0xff;
+		int b2 = sw & 0xff;
+		int a3 = (se >> 24) & 0xff;
+		int r3 = (se >> 16) & 0xff;
+		int g3 = (se >> 8) & 0xff;
+		int b3 = se & 0xff;
+
+		float cx = 1.0f-x;
+		float cy = 1.0f-y;
+
+		m0 = cx * a0 + x * a1;
+		m1 = cx * a2 + x * a3;
+		int a = (int)(cy * m0 + y * m1);
+
+		m0 = cx * r0 + x * r1;
+		m1 = cx * r2 + x * r3;
+		int r = (int)(cy * m0 + y * m1);
+
+		m0 = cx * g0 + x * g1;
+		m1 = cx * g2 + x * g3;
+		int g = (int)(cy * m0 + y * m1);
+
+		m0 = cx * b0 + x * b1;
+		m1 = cx * b2 + x * b3;
+		int b = (int)(cy * m0 + y * m1);
+
+		return (a << 24) | (r << 16) | (g << 8) | b;
+	}
+}"
+GETLIGHTERFONTWEIGHT,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.mixed(ProblemZ3.java:1062) at gov.nasa.jpf.symbc.numeric.PCParser.createDPMixedConstraint(PCParser.java:389) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1110) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.F2I.execute(F2I.java:74) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class GETLIGHTERFONTWEIGHT {
+/**
+         * Returns a lighter font-weight.
+         */
+        public float getLighterFontWeight(float f) {
+            // Round f to nearest 100...
+            int weight = ((int)((f+50)/100))*100;
+            switch (weight) {
+            case 100: return 100;
+            case 200: return 100;
+            case 300: return 200;
+            case 400: return 300;
+            case 500: return 400;
+            case 600: return 400;
+            case 700: return 400;
+            case 800: return 400;
+            case 900: return 400;
+            default:
+                throw new IllegalArgumentException(""Bad Font Weight: "" + f);
+            }
+        }
+}"
+SATURATION,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.shiftR(ProblemZ3.java:1036) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:206) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:179) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:749) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:574) at gov.nasa.jpf.symbc.bytecode.optimization.IF_ICMPLT.execute(IF_ICMPLT.java:64) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:189) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class SATURATION {
+/**
+     * Returns the saturation component of a color int.
+     * 
+     * @return A value between 0.0f and 1.0f
+     * 
+     * @hide Pending API council
+     */
+    public static float saturation(int color) {
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+
+
+        int V = Math.max(b, Math.max(r, g));
+        int temp = Math.min(b, Math.min(r, g));
+
+        float S;
+
+        if (V == temp) {
+            S = 0;
+        } else {
+            S = (V - temp) / (float) V;
+        }
+
+        return S;
+    }
+}"
+VOCALTRACTCOMPENSATION,java.lang.RuntimeException: ## Error: Math.power not supported at gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral.power(ProblemGeneral.java:169) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:331) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:268) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:286) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:328) at gov.nasa.jpf.symbc.numeric.PCParser.createDPRealConstraint(PCParser.java:431) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1105) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.DDIV.execute(DDIV.java:135) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class VOCALTRACTCOMPENSATION {
+/**
+     * Compensation of the vocal tract influence
+     * @param freq
+     * @param formant
+     * @param bandWidth
+     * @return
+     */   
+    public double vocalTractCompensation(double freq, double formant, double bandWidth){
+      double num, denom, aux, val;     
+      aux = Math.pow((bandWidth/2), 2.0);
+      num = Math.pow(formant, 2.0) + aux;
+      denom = Math.sqrt( ( Math.pow((freq-formant), 2.0) + aux )*( Math.pow((freq+formant), 2.0) + aux) );
+      val = (num/denom);
+      if(val > 0.0)
+        return (20 * Math.log10(val));
+      else{
+        System.out.println(""vocalTractCompensation: warning value < 0.0"");
+        return 0.0;
+      }      
+    }
+}"
+BINARYGCD,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.shiftL(ProblemZ3.java:1021) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:224) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:714) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:490) at gov.nasa.jpf.symbc.bytecode.optimization.IFEQ.execute(IFEQ.java:67) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class BINARYGCD {
+/**
+     * Calculate GCD of a and b interpreted as unsigned integers.
+     */
+    static int binaryGcd(int a, int b) {
+        if (b == 0)
+            return a;
+        if (a == 0)
+            return b;
+
+        // Right shift a & b till their last bits equal to 1.
+        int aZeros = Integer.numberOfTrailingZeros(a);
+        int bZeros = Integer.numberOfTrailingZeros(b);
+        a >>>= aZeros;
+        b >>>= bZeros;
+
+        int t = (aZeros < bZeros ? aZeros : bZeros);
+
+        while (a != b) {
+            if ((a+0x80000000) > (b+0x80000000)) {  // a > b as unsigned
+                a -= b;
+                a >>>= Integer.numberOfTrailingZeros(a);
+            } else {
+                b -= a;
+                b >>>= Integer.numberOfTrailingZeros(b);
+            }
+        }
+        return a<<t;
+    }
+}"
+HYPOT,java.lang.AssertionError at gov.nasa.jpf.symbc.numeric.BinaryRealExpression.solution(BinaryRealExpression.java:63) at gov.nasa.jpf.symbc.numeric.BinaryRealExpression.solution(BinaryRealExpression.java:57) at gov.nasa.jpf.symbc.numeric.BinaryRealExpression.solution(BinaryRealExpression.java:57) at gov.nasa.jpf.symbc.numeric.MathRealExpression.solution(MathRealExpression.java:115) at gov.nasa.jpf.symbc.numeric.BinaryRealExpression.solution(BinaryRealExpression.java:58) at gov.nasa.jpf.symbc.SymbolicListener.instructionExecuted(SymbolicListener.java:329) at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:808) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1922) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116) ---------------------- JPF error stack trace --------------------- gov.nasa.jpf.JPFListenerException: exception during instructionExecuted() notification at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:815) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1922) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116) Caused by: java.lang.AssertionError at gov.nasa.jpf.symbc.numeric.BinaryRealExpression.solution(BinaryRealExpression.java:63) at gov.nasa.jpf.symbc.numeric.BinaryRealExpression.solution(BinaryRealExpression.java:57) at gov.nasa.jpf.symbc.numeric.BinaryRealExpression.solution(BinaryRealExpression.java:57) at gov.nasa.jpf.symbc.numeric.MathRealExpression.solution(MathRealExpression.java:115) at gov.nasa.jpf.symbc.numeric.BinaryRealExpression.solution(BinaryRealExpression.java:58) at gov.nasa.jpf.symbc.SymbolicListener.instructionExecuted(SymbolicListener.java:329) at gov.nasa.jpf.vm.VM.notifyInstructionExecuted(VM.java:808) ... 15 more,symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class HYPOT {
+/**
+ * Returns sqrt(a^2 + b^2) without under/overflow.
+ */
+public static double hypot(double a, double b) {
+	double r;
+	if (Math.abs(a) > Math.abs(b)) {
+		r = b/a;
+		r = Math.abs(a)*Math.sqrt(1+r*r);
+	} else if (b != 0) {
+		r = a/b;
+		r = Math.abs(b)*Math.sqrt(1+r*r);
+	} else {
+		r = 0.0;
+	}
+	return r;
+}
+}"
+BRIGHTNESS,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.shiftR(ProblemZ3.java:1036) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:206) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:179) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:749) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:574) at gov.nasa.jpf.symbc.bytecode.optimization.IF_ICMPLT.execute(IF_ICMPLT.java:64) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:189) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class BRIGHTNESS {
+/**
+     * Returns the brightness component of a color int.
+     * 
+     * @return A value between 0.0f and 1.0f
+     * 
+     * @hide Pending API council
+     */
+    public static float brightness(int color) {
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+
+        int V = Math.max(b, Math.max(r, g));
+
+        return (V / 255.f);
+    }
+}"
+NEXTRAND,,symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 [SEVERE] cannot load application class demo.Distance,"public class NEXTRAND {
+/** Marsaglia, 2003. */
+  long nextRand(long x) {
+    x ^= (x << 13);
+    x ^= (x >>> 7);
+    return (x ^= (x << 17));
+  }
+}"
+COMPARENUMBERS,,symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 [SEVERE] cannot load application class demo.Distance,"public class COMPARENUMBERS {
+/**
+   * Compare two numbers for equality.
+   *
+   *
+   * @param n1 First number to compare
+   * @param n2 Second number to compare
+   *
+   * @return true if n1 is equal to n2
+   */
+  boolean compareNumbers(double n1, double n2)
+  {
+    return n1 == n2;
+  }
+}"
+HYPERGEOMETRIC,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.mixed(ProblemZ3.java:1062) at gov.nasa.jpf.symbc.numeric.PCParser.createDPMixedConstraint(PCParser.java:379) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1110) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.I2D.execute(I2D.java:77) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class HYPERGEOMETRIC {
+/**
+   * Find a hypergeometric distribution.  This uses exact math, trying
+   * fairly hard to avoid numeric overflow by interleaving
+   * multiplications and divisions.
+   * (To do: make it even better at avoiding overflow, by using loops
+   * that will do either a multiple or divide based on the size of the
+   * intermediate result.)
+   *
+   * @param k The number of black balls drawn
+   * @param n The total number of balls
+   * @param r The number of black balls
+   * @param m The number of balls drawn
+   * @return The hypergeometric value
+   */
+  public static double hypergeometric(int k, int n, int r, int m) {
+    if (k < 0 || r > n || m > n || n <= 0 || m < 0 || r < 0) {
+      throw new IllegalArgumentException(""Invalid hypergeometric"");
+    }
+
+    // exploit symmetry of problem
+    if (m > n / 2) {
+      m = n - m;
+      k = r - k;
+    }
+    if (r > n / 2) {
+      r = n - r;
+      k = m - k;
+    }
+    if (m > r) {
+      int temp = m;
+      m = r;
+      r = temp;
+    }
+    // now we have that k <= m <= r <= n/2
+
+    if (k < (m + r) - n || k > m) {
+      return 0.0;
+    }
+
+    // Do limit cases explicitly
+    // It's unclear whether this is a good idea.  I put it in fearing
+    // numerical errors when the numbers seemed off, but actually there
+    // was a bug in the Fisher's exact routine.
+    if (r == n) {
+      if (k == m) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    } else if (r == n - 1) {
+      if (k == m) {
+        return (n - m) / (double) n;
+      } else if (k == m - 1) {
+        return m / (double) n;
+      } else {
+        return 0.0;
+      }
+    } else if (m == 1) {
+      if (k == 0) {
+        return (n - r) / (double) n;
+      } else if (k == 1) {
+        return r / (double) n;
+      } else {
+        return 0.0;
+      }
+    } else if (m == 0) {
+      if (k == 0) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    } else if (k == 0) {
+      double ans = 1.0;
+      for (int m0 = 0; m0 < m; m0++) {
+        ans *= ((n - r) - m0);
+        ans /= (n - m0);
+      }
+      return ans;
+    }
+
+    double ans = 1.0;
+    // do (n-r)x...x((n-r)-((m-k)-1))/n x...x (n-((m-k-1)))
+    // leaving rest of denominator to get to multimply by (n-(m-1))
+    // that's k things which goes into next loop
+    for (int nr = n - r, n0 = n; nr > (n - r) - (m - k); nr--, n0--) {
+      // System.out.println(""Multiplying by "" + nr);
+      ans *= nr;
+      // System.out.println(""Dividing by "" + n0);
+      ans /= n0;
+    }
+    // System.out.println(""Done phase 1"");
+    for (int k0 = 0; k0 < k; k0++) {
+      ans *= (m - k0);
+      // System.out.println(""Multiplying by "" + (m-k0));
+      ans /= ((n - (m - k0)) + 1);
+      // System.out.println(""Dividing by "" + ((n-(m+k0)+1)));
+      ans *= (r - k0);
+      // System.out.println(""Multiplying by "" + (r-k0));
+      ans /= (k0 + 1);
+      // System.out.println(""Dividing by "" + (k0+1));
+    }
+    return ans;
+  }
+}"
+HSBTORGB,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.mixed(ProblemZ3.java:1062) at gov.nasa.jpf.symbc.numeric.PCParser.createDPMixedConstraint(PCParser.java:370) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1110) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.D2L.execute(D2L.java:84) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class HSBTORGB {
+/**
+     * Converts the components of a color, as specified by the HSB
+     * model, to an equivalent set of values for the default RGB model.
+     * <p>
+     * The <code>saturation</code> and <code>brightness</code> components
+     * should be floating-point values between zero and one
+     * (numbers in the range 0.0-1.0).  The <code>hue</code> component
+     * can be any floating-point number.  The floor of this number is
+     * subtracted from it to create a fraction between 0 and 1.  This
+     * fractional number is then multiplied by 360 to produce the hue
+     * angle in the HSB color model.
+     * <p>
+     * The integer that is returned by <code>HSBtoRGB</code> encodes the
+     * value of a color in bits 0-23 of an integer value that is the same
+     * format used by the method {@link #getRGB() getRGB}.
+     * This integer can be supplied as an argument to the
+     * <code>Color</code> constructor that takes a single integer argument.
+     * @param     hue   the hue component of the color
+     * @param     saturation   the saturation of the color
+     * @param     brightness   the brightness of the color
+     * @return    the RGB value of the color with the indicated hue,
+     *                            saturation, and brightness.
+     * @see       java.awt.Color#getRGB()
+     * @see       java.awt.Color#Color(int)
+     * @see       java.awt.image.ColorModel#getRGBdefault()
+     * @since     JDK1.0
+     */
+    public static int HSBtoRGB(float hue, float saturation, float brightness) {
+        int r = 0, g = 0, b = 0;
+        if (saturation == 0) {
+            r = g = b = (int) (brightness * 255.0f + 0.5f);
+        } else {
+            float h = (hue - (float)Math.floor(hue)) * 6.0f;
+            float f = h - (float)java.lang.Math.floor(h);
+            float p = brightness * (1.0f - saturation);
+            float q = brightness * (1.0f - saturation * f);
+            float t = brightness * (1.0f - (saturation * (1.0f - f)));
+            switch ((int) h) {
+            case 0:
+                r = (int) (brightness * 255.0f + 0.5f);
+                g = (int) (t * 255.0f + 0.5f);
+                b = (int) (p * 255.0f + 0.5f);
+                break;
+            case 1:
+                r = (int) (q * 255.0f + 0.5f);
+                g = (int) (brightness * 255.0f + 0.5f);
+                b = (int) (p * 255.0f + 0.5f);
+                break;
+            case 2:
+                r = (int) (p * 255.0f + 0.5f);
+                g = (int) (brightness * 255.0f + 0.5f);
+                b = (int) (t * 255.0f + 0.5f);
+                break;
+            case 3:
+                r = (int) (p * 255.0f + 0.5f);
+                g = (int) (q * 255.0f + 0.5f);
+                b = (int) (brightness * 255.0f + 0.5f);
+                break;
+            case 4:
+                r = (int) (t * 255.0f + 0.5f);
+                g = (int) (p * 255.0f + 0.5f);
+                b = (int) (brightness * 255.0f + 0.5f);
+                break;
+            case 5:
+                r = (int) (brightness * 255.0f + 0.5f);
+                g = (int) (p * 255.0f + 0.5f);
+                b = (int) (q * 255.0f + 0.5f);
+                break;
+            }
+        }
+        return 0xff000000 | (r << 16) | (g << 8) | (b << 0);
+    }
+}"
+INVERSEERF,java.lang.RuntimeException: ## Error: Math.log not supported at gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral.log(ProblemGeneral.java:154) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:326) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:273) at gov.nasa.jpf.symbc.numeric.PCParser.createDPRealConstraint(PCParser.java:447) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1105) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoiceDouble(IFInstrSymbHelper.java:367) at gov.nasa.jpf.symbc.bytecode.optimization.DCMPG.execute(DCMPG.java:44) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:189) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class INVERSEERF {
+/**
+     * Returns the inverse error function.
+     *
+     * <p>This implementation is described in the paper:
+     * <a href=""http://people.maths.ox.ac.uk/gilesm/files/gems_erfinv.pdf"">Approximating
+     * the erfinv function</a> by Mike Giles, Oxford-Man Institute of Quantitative Finance,
+     * which was published in GPU Computing Gems, volume 2, 2010.
+     * The source code is available <a href=""http://gpucomputing.net/?q=node/1828"">here</a>.
+     * </p>
+     *
+     * <p>This is the implementation in Commons Numbers 1.0.
+     *
+     * @param x Value in [-1, 1].
+     * @return t such that {@code x = erf(t)}
+     */
+    public static double inverseErf(final double x) {
+        // Beware that the logarithm argument must be
+        // computed as (1 - x) * (1 + x),
+        // it must NOT be simplified as 1 - x * x as this
+        // would induce rounding errors near the boundaries +/-1
+        double w = -Math.log((1 - x) * (1 + x));
+        double p;
+
+        if (w < 6.25) {
+            w -= 3.125;
+            p =  -3.6444120640178196996e-21;
+            p =   -1.685059138182016589e-19 + p * w;
+            p =   1.2858480715256400167e-18 + p * w;
+            p =    1.115787767802518096e-17 + p * w;
+            p =   -1.333171662854620906e-16 + p * w;
+            p =   2.0972767875968561637e-17 + p * w;
+            p =   6.6376381343583238325e-15 + p * w;
+            p =  -4.0545662729752068639e-14 + p * w;
+            p =  -8.1519341976054721522e-14 + p * w;
+            p =   2.6335093153082322977e-12 + p * w;
+            p =  -1.2975133253453532498e-11 + p * w;
+            p =  -5.4154120542946279317e-11 + p * w;
+            p =    1.051212273321532285e-09 + p * w;
+            p =  -4.1126339803469836976e-09 + p * w;
+            p =  -2.9070369957882005086e-08 + p * w;
+            p =   4.2347877827932403518e-07 + p * w;
+            p =  -1.3654692000834678645e-06 + p * w;
+            p =  -1.3882523362786468719e-05 + p * w;
+            p =    0.0001867342080340571352 + p * w;
+            p =  -0.00074070253416626697512 + p * w;
+            p =   -0.0060336708714301490533 + p * w;
+            p =      0.24015818242558961693 + p * w;
+            p =       1.6536545626831027356 + p * w;
+        } else if (w < 16.0) {
+            w = Math.sqrt(w) - 3.25;
+            p =   2.2137376921775787049e-09;
+            p =   9.0756561938885390979e-08 + p * w;
+            p =  -2.7517406297064545428e-07 + p * w;
+            p =   1.8239629214389227755e-08 + p * w;
+            p =   1.5027403968909827627e-06 + p * w;
+            p =   -4.013867526981545969e-06 + p * w;
+            p =   2.9234449089955446044e-06 + p * w;
+            p =   1.2475304481671778723e-05 + p * w;
+            p =  -4.7318229009055733981e-05 + p * w;
+            p =   6.8284851459573175448e-05 + p * w;
+            p =   2.4031110387097893999e-05 + p * w;
+            p =   -0.0003550375203628474796 + p * w;
+            p =   0.00095328937973738049703 + p * w;
+            p =   -0.0016882755560235047313 + p * w;
+            p =    0.0024914420961078508066 + p * w;
+            p =   -0.0037512085075692412107 + p * w;
+            p =     0.005370914553590063617 + p * w;
+            p =       1.0052589676941592334 + p * w;
+            p =       3.0838856104922207635 + p * w;
+        } else if (w < Double.POSITIVE_INFINITY) {
+            w = Math.sqrt(w) - 5;
+            p =  -2.7109920616438573243e-11;
+            p =  -2.5556418169965252055e-10 + p * w;
+            p =   1.5076572693500548083e-09 + p * w;
+            p =  -3.7894654401267369937e-09 + p * w;
+            p =   7.6157012080783393804e-09 + p * w;
+            p =  -1.4960026627149240478e-08 + p * w;
+            p =   2.9147953450901080826e-08 + p * w;
+            p =  -6.7711997758452339498e-08 + p * w;
+            p =   2.2900482228026654717e-07 + p * w;
+            p =  -9.9298272942317002539e-07 + p * w;
+            p =   4.5260625972231537039e-06 + p * w;
+            p =  -1.9681778105531670567e-05 + p * w;
+            p =   7.5995277030017761139e-05 + p * w;
+            p =  -0.00021503011930044477347 + p * w;
+            p =  -0.00013871931833623122026 + p * w;
+            p =       1.0103004648645343977 + p * w;
+            p =       4.8499064014085844221 + p * w;
+        } else if (w == Double.POSITIVE_INFINITY) {
+            // this branch does not appears in the original code, it
+            // was added because the previous branch does not handle
+            // x = +/-1 correctly. In this case, w is positive infinity
+            // and as the first coefficient (-2.71e-11) is negative.
+            // Once the first multiplication is done, p becomes negative
+            // infinity and remains so throughout the polynomial evaluation.
+            // So the branch above incorrectly returns negative infinity
+            // instead of the correct positive infinity.
+            p = Double.POSITIVE_INFINITY;
+        } else {
+            // this branch does not appears in the original code, it
+            // occurs when the input is NaN or not in the range [-1, 1].
+            return Double.NaN;
+        }
+
+        return p * x;
+    }
+}"
+ISCASED,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.shiftUR(ProblemZ3.java:1051) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:215) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:730) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:490) at gov.nasa.jpf.symbc.bytecode.optimization.IFNE.execute(IFNE.java:67) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:189) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class ISCASED {
+/**
+     * Examines whether a character is 'cased'.
+     *
+     * A character C is defined to be 'cased' if and only if at least one of
+     * following are true for C: uppercase==true, or lowercase==true, or
+     * general_category==titlecase_letter.
+     *
+     * The uppercase and lowercase property values are specified in the data
+     * file DerivedCoreProperties.txt in the Unicode Character Database.
+     */
+    public static boolean isCased(int ch) {
+        int type = Character.getType(ch);
+        if (type == Character.LOWERCASE_LETTER ||
+                type == Character.UPPERCASE_LETTER ||
+                type == Character.TITLECASE_LETTER) {
+            return true;
+        } else {
+            // Check for Other_Lowercase and Other_Uppercase
+            //
+            if ((ch >= 0x02B0) && (ch <= 0x02B8)) {
+                // MODIFIER LETTER SMALL H..MODIFIER LETTER SMALL Y
+                return true;
+            } else if ((ch >= 0x02C0) && (ch <= 0x02C1)) {
+                // MODIFIER LETTER GLOTTAL STOP..MODIFIER LETTER REVERSED GLOTTAL STOP
+                return true;
+            } else if ((ch >= 0x02E0) && (ch <= 0x02E4)) {
+                // MODIFIER LETTER SMALL GAMMA..MODIFIER LETTER SMALL REVERSED GLOTTAL STOP
+                return true;
+            } else if (ch == 0x0345) {
+                // COMBINING GREEK YPOGEGRAMMENI
+                return true;
+            } else if (ch == 0x037A) {
+                // GREEK YPOGEGRAMMENI
+                return true;
+            } else if ((ch >= 0x1D2C) && (ch <= 0x1D61)) {
+                // MODIFIER LETTER CAPITAL A..MODIFIER LETTER SMALL CHI
+                return true;
+            } else if ((ch >= 0x2160) && (ch <= 0x217F)) {
+                // ROMAN NUMERAL ONE..ROMAN NUMERAL ONE THOUSAND
+                // SMALL ROMAN NUMERAL ONE..SMALL ROMAN NUMERAL ONE THOUSAND
+                return true;
+            } else if ((ch >= 0x24B6) && (ch <= 0x24E9)) {
+                // CIRCLED LATIN CAPITAL LETTER A..CIRCLED LATIN CAPITAL LETTER Z
+                // CIRCLED LATIN SMALL LETTER A..CIRCLED LATIN SMALL LETTER Z
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+}"
+ALPHABLEND,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.and(ProblemZ3.java:971) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:179) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:206) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:179) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:121) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:762) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:574) at gov.nasa.jpf.symbc.bytecode.optimization.IF_ICMPGE.execute(IF_ICMPGE.java:65) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:189) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class ALPHABLEND {
+/**
+     * Uses the alpha of the two colors passed in to determine the contributions of each color.  If either of them has
+     * an alpha greater than 0 then the returned alpha is 255 otherwise its zero if they are both zero. Args: color1,
+     * color2
+     */
+    public int alphaBlend(int par1, int par2)
+    {
+        int i = (par1 & 0xff000000) >> 24 & 0xff;
+        int j = (par2 & 0xff000000) >> 24 & 0xff;
+        char c = '\377';
+
+        if (i + j < 255)
+        {
+            c = '\0';
+            i = 1;
+            j = 1;
+        }
+        else if (i > j)
+        {
+            i = 255;
+            j = 1;
+        }
+        else
+        {
+            i = 1;
+            j = 255;
+        }
+
+        int k = (par1 >> 16 & 0xff) * i;
+        int l = (par1 >> 8 & 0xff) * i;
+        int i1 = (par1 & 0xff) * i;
+        int j1 = (par2 >> 16 & 0xff) * j;
+        int k1 = (par2 >> 8 & 0xff) * j;
+        int l1 = (par2 & 0xff) * j;
+        int i2 = (k + j1) / (i + j);
+        int j2 = (l + k1) / (i + j);
+        int k2 = (i1 + l1) / (i + j);
+        return c << 24 | i2 << 16 | j2 << 8 | k2;
+    }
+}"
+GETMINRATING,,symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 [SEVERE] cannot load application class demo.Distance,"public class GETMINRATING {
+/**
+     * Obtains the min rating of the length sum of the 2 names. In essence the larger the sum length the smaller the
+     * min rating. Values strictly from documentation.
+     *
+     * <h2>API Usage</h2>
+     * <p>
+     * Consider this method public, it is package public for unit testing only.
+     * </p>
+     *
+     * @param sumLength
+     *            The length of 2 strings sent down.
+     * @return The min rating value.
+     */
+    int getMinRating(final int sumLength) {
+        int minRating = 0;
+
+        if (sumLength <= 4) {
+            minRating = 5;
+        } else if (sumLength <= 7) { // already know it is at least 5
+            minRating = 4;
+        } else if (sumLength <= 11) { // already know it is at least 8
+            minRating = 3;
+        } else if (sumLength == 12) {
+            minRating = 2;
+        } else {
+            minRating = 1; // docs said little here.
+        }
+
+        return minRating;
+    }
+}"
+ISVALIDTOKENCHAR,,symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 [SEVERE] cannot load application class demo.Distance,"public class ISVALIDTOKENCHAR {
+/**
+     * This function returns TRUE if the character is a valid token character.
+     *
+     *     token          = 1*<any CHAR except CTLs or separators>
+     *
+     *      separators     = ""("" | "")"" | ""<"" | "">"" | ""@""
+     *                     | "","" | "";"" | "":"" | ""\"" | <"">
+     *                     | ""/"" | ""["" | ""]"" | ""?"" | ""=""
+     *                     | ""{"" | ""}"" | SP | HT
+     *
+     *      CTL            = <any US-ASCII control character
+     *                       (octets 0 - 31) and DEL (127)>
+     *
+     *      CHAR           = <any US-ASCII character (octets 0 - 127)>
+     *
+     * @param c  character to be tested
+     *
+     * @return Returns TRUE if the character is a valid token character.
+     */
+    boolean isValidTokenChar(
+        char c)
+    {
+        if ( ( (c >= '\u0000') && (c <='\u0020') ) ||
+             ( (c >= '\u003a') && (c <= '\u0040') ) ||
+             ( (c >= '\u005b') && (c <= '\u005d') ) ||
+             ('\u002c' == c) ||
+             ('\u0025' == c) ||
+             ('\u0028' == c) ||
+             ('\u0029' == c) ||
+             ('\u007b' == c) ||
+             ('\u007d' == c) ||
+             ('\u007f' == c) )
+            return false;
+
+        return true;
+    }
+}"
+NUMBEROFTRAILINGZEROS,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.shiftL(ProblemZ3.java:1021) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:224) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:714) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:490) at gov.nasa.jpf.symbc.bytecode.optimization.IFEQ.execute(IFEQ.java:67) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class NUMBEROFTRAILINGZEROS {
+/**
+     * Returns the number of zero bits following the lowest-order (""rightmost"")
+     * one-bit in the two's complement binary representation of the specified
+     * {@code int} value.  Returns 32 if the specified value has no
+     * one-bits in its two's complement representation, in other words if it is
+     * equal to zero.
+     *
+     * @param i the value whose number of trailing zeros is to be computed
+     * @return the number of zero bits following the lowest-order (""rightmost"")
+     *     one-bit in the two's complement binary representation of the
+     *     specified {@code int} value, or 32 if the value is equal
+     *     to zero.
+     * @since 1.5
+     */
+    public static int numberOfTrailingZeros(int i) {
+        // HD, Figure 5-14
+        int y;
+        if (i == 0) return 32;
+        int n = 31;
+        y = i <<16; if (y != 0) { n = n -16; i = y; }
+        y = i << 8; if (y != 0) { n = n - 8; i = y; }
+        y = i << 4; if (y != 0) { n = n - 4; i = y; }
+        y = i << 2; if (y != 0) { n = n - 2; i = y; }
+        return n - ((i << 1) >>> 31);
+    }
+}"
+INTPOW,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.and(ProblemZ3.java:971) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:179) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:714) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:490) at gov.nasa.jpf.symbc.bytecode.optimization.IFEQ.execute(IFEQ.java:67) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:194) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class INTPOW {
+/**
+   * Exponentiation like we learned in grade school:
+   * multiply b by itself e times.  Uses power of two trick.
+   * e must be nonnegative!!!  no checking!!!  For e &lt;= 0,
+   * the exponent is treated as 0, and 1 is returned.  0^0 also
+   * returns 1.
+   *
+   * @param b base
+   * @param e exponent
+   * @return b^e
+   */
+  public static int intPow(int b, int e) {
+    int result = 1;
+    int currPow = b;
+    while (e > 0) {
+      if ((e & 1) != 0) { result *= currPow; }
+      currPow = currPow * currPow;
+      e >>= 1;
+    }
+    return result;
+  }
+}"
+SMALLESTCHANGE,java.lang.UnsatisfiedLinkError: com.microsoft.z3.Native.INTERNALgetErrorMsgEx(JI)Ljava/lang/String; at com.microsoft.z3.Native.INTERNALgetErrorMsgEx(Native Method) at com.microsoft.z3.Native.mkNumeral(Native.java:1887) at com.microsoft.z3.Context.mkReal(Context.java:1914) at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.lt(ProblemZ3.java:821) at gov.nasa.jpf.symbc.numeric.PCParser.createDPRealConstraint(PCParser.java:447) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1105) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoiceDouble(IFInstrSymbHelper.java:367) at gov.nasa.jpf.symbc.bytecode.optimization.DCMPL.execute(DCMPL.java:43) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:189) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class SMALLESTCHANGE {
+/**
+     * Perform the smallest change to the value. This returns the next double value
+     * adjacent to d in the direction of infinity. Edge cases: if already infinity then
+     * return the next closest in the direction of negative infinity; if nan then return
+     * 0.
+     *
+     * @param x the x
+     * @return the new value
+     */
+    public static double smallestChange(double x) {
+        if (Double.isNaN(x)) {
+            return 0;
+        }
+        return x == Double.POSITIVE_INFINITY ? Math.nextDown(x) : Math.nextUp(x);
+    }
+}"
+PREPARESETTINGS,java.lang.ClassCastException: gov.nasa.jpf.util.ObjectList$Node cannot be cast to gov.nasa.jpf.symbc.numeric.IntegerExpression at gov.nasa.jpf.symbc.bytecode.IOR.execute(IOR.java:49) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:189) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class PREPARESETTINGS {
+/**
+     * Its only job is to accept lots of setting flags as arguments and create a single integer
+     * that represents all those settings. <b>Note</b>, that it doesn't set {@link #settingFlags settingFlags} at all,
+     * it will simply return the combined setting flags. You can pass the output of this method to {@link #isSettingSet(int) isSettingSet}
+     * to check for multiple settings at one call, or pass this value to constructors. 
+     * @param flags The settings as arguments.
+     * @return The settings ORed together. 
+     */
+    public static int prepareSettings(int... flags) {
+	int settings = 0;
+	for (int flag : flags) {
+	    settings = settings | flag;
+	}
+	return settings;
+    }
+}"
+CHECKFROMINDEXSIZE,java.lang.RuntimeException: ## Error Z3 at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.or(ProblemZ3.java:996) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:190) at gov.nasa.jpf.symbc.numeric.PCParser.getExpression(PCParser.java:190) at gov.nasa.jpf.symbc.numeric.PCParser.createDPLinearIntegerConstraint(PCParser.java:746) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1107) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoice(IFInstrSymbHelper.java:490) at gov.nasa.jpf.symbc.bytecode.optimization.IFLT.execute(IFLT.java:45) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:189) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class CHECKFROMINDEXSIZE {
+/**
+     * Checks if the sub-range from fromIndex (inclusive) to fromIndex + size (exclusive) is
+     * within the bounds of range from 0 (inclusive) to length (exclusive).
+     *
+     * <p>This function provides the functionality of
+     * {@code java.utils.Objects.checkFromIndexSize} introduced in JDK 9. The
+     * <a href=""https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Objects.html#checkFromIndexSize(int,int,int)"">Objects</a>
+     * javadoc has been reproduced for reference.
+     *
+     * <p>The sub-range is defined to be out of bounds if any of the following inequalities
+     * is true:
+     * <ul>
+     * <li>{@code fromIndex < 0}
+     * <li>{@code size < 0}
+     * <li>{@code fromIndex + size > length}, taking into account integer overflow
+     * <li>{@code length < 0}, which is implied from the former inequalities
+     * </ul>
+     *
+     * @param fromIndex the lower-bound (inclusive) of the sub-interval
+     * @param size the size of the sub-range
+     * @param length the upper-bound (exclusive) of the range
+     * @return the fromIndex
+     * @throws IndexOutOfBoundsException if the sub-range is out of bounds
+     */
+    public static int checkFromIndexSize(int fromIndex, int size, int length) {
+        // check for any negatives,
+        // or overflow safe length check given the values are all positive
+        // remaining = length - fromIndex
+        if ((fromIndex | size | length) < 0 || size > length - fromIndex) {
+            throw new IndexOutOfBoundsException(
+                // Note: %<d is 'relative indexing' to re-use the last argument
+                String.format(""Range [%d, %<d + %d) out of bounds for length %d"",
+                    fromIndex, size, length));
+        }
+        return fromIndex;
+    }
+}"
+NEXTDOWN,java.lang.UnsatisfiedLinkError: com.microsoft.z3.Native.INTERNALgetErrorMsgEx(JI)Ljava/lang/String; at com.microsoft.z3.Native.INTERNALgetErrorMsgEx(Native Method) at com.microsoft.z3.Native.mkNumeral(Native.java:1887) at com.microsoft.z3.Context.mkReal(Context.java:1914) at gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3.lt(ProblemZ3.java:821) at gov.nasa.jpf.symbc.numeric.PCParser.createDPRealConstraint(PCParser.java:447) at gov.nasa.jpf.symbc.numeric.PCParser.addConstraint(PCParser.java:1105) at gov.nasa.jpf.symbc.numeric.PCParser.parse(PCParser.java:1091) at gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral.isSatisfiable(SymbolicConstraintsGeneral.java:128) at gov.nasa.jpf.symbc.numeric.PathCondition.simplifyOld(PathCondition.java:393) at gov.nasa.jpf.symbc.numeric.PathCondition.simplify(PathCondition.java:340) at gov.nasa.jpf.symbc.bytecode.optimization.util.IFInstrSymbHelper.getNextInstructionAndSetPCChoiceDouble(IFInstrSymbHelper.java:367) at gov.nasa.jpf.symbc.bytecode.optimization.DCMPL.execute(DCMPL.java:43) at gov.nasa.jpf.vm.ThreadInfo.executeInstruction(ThreadInfo.java:1908) at gov.nasa.jpf.vm.ThreadInfo.executeTransition(ThreadInfo.java:1859) at gov.nasa.jpf.vm.SystemState.executeNextTransition(SystemState.java:765) at gov.nasa.jpf.vm.VM.forward(VM.java:1722) at gov.nasa.jpf.search.Search.forward(Search.java:937) at gov.nasa.jpf.search.heuristic.HeuristicSearch.generateChildren(HeuristicSearch.java:112) at gov.nasa.jpf.search.heuristic.HeuristicSearch.search(HeuristicSearch.java:189) at gov.nasa.jpf.JPF.run(JPF.java:613) at gov.nasa.jpf.JPF.start(JPF.java:189) at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) at java.lang.reflect.Method.invoke(Method.java:498) at gov.nasa.jpf.tool.Run.call(Run.java:80) at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116),symbolic.min_int=-2147483648 symbolic.min_long=-9223372036854775808 symbolic.min_short=-32768 symbolic.min_byte=-128 symbolic.min_char=0 symbolic.max_int=2147483647 symbolic.max_long=9223372036854775807 symbolic.max_short=32767 symbolic.max_byte=127 symbolic.max_char=65535 symbolic.min_double=4.9E-324 symbolic.max_double=1.7976931348623157E308 JavaPathfinder core system v8.0 (rev 8798687bf4adcf77ddaf68c011ff364ca450c21e) - (C) 2005-2014 United States Government. All rights reserved.,"public class NEXTDOWN {
+/**
+     * Returns the floating-point value adjacent to {@code d} in
+     * the direction of negative infinity.  This method is
+     * semantically equivalent to {@code nextAfter(d,
+     * Double.NEGATIVE_INFINITY)}; however, a
+     * {@code nextDown} implementation may run faster than its
+     * equivalent {@code nextAfter} call.
+     *
+     * <p>Special Cases:
+     * <ul>
+     * <li> If the argument is NaN, the result is NaN.
+     *
+     * <li> If the argument is negative infinity, the result is
+     * negative infinity.
+     *
+     * <li> If the argument is zero, the result is
+     * {@code -Double.MIN_VALUE}
+     *
+     * </ul>
+     *
+     * @param d  starting floating-point value
+     * @return The adjacent floating-point value closer to negative
+     * infinity.
+     * @since 1.8
+     */
+    public static double nextDown(double d) {
+        if (Double.isNaN(d) || d == Double.NEGATIVE_INFINITY)
+            return d;
+        else {
+            if (d == 0.0)
+                return -Double.MIN_VALUE;
+            else
+                return Double.longBitsToDouble(Double.doubleToRawLongBits(d) +
+                                               ((d > 0.0d)?-1L:+1L));
+        }
+    }
+}"

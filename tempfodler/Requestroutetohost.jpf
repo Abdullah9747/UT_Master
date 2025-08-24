@@ -1,0 +1,10 @@
+target=demo.Requestroutetohost
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method = demo.Requestroutetohost.Requestroutetohost(sym)
+search.class = .search.heuristic.BFSHeuristic
+symbolic.dp=z3
+listener = .symbc.SymbolicListener
+search.depth_limit=100
+search.multiple_errors=true
+

@@ -1,0 +1,805 @@
+original_code,class_name,signature,javadoc,body,full_method,cyclomatic_complexity,generated_tests,error
+"public class DEHEXCHAR {
+/**
+     * Get the hex value of a character (base16).
+     * @param c A character between '0' and '9' or between 'A' and 'F' or
+     * between 'a' and 'f'.
+     * @return  An int between 0 and 15, or -1 if c was not a hex digit.
+     */
+    public static int dehexchar(char c) {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        if (c >= 'A' && c <= 'F') {
+            return c - ('A' - 10);
+        }
+        if (c >= 'a' && c <= 'f') {
+            return c - ('a' - 10);
+        }
+        return -1;
+    }
+}",DEHEXCHAR,public static int dehexchar(char c),"/**
+     * Get the hex value of a character (base16).
+     * @param c A character between '0' and '9' or between 'A' and 'F' or
+     * between 'a' and 'f'.
+     * @return  An int between 0 and 15, or -1 if c was not a hex digit.
+     */","if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        if (c >= 'A' && c <= 'F') {
+            return c - ('A' - 10);
+        }
+        if (c >= 'a' && c <= 'f') {
+            return c - ('a' - 10);
+        }
+        return -1;","/**
+     * Get the hex value of a character (base16).
+     * @param c A character between '0' and '9' or between 'A' and 'F' or
+     * between 'a' and 'f'.
+     * @return  An int between 0 and 15, or -1 if c was not a hex digit.
+     */
+    public static int dehexchar(char c) {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        if (c >= 'A' && c <= 'F') {
+            return c - ('A' - 10);
+        }
+        if (c >= 'a' && c <= 'f') {
+            return c - ('a' - 10);
+        }
+        return -1;
+    }",7,"import org.junit.Assert;
+import org.junit.Test;
+
+public class DEHEXCHARTEST {
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, DEHEXCHAR.dehexchar('0'));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(15, DEHEXCHAR.dehexchar('F'));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(10, DEHEXCHAR.dehexchar('a'));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(-1, DEHEXCHAR.dehexchar('g'));
+    }
+}",
+"public class HEXCHARTONIBBLE {
+/**
+     * Internal method to turn a hex char into a nibble.
+     */
+    private static int hexCharToNibble(char ch) {
+        if ((ch >= '0') && (ch <= '9')) {
+            return ch - '0';
+        } else if ((ch >= 'a') && (ch <= 'f')) {
+            return ch - 'a' + 10;
+        } else if ((ch >= 'A') && (ch <= 'F')) {
+            return ch - 'A' + 10;
+        } else {
+            throw new IllegalArgumentException(""Not a hex char - '"" + ch + ""'"");
+        }
+    }
+}",HEXCHARTONIBBLE,private static int hexCharToNibble(char ch),"/**
+     * Internal method to turn a hex char into a nibble.
+     */","if ((ch >= '0') && (ch <= '9')) {
+            return ch - '0';
+        } else if ((ch >= 'a') && (ch <= 'f')) {
+            return ch - 'a' + 10;
+        } else if ((ch >= 'A') && (ch <= 'F')) {
+            return ch - 'A' + 10;
+        } else {
+            throw new IllegalArgumentException(""Not a hex char - '"" + ch + ""'"");
+        }","/**
+     * Internal method to turn a hex char into a nibble.
+     */
+    private static int hexCharToNibble(char ch) {
+        if ((ch >= '0') && (ch <= '9')) {
+            return ch - '0';
+        } else if ((ch >= 'a') && (ch <= 'f')) {
+            return ch - 'a' + 10;
+        } else if ((ch >= 'A') && (ch <= 'F')) {
+            return ch - 'A' + 10;
+        } else {
+            throw new IllegalArgumentException(""Not a hex char - '"" + ch + ""'"");
+        }
+    }",7,"import org.junit.Assert;
+import org.junit.Test;
+
+public class HEXCHARTONIBBLETest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, HEXCHARTONIBBLE.hexCharToNibble('0'));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(9, HEXCHARTONIBBLE.hexCharToNibble('9'));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(10, HEXCHARTONIBBLE.hexCharToNibble('a'));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(15, HEXCHARTONIBBLE.hexCharToNibble('f'));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(10, HEXCHARTONIBBLE.hexCharToNibble('A'));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(15, HEXCHARTONIBBLE.hexCharToNibble('F'));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCase7() {
+        HEXCHARTONIBBLE.hexCharToNibble('g');
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCase8() {
+        HEXCHARTONIBBLE.hexCharToNibble('G');
+    }
+}",
+"public class SHORTTOULAW {
+/**
+     * Convert a short to ulaw format
+     * 
+     * @param sample the short to convert
+     *
+     * @return a short containing an unsigned 8-bit quantity
+     *          representing the ulaw
+     */
+    public static byte shortToUlaw(short sample) {
+        final int[] exp_lut = {0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,
+                                   4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+                                   5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+                                   5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7};
+
+        int sign, exponent, mantissa;
+        short ulawbyte;
+
+        final short CLIP = 32635;
+        final short BIAS = 0x0084;
+
+        /* Get the sample into sign-magnitude. */
+        sign = (sample >> 8) & 0x80; /* set aside the sign */
+        if ( sign != 0 ) {
+            sample = (short) -sample; /* get magnitude */
+        }
+        if ( sample > CLIP ) sample = CLIP; /* clip the magnitude */
+
+        /* Convert from 16 bit linear to ulaw. */
+        sample = (short) (sample + BIAS);
+        exponent = exp_lut[( sample >> 7 ) & 0xFF];
+        mantissa = ( sample >> ( exponent + 3 ) ) & 0x0F;
+        ulawbyte = (short)
+            ((~ ( sign | ( exponent << 4 ) | mantissa)) & 0x00FF);
+        if ( ulawbyte == 0 ) ulawbyte = 0x02; /* optional CCITT trap */
+        // Now ulawbyte is an unsigned 8-bit entity.
+        // Return as a (signed) byte:
+        return (byte) (ulawbyte-128);
+    }
+}",SHORTTOULAW,public static byte shortToUlaw(short sample),"/**
+     * Convert a short to ulaw format
+     * 
+     * @param sample the short to convert
+     *
+     * @return a short containing an unsigned 8-bit quantity
+     *          representing the ulaw
+     */","final int[] exp_lut = {0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,
+                                   4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+                                   5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+                                   5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7};
+
+        int sign, exponent, mantissa;
+        short ulawbyte;
+
+        final short CLIP = 32635;
+        final short BIAS = 0x0084;
+
+        /* Get the sample into sign-magnitude. */
+        sign = (sample >> 8) & 0x80; /* set aside the sign */
+        if ( sign != 0 ) {
+            sample = (short) -sample; /* get magnitude */
+        }
+        if ( sample > CLIP ) sample = CLIP; /* clip the magnitude */
+
+        /* Convert from 16 bit linear to ulaw. */
+        sample = (short) (sample + BIAS);
+        exponent = exp_lut[( sample >> 7 ) & 0xFF];
+        mantissa = ( sample >> ( exponent + 3 ) ) & 0x0F;
+        ulawbyte = (short)
+            ((~ ( sign | ( exponent << 4 ) | mantissa)) & 0x00FF);
+        if ( ulawbyte == 0 ) ulawbyte = 0x02; /* optional CCITT trap */
+        // Now ulawbyte is an unsigned 8-bit entity.
+        // Return as a (signed) byte:
+        return (byte) (ulawbyte-128);","/**
+     * Convert a short to ulaw format
+     * 
+     * @param sample the short to convert
+     *
+     * @return a short containing an unsigned 8-bit quantity
+     *          representing the ulaw
+     */
+    public static byte shortToUlaw(short sample) {
+        final int[] exp_lut = {0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,
+                                   4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+                                   5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+                                   5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+                                   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7};
+
+        int sign, exponent, mantissa;
+        short ulawbyte;
+
+        final short CLIP = 32635;
+        final short BIAS = 0x0084;
+
+        /* Get the sample into sign-magnitude. */
+        sign = (sample >> 8) & 0x80; /* set aside the sign */
+        if ( sign != 0 ) {
+            sample = (short) -sample; /* get magnitude */
+        }
+        if ( sample > CLIP ) sample = CLIP; /* clip the magnitude */
+
+        /* Convert from 16 bit linear to ulaw. */
+        sample = (short) (sample + BIAS);
+        exponent = exp_lut[( sample >> 7 ) & 0xFF];
+        mantissa = ( sample >> ( exponent + 3 ) ) & 0x0F;
+        ulawbyte = (short)
+            ((~ ( sign | ( exponent << 4 ) | mantissa)) & 0x00FF);
+        if ( ulawbyte == 0 ) ulawbyte = 0x02; /* optional CCITT trap */
+        // Now ulawbyte is an unsigned 8-bit entity.
+        // Return as a (signed) byte:
+        return (byte) (ulawbyte-128);
+    }",4,"import org.junit.Assert;
+import org.junit.Test;
+
+public class SHORTTOULAWTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(128, SHORTTOULAW.shortToUlaw((short) 0));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(127, SHORTTOULAW.shortToUlaw((short) -1));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(255, SHORTTOULAW.shortToUlaw((short) 32767));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(0, SHORTTOULAW.shortToUlaw((short) -32768));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(255, SHORTTOULAW.shortToUlaw((short) 16384));
+        Assert.assertEquals(0, SHORTTOULAW.shortToUlaw((short) -16384));
+    }
+}",
+"public class CLAMP {
+/**
+	 * Clamp a value to an interval.
+	 * @param a the lower clamp threshold
+	 * @param b the upper clamp threshold
+	 * @param x the input parameter
+	 * @return the clamped value
+	 */
+	public static float clamp(float x, float a, float b) {
+		return (x < a) ? a : (x > b) ? b : x;
+	}
+}",CLAMP,"public static float clamp(float x, float a, float b)","/**
+	 * Clamp a value to an interval.
+	 * @param a the lower clamp threshold
+	 * @param b the upper clamp threshold
+	 * @param x the input parameter
+	 * @return the clamped value
+	 */",return (x < a) ? a : (x > b) ? b : x;,"/**
+	 * Clamp a value to an interval.
+	 * @param a the lower clamp threshold
+	 * @param b the upper clamp threshold
+	 * @param x the input parameter
+	 * @return the clamped value
+	 */
+	public static float clamp(float x, float a, float b) {
+		return (x < a) ? a : (x > b) ? b : x;
+	}",1,"import org.junit.Assert;
+import org.junit.Test;
+
+public class CLAMPTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(2.0f, CLAMP.clamp(1.0f, 2.0f, 3.0f), 0.0f);
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(3.0f, CLAMP.clamp(4.0f, 5.0f, 3.0f), 0.0f);
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(4.0f, CLAMP.clamp(4.0f, 3.0f, 5.0f), 0.0f);
+    }
+}",
+"public class ISSTATUSERROR {
+/**
+     * Returns whether the status is an error (i.e. 4xx or 5xx).
+     * @hide
+     */
+    public static boolean isStatusError(int status) {
+        return (status >= 400 && status < 600);
+    }
+}",ISSTATUSERROR,public static boolean isStatusError(int status),"/**
+     * Returns whether the status is an error (i.e. 4xx or 5xx).
+     * @hide
+     */",return (status >= 400 && status < 600);,"/**
+     * Returns whether the status is an error (i.e. 4xx or 5xx).
+     * @hide
+     */
+    public static boolean isStatusError(int status) {
+        return (status >= 400 && status < 600);
+    }",2,"import org.junit.Assert;
+import org.junit.Test;
+
+public class ISSTATUSERRORTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(false, ISSTATUSERROR.isStatusError(200));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(true, ISSTATUSERROR.isStatusError(400));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(true, ISSTATUSERROR.isStatusError(500));
+    }
+}",
+"public class ISMARKUP {
+/**
+     * Returns true if the specified character can be considered markup.
+     * Markup characters include '&lt;', '&amp;', and '%'.
+     *
+     * @param c The character to check.
+     */
+    public static boolean isMarkup(int c) {
+        return c == '<' || c == '&' || c == '%';
+    }
+}",ISMARKUP,public static boolean isMarkup(int c),"/**
+     * Returns true if the specified character can be considered markup.
+     * Markup characters include '&lt;', '&amp;', and '%'.
+     *
+     * @param c The character to check.
+     */",return c == '<' || c == '&' || c == '%';,"/**
+     * Returns true if the specified character can be considered markup.
+     * Markup characters include '&lt;', '&amp;', and '%'.
+     *
+     * @param c The character to check.
+     */
+    public static boolean isMarkup(int c) {
+        return c == '<' || c == '&' || c == '%';
+    }",3,"import org.junit.Assert;
+import org.junit.Test;
+
+public class ISMARKUPTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(false, ISMARKUP.isMarkup(60));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(true, ISMARKUP.isMarkup(37));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(true, ISMARKUP.isMarkup(38));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(false, ISMARKUP.isMarkup(99));
+    }
+}",
+"public class ISLEAP {
+/**
+     * Returns whether this field is 'leap' for the specified instant.
+     * <p>
+     * For example, a leap year would return true, a non leap year would return
+     * false.
+     * <p>
+     * This implementation returns false.
+     * 
+     * @return true if the field is 'leap'
+     */
+    public boolean isLeap(long instant) {
+        return false;
+    }
+}",ISLEAP,public boolean isLeap(long instant),"/**
+     * Returns whether this field is 'leap' for the specified instant.
+     * <p>
+     * For example, a leap year would return true, a non leap year would return
+     * false.
+     * <p>
+     * This implementation returns false.
+     * 
+     * @return true if the field is 'leap'
+     */",return false;,"/**
+     * Returns whether this field is 'leap' for the specified instant.
+     * <p>
+     * For example, a leap year would return true, a non leap year would return
+     * false.
+     * <p>
+     * This implementation returns false.
+     * 
+     * @return true if the field is 'leap'
+     */
+    public boolean isLeap(long instant) {
+        return false;
+    }",1,"import org.junit.Assert;
+import org.junit.Test;
+
+public class ISLEAPTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(false, new ISLEAP().isLeap(0));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(false, new ISLEAP().isLeap(1));
+    }
+}",
+"public class GETBLOCKTEXTUREFROMSIDEANDMETADATA {
+/**
+     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     */
+    public int getBlockTextureFromSideAndMetadata(int par1, int par2)
+    {
+        if (par1 == 1)
+        {
+            return 0;
+        }
+
+        return par1 != 0 ? 3 : 2;
+    }
+}",GETBLOCKTEXTUREFROMSIDEANDMETADATA,"public int getBlockTextureFromSideAndMetadata(int par1, int par2)","/**
+     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     */","if (par1 == 1)
+        {
+            return 0;
+        }
+
+        return par1 != 0 ? 3 : 2;","/**
+     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     */
+    public int getBlockTextureFromSideAndMetadata(int par1, int par2)
+    {
+        if (par1 == 1)
+        {
+            return 0;
+        }
+
+        return par1 != 0 ? 3 : 2;
+    }",2,"import org.junit.Assert;
+import org.junit.Test;
+
+public class GETBLOCKTEXTUREFROMSIDEANDMETADATATest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, GETBLOCKTEXTUREFROMSIDEANDMETADATA.getBlockTextureFromSideAndMetadata(0, 0));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(2, GETBLOCKTEXTUREFROMSIDEANDMETADATA.getBlockTextureFromSideAndMetadata(1, 0));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(3, GETBLOCKTEXTUREFROMSIDEANDMETADATA.getBlockTextureFromSideAndMetadata(2, 0));
+    }
+}",
+"public class BITOR {
+/**
+     * BITOR( ) Performs a bitwise OR of two integers.
+     * 
+     * {talendTypes} int | Integer
+     * 
+     * {Category} Mathematical
+     * 
+     * {param} int(10) a: integer
+     * 
+     * {param} int(10) b: integer
+     * 
+     * {example} BITOR(10,10)
+     * 
+     * 
+     */
+    public static int BITOR(int a, int b) {
+        return a | b;
+    }
+}",BITOR,"public static int BITOR(int a, int b)","/**
+     * BITOR( ) Performs a bitwise OR of two integers.
+     * 
+     * {talendTypes} int | Integer
+     * 
+     * {Category} Mathematical
+     * 
+     * {param} int(10) a: integer
+     * 
+     * {param} int(10) b: integer
+     * 
+     * {example} BITOR(10,10)
+     * 
+     * 
+     */",return a | b;,"/**
+     * BITOR( ) Performs a bitwise OR of two integers.
+     * 
+     * {talendTypes} int | Integer
+     * 
+     * {Category} Mathematical
+     * 
+     * {param} int(10) a: integer
+     * 
+     * {param} int(10) b: integer
+     * 
+     * {example} BITOR(10,10)
+     * 
+     * 
+     */
+    public static int BITOR(int a, int b) {
+        return a | b;
+    }",1,"import org.junit.Assert;
+import org.junit.Test;
+
+public class BITORTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, BITOR.BITOR(0, 0));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(1, BITOR.BITOR(0, 1));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(1, BITOR.BITOR(1, 0));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(-1, BITOR.BITOR(-1, -1));
+    }
+}",
+"public class GETBLOCKTEXTUREFROMSIDEANDMETADATA {
+/**
+     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     */
+    public int getBlockTextureFromSideAndMetadata(int par1, int par2)
+    {
+        switch (par2)
+        {
+            default:
+                return 54;
+
+            case 1:
+                return 100;
+
+            case 2:
+                return 101;
+
+            case 3:
+                return 213;
+        }
+    }
+}",GETBLOCKTEXTUREFROMSIDEANDMETADATA,"public int getBlockTextureFromSideAndMetadata(int par1, int par2)","/**
+     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     */","switch (par2)
+        {
+            default:
+                return 54;
+
+            case 1:
+                return 100;
+
+            case 2:
+                return 101;
+
+            case 3:
+                return 213;
+        }","/**
+     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     */
+    public int getBlockTextureFromSideAndMetadata(int par1, int par2)
+    {
+        switch (par2)
+        {
+            default:
+                return 54;
+
+            case 1:
+                return 100;
+
+            case 2:
+                return 101;
+
+            case 3:
+                return 213;
+        }
+    }",2,"import org.junit.Assert;
+import org.junit.Test;
+
+public class GETBLOCKTEXTUREFROMSIDEANDMETADATATest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(54, GETBLOCKTEXTUREFROMSIDEANDMETADATA.getBlockTextureFromSideAndMetadata(0, 0));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(54, GETBLOCKTEXTUREFROMSIDEANDMETADATA.getBlockTextureFromSideAndMetadata(0, 1));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(54, GETBLOCKTEXTUREFROMSIDEANDMETADATA.getBlockTextureFromSideAndMetadata(0, 2));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(54, GETBLOCKTEXTUREFROMSIDEANDMETADATA.getBlockTextureFromSideAndMetadata(0, 3));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(54, GETBLOCKTEXTUREFROMSIDEANDMETADATA.getBlockTextureFromSideAndMetadata(0, 4));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(54, GETBLOCKTEXTUREFROMSIDEANDMETADATA.getBlockTextureFromSideAndMetadata(0, 5));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(54, GETBLOCKTEXTUREFROMSIDEANDMETADATA.getBlockTextureFromSideAndMetadata(0, 10));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(54, GETBLOCKTEXTUREFROMSIDEANDMETADATA.getBlockTextureFromSideAndMetadata(1, 0));
+    }
+}",
+"public class ACCEPTNUMPARAM {
+/**
+	Returns true only for 2 parameters, false otherwise.
+	*/
+	public boolean acceptNumParam(int numParam) {
+		return numParam == 2;
+	}
+}",ACCEPTNUMPARAM,public boolean acceptNumParam(int numParam),"/**
+	Returns true only for 2 parameters, false otherwise.
+	*/",return numParam == 2;,"/**
+	Returns true only for 2 parameters, false otherwise.
+	*/
+	public boolean acceptNumParam(int numParam) {
+		return numParam == 2;
+	}",1,"import org.junit.Assert;
+import org.junit.Test;
+
+public class ACCEPTNUMPARAMTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(true, new ACCEPTNUMPARAM().acceptNumParam(2));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(false, new ACCEPTNUMPARAM().acceptNumParam(1));
+    }
+}",
+"public class CALCULATECELESTIALANGLE {
+/**
+     * Calculates the angle of sun and moon in the sky relative to a specified time (usually worldTime)
+     */
+    public float calculateCelestialAngle(long par1, float par3)
+    {
+        return 0.0F;
+    }
+}",CALCULATECELESTIALANGLE,"public float calculateCelestialAngle(long par1, float par3)","/**
+     * Calculates the angle of sun and moon in the sky relative to a specified time (usually worldTime)
+     */",return 0.0F;,"/**
+     * Calculates the angle of sun and moon in the sky relative to a specified time (usually worldTime)
+     */
+    public float calculateCelestialAngle(long par1, float par3)
+    {
+        return 0.0F;
+    }",1,"import org.junit.Assert;
+import org.junit.Test;
+
+public class CALCULATECELESTIALANGLETest {
+
+    @Test
+    public void testCase1() {
+        float result = CALCULATECELESTIALANGLE.calculateCelestialAngle(0, 0.0f);
+        Assert.assertEquals(0.0f, result, 0.0f);
+    }
+
+    @Test
+    public void testCase2() {
+        float result = CALCULATECELESTIALANGLE.calculateCelestialAngle(1, 1.0f);
+        Assert.assertEquals(0.0f, result, 0.0f);
+    }
+}",
+,,,,,,,,

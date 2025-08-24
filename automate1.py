@@ -1,104 +1,108 @@
-import os
-import subprocess
-import re
-import javalang
+
+import hashlib
 import pandas as pd
-import random
-import string
-import numpy as np
 
+def _norm_func_key(func_text: str) -> str:
+    if not isinstance(func_text, str):
+        return ""
+    cleaned = " ".join(func_text.split())
+    return hashlib.sha1(cleaned.encode("utf-8")).hexdigest()
 
+def merge_result_csvs(
+        base_csv: str = "detailed_combined_results.csv",
+        jqf_csv: str = "a_jqf_process_res.csv",
+        spf_csv: str = "a_spf_process_res.csv",
+        llm_csv: str = "a_llm_process_res.csv",
+        out_csv: str = "merged_results.csv"
+    ) -> pd.DataFrame | None:
+    try:
+        base_df = pd.read_csv(base_csv)
+    except Exception as e:
+        print(f"Base load failed: {e}")
+        return None
+    if "Function" not in base_df.columns:
+        print("Base file missing 'Function' column.")
+        return None
 
+    base_df["__FUNC_KEY__"] = base_df["Function"].apply(_norm_func_key)
+    base_df = base_df.drop_duplicates("__FUNC_KEY__")
 
+    def load_optional(path, tag):
+        try:
+            df = pd.read_csv(path)
+            if "Function" not in df.columns:
+                print(f"{tag} missing Function column, skipped.")
+                return None
+            df["__FUNC_KEY__"] = df["Function"].apply(_norm_func_key)
 
+            # Renames / passthrough handling
+            rename_map = {}
+            # Generic single LLM result (older files)
+            if "LLM_Result" in df.columns:
+                rename_map["LLM_Result"] = f"LLM_Result_{tag}"
+            # New dual LLM results
+            if "LLM_Result_Statement" in df.columns:
+                rename_map["LLM_Result_Statement"] = "LLM_Result_Statement"
+            if "LLM_Result_Branch" in df.columns:
+                rename_map["LLM_Result_Branch"] = "LLM_Result_Branch"
+            # JQF / SPF values
+            if "JQF_Test_Values" in df.columns:
+                rename_map["JQF_Test_Values"] = "JQF_Test_Values"
+            if "SPF_Test_Values" in df.columns:
+                rename_map["SPF_Test_Values"] = "SPF_Test_Values"
 
+            if rename_map:
+                df = df.rename(columns=rename_map)
 
+            # Drop columns we don't want duplicated over base
+            drop_cols = [c for c in ["Class_Name", "Function"] if c in df.columns]
+            if drop_cols:
+                df = df.drop(columns=drop_cols)
 
-class Driver:
-    def __init__(self):
-        self.jqf=JQF()
-        self.spf=SPF()
+            # Keep only key + new data columns
+            keep_cols = ["__FUNC_KEY__"] + [c for c in df.columns if c != "__FUNC_KEY__"]
+            df = df[keep_cols].drop_duplicates("__FUNC_KEY__")
+            # Drop empty (only key) frames
+            if len(df.columns) == 1:
+                return None
+            return df
+        except FileNotFoundError:
+            print(f"{tag} file not found; skipping.")
+            return None
+        except Exception as e:
+            print(f"{tag} load error: {e}")
+            return None
 
-    def prepare_JQf(self,function_code):
-        class_name,method,params=self.jqf.make_AST(function_code)
-        self.jqf.make_JQF_file(class_name,function_code)
-        self.jqf.generate_test_file(class_name,params,method)
-    def driver(self,file_name):
-        jqf_file_name = f"{file_name}Test"
-        self.jqf.run_jqf(jqf_file_name)
+    jqf_df = load_optional(jqf_csv, "JQF")
+    spf_df = load_optional(spf_csv, "SPF")
+    llm_df = load_optional(llm_csv, "LLM")
 
+    merged = base_df.copy()
 
+    for addon, tag in [(jqf_df, "JQF"), (spf_df, "SPF"), (llm_df, "LLM")]:
+        if addon is not None:
+            print(f"Merging {tag}...")
+            merged = merged.merge(addon, on="__FUNC_KEY__", how="left")
 
-function1="""public class TrafficLight {
-    public static int calculateGreenLightTime(int roadLength, int trafficDensity, int avgSpeed, boolean isPeakHour) {
-        if (roadLength <= 0 || trafficDensity <= 0 || avgSpeed <= 0) {
-            throw new IllegalArgumentException("Invalid input parameters");
-        }
-        int baseTime = roadLength / avgSpeed; // Basic green light time
-        if (isPeakHour) {
-            baseTime += (trafficDensity / 10); // Increase time during peak hours
-        } else if (trafficDensity > 50) {
-            baseTime += (trafficDensity / 20); // Increase time for higher density
-        } else {
-            baseTime = Math.max(baseTime - 5, 10); // Minimum time during low density
-        }
-        return baseTime;
-    }
+    # Preferred ordering (includes dual LLM results)
+    prefer_order = [c for c in [
+        "Class_Name",
+        "Function",
+        "JQF_Test_Values",
+        "SPF_Test_Values",
+        "LLM_Result_JQF",
+        "LLM_Result_SPF",
+        "LLM_Result_LLM",
+        "LLM_Result_Statement",
+        "LLM_Result_Branch"
+    ] if c in merged.columns]
 
-}"""
+    other_cols = [c for c in merged.columns if c not in prefer_order and c != "__FUNC_KEY__"]
+    merged = merged[prefer_order + other_cols]
 
-function2="""public class WaterUsage {
-    public static double calculateWaterUsage(int familyMembers, int appliances, boolean hasGarden, int dailyUseLiters) {
-        double baseUsage = familyMembers * dailyUseLiters;
-        if (hasGarden) {
-            baseUsage += 50; // Additional for garden
-        }
-        if (appliances > 0) {
-            baseUsage += appliances * 10; // Additional for appliances
-        }
-        if (familyMembers > 5) {
-            baseUsage *= 1.1; // Slight increase for larger families
-        }
-        return baseUsage;
-    }
+    merged.to_csv(out_csv, index=False)
+    print(f"Merged saved to {out_csv} (rows={len(merged)})")
+    return merged
 
-}"""
-
-function3="""public class ElectricityBill {
-    public static double calculateBill(int unitsConsumed, double ratePerUnit, boolean isPeakMonth) {
-        if (unitsConsumed < 0 || ratePerUnit <= 0) {
-            throw new IllegalArgumentException("Invalid input values");
-        }
-        double bill = unitsConsumed * ratePerUnit;
-        if (isPeakMonth) {
-            bill *= 1.2; // Surcharge during peak months
-        } 
-        if (unitsConsumed > 500) {
-            bill += 50; // Additional fixed charge for high usage
-        } else if (unitsConsumed < 100) {
-            bill *= 0.9; // Discount for low usage
-        }
-        return bill;
-    }
-
-}"""
-function4="""public class TaxCalculator {
-    public static double calculateTax(double income, int dependents, boolean hasInvestments) {
-        if (income < 0 || dependents < 0) {
-            throw new IllegalArgumentException("Invalid input values");
-        }
-        double taxRate = income > 100000 ? 0.3 : income > 50000 ? 0.2 : 0.1;
-        double baseTax = income * taxRate;
-        if (dependents > 0) {
-            baseTax -= dependents * 2000; // Deduction per dependent
-        }
-        if (hasInvestments) {
-            baseTax *= 0.85; // Investment rebate
-        }
-        return Math.max(baseTax, 0); // Ensure tax is not negative
-    }
-
-}"""
-driver_object=Driver()
-driver_object.prepare_JQf(function1)
-driver_object.driver("WaterUsage")
+if __name__ == "__main__":
+    merge_result_csvs()

@@ -1,0 +1,726 @@
+Unnamed: 0.1,Function,cyclomatic_complexity,javadoc_length,tokens,LOC,Unnamed: 0,doc_bin,loc_bin,group,class_name,SPF_Results,SPF_Time
+28,"public class GREATESTCOMMONDIVISOR {
+/**
+     * Gets the greatest common divisor of the absolute value of
+     * two numbers, using the ""binary gcd"" method which avoids
+     * division and modulo operations.  See Knuth 4.5.2 algorithm B.
+     * This algorithm is due to Josef Stein (1961).
+     *
+     * @param u  a non-zero number
+     * @param v  a non-zero number
+     * @return the greatest common divisor, never zero
+     */
+    public static int greatestCommonDivisor(int u, int v) {
+        // From Commons Math:
+        if (u == 0 || v == 0) {
+            if (u == Integer.MIN_VALUE || v == Integer.MIN_VALUE) {
+                throw new ArithmeticException(""overflow: gcd is 2^31"");
+            }
+            return Math.abs(u) + Math.abs(v);
+        }
+        // if either operand is abs 1, return 1:
+        if (Math.abs(u) == 1 || Math.abs(v) == 1) {
+            return 1;
+        }
+        // keep u and v negative, as negative integers range down to
+        // -2^31, while positive numbers can only be as large as 2^31-1
+        // (i.e. we can't necessarily negate a negative number without
+        // overflow)
+        if (u > 0) {
+            u = -u;
+        } // make u negative
+        if (v > 0) {
+            v = -v;
+        } // make v negative
+        // B1. [Find power of 2]
+        int k = 0;
+        while ((u & 1) == 0 && (v & 1) == 0 && k < 31) { // while u and v are both even...
+            u /= 2;
+            v /= 2;
+            k++; // cast out twos.
+        }
+        if (k == 31) {
+            throw new ArithmeticException(""overflow: gcd is 2^31"");
+        }
+        // B2. Initialize: u and v have been divided by 2^k and at least
+        // one is odd.
+        int t = (u & 1) == 1 ? v : -(u / 2)/* B3 */;
+        // t negative: u was odd, v may be even (t replaces v)
+        // t positive: u was even, v is odd (t replaces u)
+        do {
+            /* assert u<0 && v<0; */
+            // B4/B3: cast out twos from t.
+            while ((t & 1) == 0) { // while t is even.
+                t /= 2; // cast out twos
+            }
+            // B5 [reset max(u,v)]
+            if (t > 0) {
+                u = -t;
+            } else {
+                v = t;
+            }
+            // B6/B3. at this point both u and v should be odd.
+            t = (v - u) / 2;
+            // |u| larger: t positive (replace u)
+            // |v| larger: t negative (replace v)
+        } while (t != 0);
+        return -u * (1 << k); // gcd is u*2^k
+    }
+}",16.0,4,36,31,,Long (21-40),Long (21+),Long (21-40) | Long (21+),GREATESTCOMMONDIVISOR,"Inputs: u_1_SYMINT,v_2_SYMINT
+
+demo.Distance.distance(0,-2147483648)  --> ""java.lang.ArithmeticException: overflow: gcd is 2^31...""
+demo.Distance.distance(-2147483648,0)  --> ""java.lang.ArithmeticException: overflow: gcd is 2^31...""
+(0,-2147483646)  --> Return Value: 2147483646
+(0,0)  --> Return Value: 0
+(-2147483646,0)  --> Return Value: 2147483646
+(2,0)  --> Return Value: 2
+(-1,1)  --> Return Value: 1
+(1,1)  --> Return Value: 1
+",1.7789974212646484
+679,"public class GETHIGHBIT {
+/**
+     * Returns the index of the high bit in value (assuming le, actually
+     * power of 2 >= value). value must be positive.
+     */
+    public static int getHighBit(int value) {
+        if (value <= 0) {
+            return -32;
+        }
+
+        int bit = 0;
+
+        if (value >= 1 << 16) {
+            value >>= 16;
+            bit += 16;
+        }
+
+        if (value >= 1 << 8) {
+            value >>= 8;
+            bit += 8;
+        }
+
+        if (value >= 1 << 4) {
+            value >>= 4;
+            bit += 4;
+        }
+
+        if (value >= 1 << 2) {
+            value >>= 2;
+            bit += 2;
+        }
+
+        if (value >= 1 << 1) {
+            bit += 1;
+        }
+
+        return bit;
+    }
+}",7.0,2,21,18,543.0,Long (21-40),Medium (11-20),Long (21-40) | Medium (11-20),GETHIGHBIT,"Inputs: value_1_SYMINT
+
+(-2147483646)  --> Return Value: -32
+",1.6877837181091309
+125,"public class GETDEVIANCEPART {
+/**
+     * A part of the deviance portion of the saddle point approximation.
+     * <p>
+     * References:
+     * <ol>
+     * <li>Catherine Loader (2000). ""Fast and Accurate Computation of Binomial
+     * Probabilities."". <a target=""_blank""
+     * href=""http://www.herine.net/stat/papers/dbinom.pdf"">
+     * http://www.herine.net/stat/papers/dbinom.pdf</a></li>
+     * </ol>
+     *
+     * <p>Note: This function has been modified for integer {@code x}.</p>
+     *
+     * @param x Value at which the function is evaluated.
+     * @param mu Average.
+     * @return a part of the deviance.
+     */
+    static double getDeviancePart(int x, double mu) {
+        if (Math.abs(x - mu) < 0.1 * (x + mu)) {
+            final double d = x - mu;
+            double v = d / (x + mu);
+            double s1 = v * d;
+            double s = Double.NaN;
+            double ej = 2.0 * x * v;
+            v *= v;
+            int j = 1;
+            while (s1 != s) {
+                s = s1;
+                ej *= v;
+                s1 = s + ej / ((j * 2) + 1);
+                ++j;
+            }
+            return s1;
+        } else if (x == 0) {
+            return mu;
+        }
+        return x * Math.log(x / mu) + mu - x;
+    }
+}",4.0,10,39,17,,Long (21-40),Medium (11-20),Long (21-40) | Medium (11-20),GETDEVIANCEPART,No path condition,1.5377326011657717
+189,"public class LOG2 {
+/**
+     * Method that calculates the floor of the log, base 2,
+     * of 'x'. The calculation is performed in integer arithmetic,
+     * therefore, it is exact.
+     *
+     * @param x The value to calculate log2 on.
+     *
+     * @return floor(log(x)/log(2)), calculated in an exact way.
+     * */
+    public static int log2(int x) {
+        int y,v;
+        // No log of 0 or negative
+        if (x <= 0) {
+            throw new IllegalArgumentException(""""+x+"" <= 0"");
+        }
+        // Calculate log2 (it's actually floor log2)
+        v = x;
+        y = -1;
+        while (v>0) {
+            v >>=1;
+            y++;
+        }
+        return y;
+    }
+}",3.0,3,23,9,53.0,Long (21-40),Short (6-10),Long (21-40) | Short (6-10),LOG2,"Inputs: x_1_SYMINT
+
+demo.Distance.distance(-2147483646)  --> ""java.lang.IllegalArgumentException: 0 <= 0...""
+(1)  --> Return Value: 0
+(2)  --> Return Value: 1
+(4)  --> Return Value: 2
+",1.5870585441589355
+546,"public class GETDATAMASKBIT {
+/**
+   * Return the mask bit for ""getMaskPattern"" at ""x"" and ""y"". See 8.8 of JISX0510:2004 for mask
+   * pattern conditions.
+   */
+  static boolean getDataMaskBit(int maskPattern, int x, int y) {
+    int intermediate;
+    int temp;
+    switch (maskPattern) {
+      case 0:
+        intermediate = (y + x) & 0x1;
+        break;
+      case 1:
+        intermediate = y & 0x1;
+        break;
+      case 2:
+        intermediate = x % 3;
+        break;
+      case 3:
+        intermediate = (y + x) % 3;
+        break;
+      case 4:
+        intermediate = ((y >>> 1) + (x / 3)) & 0x1;
+        break;
+      case 5:
+        temp = y * x;
+        intermediate = (temp & 0x1) + (temp % 3);
+        break;
+      case 6:
+        temp = y * x;
+        intermediate = ((temp & 0x1) + (temp % 3)) & 0x1;
+        break;
+      case 7:
+        temp = y * x;
+        intermediate = ((temp % 3) + ((y + x) & 0x1)) & 0x1;
+        break;
+      default:
+        throw new IllegalArgumentException(""Invalid mask pattern: "" + maskPattern);
+    }
+    return intermediate == 0;
+  }
+}",2.0,2,18,33,410.0,Medium (11-20),Long (21+),Medium (11-20) | Long (21+),GETDATAMASKBIT,"Inputs: maskPattern_1_SYMINT,x_2_SYMINT,y_3_SYMINT
+
+demo.Distance.distance(8,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> ""java.lang.IllegalArgumentException: Invalid mask pattern: 0...""
+(0,0,0)  --> Return Value: 1
+(0,0,1)  --> Return Value: 0
+(1,-9223372036854775808(don't care),0)  --> Return Value: 1
+(1,-9223372036854775808(don't care),1)  --> Return Value: 0
+(2,1788567546,-9223372036854775808(don't care))  --> Return Value: 1
+(2,1673570278,-9223372036854775808(don't care))  --> Return Value: 0
+(3,530979712,98657393)  --> Return Value: 1
+(3,1930100610,1179589)  --> Return Value: 0
+(4,7,0)  --> Return Value: 1
+(4,4,0)  --> Return Value: 0
+(5,-1292859294,1146515113)  --> Return Value: 1
+(5,1304754209,563693218)  --> Return Value: 0
+(6,172673,147005824)  --> Return Value: 1
+(6,855816795,681576670)  --> Return Value: 0
+(7,1441801742,175498102)  --> Return Value: 1
+(7,708555396,557371710)  --> Return Value: 0
+",2.6761341094970703
+76,"public class GCDLONGADAPTEDFORINT {
+/**
+     * This is a copy of the GCD method for longs, but adapted for ints.
+     *
+     * @param p an int.
+     * @param q an int.
+     * @return the GCD of p and q.
+     */
+    public static int gcdLongAdaptedForInt(int p, int q) {
+        // Perform the gcd algorithm on negative numbers, so that -2^31 does not
+        // need to be handled separately
+        int a = p > 0 ? -p : p;
+        int b = q > 0 ? -q : q;
+
+        int negatedGcd;
+        if (a == 0) {
+            negatedGcd = b;
+        } else if (b == 0) {
+            negatedGcd = a;
+        } else {
+            // Make ""a"" and ""b"" odd, keeping track of common power of 2.
+            final int aTwos = Integer.numberOfTrailingZeros(a);
+            final int bTwos = Integer.numberOfTrailingZeros(b);
+            a >>= aTwos;
+            b >>= bTwos;
+            final int shift = Math.min(aTwos, bTwos);
+
+            // ""a"" and ""b"" are negative and odd.
+            // If a < b then ""gdc(a, b)"" is equal to ""gcd(a - b, b)"".
+            // If a > b then ""gcd(a, b)"" is equal to ""gcd(b - a, a)"".
+            // Hence, in the successive iterations:
+            //  ""a"" becomes the negative absolute difference of the current values,
+            //  ""b"" becomes that value of the two that is closer to zero.
+            while (true) {
+                final int delta = a - b;
+
+                if (delta == 0) {
+                    break;
+                }
+
+                b = Math.max(a, b);
+                a = delta > 0 ? -delta : delta;
+
+                // Remove any power of 2 in ""a"" (""b"" is guaranteed to be odd).
+                a >>= Integer.numberOfTrailingZeros(a);
+            }
+
+            // Recover the common power of 2.
+            negatedGcd = a << shift;
+        }
+        if (negatedGcd == Integer.MIN_VALUE) {
+            throw new ArithmeticException();
+        }
+        return -negatedGcd;
+    }
+}",6.0,1,14,24,,Medium (11-20),Long (21+),Medium (11-20) | Long (21+),GCDLONGADAPTEDFORINT,"Inputs: p_1_SYMINT,q_2_SYMINT
+
+(1,0)  --> Return Value: 1
+(0,1)  --> Return Value: 1
+demo.Distance.distance(0,-2147483648)  --> ""java.lang.ArithmeticException...""
+(0,-2147483646)  --> Return Value: 2147483646
+",1.990055084228516
+571,"public class ISLATINCHAR {
+/**
+     * Returns true if the specified character is within one of the Latin
+     * unicode character blocks.
+     *
+     * @param c The char to test.
+     *
+     * @return True if c is latin.
+     */
+    public boolean isLatinChar(char c) {
+
+        if ( c < 255 && Character.isLetterOrDigit( c )){
+            // cheap quick check, should catch most lation-chars
+            return true;
+        }
+
+        Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
+
+        if (block == Character.UnicodeBlock.BASIC_LATIN ||
+            block == Character.UnicodeBlock.LATIN_1_SUPPLEMENT ||
+            block == Character.UnicodeBlock.LATIN_EXTENDED_ADDITIONAL ||
+            block == Character.UnicodeBlock.LATIN_EXTENDED_A ||
+            block == Character.UnicodeBlock.LATIN_EXTENDED_B ||
+            block == Character.UnicodeBlock.ARABIC ||
+            block == Character.UnicodeBlock.ARABIC_PRESENTATION_FORMS_A ||
+            block == Character.UnicodeBlock.ARABIC_PRESENTATION_FORMS_B) {
+            return true;
+        }
+        return false;
+    }
+}",11.0,2,15,13,435.0,Medium (11-20),Medium (11-20),Medium (11-20) | Medium (11-20),ISLATINCHAR,"Inputs: c_1_SYMINT
+
+(128)  --> Return Value: 1
+(0)  --> Return Value: 1
+",2.0487987995147705
+166,"public class UNSIGNEDLEB128SIZE {
+/**
+     * Gets the number of bytes in the unsigned LEB128 encoding of the
+     * given value.
+     *
+     * @param value the value in question
+     * @return its write size, in bytes
+     */
+    public static int unsignedLeb128Size(int value) {
+        // TODO: This could be much cleverer.
+
+        int remaining = value >>> 7;
+        int count = 0;
+
+        while (remaining != 0) {
+            value = remaining;
+            remaining >>>= 7;
+            count++;
+        }
+
+        return count + 1;
+    }
+}",2.0,2,14,7,30.0,Medium (11-20),Short (6-10),Medium (11-20) | Short (6-10),UNSIGNEDLEB128SIZE,"Inputs: value_1_SYMINT
+
+(0)  --> Return Value: 1
+(128)  --> Return Value: 2
+(16384)  --> Return Value: 3
+(268435456)  --> Return Value: 5
+(2097152)  --> Return Value: 4
+",1.391655445098877
+723,"public class GETROLLEDVALUE {
+/**
+     * Returns the new value after 'roll'ing the specified value and amount.
+     */
+    public static int getRolledValue(int value, int amount, int min, int max) {
+        assert value >= min && value <= max;
+        int range = max - min + 1;
+        amount %= range;
+        int n = value + amount;
+        if (n > max) {
+            n -= range;
+        } else if (n < min) {
+            n += range;
+        }
+        assert n >= min && n <= max;
+        return n;
+    }
+}",5.0,1,11,10,587.0,Medium (11-20),Short (6-10),Medium (11-20) | Short (6-10),GETROLLEDVALUE,"Inputs: value_1_SYMINT,amount_2_SYMINT,min_3_SYMINT,max_4_SYMINT
+
+demo.Distance.distance(0,-9223372036854775808(don't care),2,-9223372036854775808(don't care))  --> ""java.lang.AssertionError...""
+demo.Distance.distance(0,-9223372036854775808(don't care),-2147483647,-2147483648)  --> ""java.lang.AssertionError...""
+demo.Distance.distance(-870492664,-9223372036854775808(don't care),-2147483648,2147483647)  --> ""java.lang.ArithmeticException: rem by 0...""
+",223.00609374046329
+550,"public class GETCOMPONENTINDEX {
+/** Given one of the constants for a component, determine the corresponding array index. */
+
+  public int getComponentIndex(int component)
+  {
+    int index = 0;
+    while (((component>>index)&1) == 0)
+      index++;
+    return index;
+  }
+}",2.0,1,15,3,414.0,Medium (11-20),Very Short (2-5),Medium (11-20) | Very Short (2-5),GETCOMPONENTINDEX,"Inputs: component_1_SYMINT
+
+(1)  --> Return Value: 0
+(2)  --> Return Value: 1
+(4)  --> Return Value: 2
+(8)  --> Return Value: 3
+",1.3647921085357666
+485,"public class BILINEARINTERPOLATE {
+/**
+	 * Bilinear interpolation of ARGB values.
+	 * @param x the X interpolation parameter 0..1
+	 * @param y the y interpolation parameter 0..1
+	 * @param rgb array of four ARGB values in the order NW, NE, SW, SE
+	 * @return the interpolated value
+	 */
+	public static int bilinearInterpolate(float x, float y, int nw, int ne, int sw, int se) {
+		float m0, m1;
+		int a0 = (nw >> 24) & 0xff;
+		int r0 = (nw >> 16) & 0xff;
+		int g0 = (nw >> 8) & 0xff;
+		int b0 = nw & 0xff;
+		int a1 = (ne >> 24) & 0xff;
+		int r1 = (ne >> 16) & 0xff;
+		int g1 = (ne >> 8) & 0xff;
+		int b1 = ne & 0xff;
+		int a2 = (sw >> 24) & 0xff;
+		int r2 = (sw >> 16) & 0xff;
+		int g2 = (sw >> 8) & 0xff;
+		int b2 = sw & 0xff;
+		int a3 = (se >> 24) & 0xff;
+		int r3 = (se >> 16) & 0xff;
+		int g3 = (se >> 8) & 0xff;
+		int b3 = se & 0xff;
+
+		float cx = 1.0f-x;
+		float cy = 1.0f-y;
+
+		m0 = cx * a0 + x * a1;
+		m1 = cx * a2 + x * a3;
+		int a = (int)(cy * m0 + y * m1);
+
+		m0 = cx * r0 + x * r1;
+		m1 = cx * r2 + x * r3;
+		int r = (int)(cy * m0 + y * m1);
+
+		m0 = cx * g0 + x * g1;
+		m1 = cx * g2 + x * g3;
+		int g = (int)(cy * m0 + y * m1);
+
+		m0 = cx * b0 + x * b1;
+		m1 = cx * b2 + x * b3;
+		int b = (int)(cy * m0 + y * m1);
+
+		return (a << 24) | (r << 16) | (g << 8) | b;
+	}
+}",1.0,1,5,32,349.0,Short (4-10),Long (21+),Short (4-10) | Long (21+),BILINEARINTERPOLATE,No path condition,1.4913909435272217
+161,"public class SATURATION {
+/**
+     * Returns the saturation component of a color int.
+     * 
+     * @return A value between 0.0f and 1.0f
+     * 
+     * @hide Pending API council
+     */
+    public static float saturation(int color) {
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+
+
+        int V = Math.max(b, Math.max(r, g));
+        int temp = Math.min(b, Math.min(r, g));
+
+        float S;
+
+        if (V == temp) {
+            S = 0;
+        } else {
+            S = (V - temp) / (float) V;
+        }
+
+        return S;
+    }
+}",2.0,1,8,11,25.0,Short (4-10),Medium (11-20),Short (4-10) | Medium (11-20),SATURATION,"Inputs: color_1_SYMINT
+
+(10526880)  --> Return Value: 0.0
+demo.Distance.distance(294906)  --> ""java.lang.ArithmeticException: div by 0...""
+",1.6028850078582764
+720,"public class BINARYGCD {
+/**
+     * Calculate GCD of a and b interpreted as unsigned integers.
+     */
+    static int binaryGcd(int a, int b) {
+        if (b == 0)
+            return a;
+        if (a == 0)
+            return b;
+
+        // Right shift a & b till their last bits equal to 1.
+        int aZeros = Integer.numberOfTrailingZeros(a);
+        int bZeros = Integer.numberOfTrailingZeros(b);
+        a >>>= aZeros;
+        b >>>= bZeros;
+
+        int t = (aZeros < bZeros ? aZeros : bZeros);
+
+        while (a != b) {
+            if ((a+0x80000000) > (b+0x80000000)) {  // a > b as unsigned
+                a -= b;
+                a >>>= Integer.numberOfTrailingZeros(a);
+            } else {
+                b -= a;
+                b >>>= Integer.numberOfTrailingZeros(b);
+            }
+        }
+        return a<<t;
+    }
+}",5.0,1,10,15,584.0,Short (4-10),Medium (11-20),Short (4-10) | Medium (11-20),BINARYGCD,"Inputs: a_1_SYMINT,b_2_SYMINT
+
+(-9223372036854775808(don't care),0)  --> Return Value: -9223372036854775808
+(0,1)  --> Return Value: 1
+",1.6750664710998535
+663,"public class CEIL_LG2 {
+/** ceiling(log[2](x)): {1->0, 2->1, 3->2, 4->2, ...} */
+    static int ceil_lg2(int x) {
+        assert(x-1 >= 0);  // x in range (int.MIN_VALUE -> 32)
+        x -= 1;
+        int lg = 0;
+        while (x != 0) {
+            lg++;
+            x >>= 1;
+        }
+        return lg;
+    }
+}",2.0,1,8,7,527.0,Short (4-10),Short (6-10),Short (4-10) | Short (6-10),CEIL_LG2,"Inputs: x_1_SYMINT
+
+demo.Distance.distance(0)  --> ""java.lang.AssertionError...""
+(1)  --> Return Value: 0
+(2)  --> Return Value: 1
+(4)  --> Return Value: 2
+",1.50402569770813
+162,"public class BRIGHTNESS {
+/**
+     * Returns the brightness component of a color int.
+     * 
+     * @return A value between 0.0f and 1.0f
+     * 
+     * @hide Pending API council
+     */
+    public static float brightness(int color) {
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+
+        int V = Math.max(b, Math.max(r, g));
+
+        return (V / 255.f);
+    }
+}",1.0,1,8,5,26.0,Short (4-10),Very Short (2-5),Short (4-10) | Very Short (2-5),BRIGHTNESS,"Inputs: color_1_SYMINT
+
+(12468220)  --> Return Value: 0.9882352941176471
+(16678656)  --> Return Value: 0.996078431372549
+(32766)  --> Return Value: 0.996078431372549
+(65024)  --> Return Value: 0.996078431372549
+",1.600696086883545
+389,"public class ALPHABLEND {
+/**
+     * Uses the alpha of the two colors passed in to determine the contributions of each color.  If either of them has
+     * an alpha greater than 0 then the returned alpha is 255 otherwise its zero if they are both zero. Args: color1,
+     * color2
+     */
+    public int alphaBlend(int par1, int par2)
+    {
+        int i = (par1 & 0xff000000) >> 24 & 0xff;
+        int j = (par2 & 0xff000000) >> 24 & 0xff;
+        char c = '\377';
+
+        if (i + j < 255)
+        {
+            c = '\0';
+            i = 1;
+            j = 1;
+        }
+        else if (i > j)
+        {
+            i = 255;
+            j = 1;
+        }
+        else
+        {
+            i = 1;
+            j = 255;
+        }
+
+        int k = (par1 >> 16 & 0xff) * i;
+        int l = (par1 >> 8 & 0xff) * i;
+        int i1 = (par1 & 0xff) * i;
+        int j1 = (par2 >> 16 & 0xff) * j;
+        int k1 = (par2 >> 8 & 0xff) * j;
+        int l1 = (par2 & 0xff) * j;
+        int i2 = (k + j1) / (i + j);
+        int j2 = (l + k1) / (i + j);
+        int k2 = (i1 + l1) / (i + j);
+        return c << 24 | i2 << 16 | j2 << 8 | k2;
+    }
+}",3.0,3,43,23,253.0,Very Long (41+),Long (21+),Very Long (41+) | Long (21+),ALPHABLEND,"Inputs: par1_1_SYMINT,par2_2_SYMINT
+
+(0,0)  --> Return Value: 0
+(-2130706432,-2147483648)  --> Return Value: -16777216
+(1073741824,-1073741824)  --> Return Value: -16777216
+",1.805680990219116
+694,"public class NUMBEROFTRAILINGZEROS {
+/**
+     * Returns the number of zero bits following the lowest-order (""rightmost"")
+     * one-bit in the two's complement binary representation of the specified
+     * {@code int} value.  Returns 32 if the specified value has no
+     * one-bits in its two's complement representation, in other words if it is
+     * equal to zero.
+     *
+     * @param i the value whose number of trailing zeros is to be computed
+     * @return the number of zero bits following the lowest-order (""rightmost"")
+     *     one-bit in the two's complement binary representation of the
+     *     specified {@code int} value, or 32 if the value is equal
+     *     to zero.
+     * @since 1.5
+     */
+    public static int numberOfTrailingZeros(int i) {
+        // HD, Figure 5-14
+        int y;
+        if (i == 0) return 32;
+        int n = 31;
+        y = i <<16; if (y != 0) { n = n -16; i = y; }
+        y = i << 8; if (y != 0) { n = n - 8; i = y; }
+        y = i << 4; if (y != 0) { n = n - 4; i = y; }
+        y = i << 2; if (y != 0) { n = n - 2; i = y; }
+        return n - ((i << 1) >>> 31);
+    }
+}",6.0,8,68,20,558.0,Very Long (41+),Medium (11-20),Very Long (41+) | Medium (11-20),NUMBEROFTRAILINGZEROS,"Inputs: i_1_SYMINT
+
+(0)  --> Return Value: 32
+",1.5826656818389893
+237,"public class INTPOW {
+/**
+   * Exponentiation like we learned in grade school:
+   * multiply b by itself e times.  Uses power of two trick.
+   * e must be nonnegative!!!  no checking!!!  For e &lt;= 0,
+   * the exponent is treated as 0, and 1 is returned.  0^0 also
+   * returns 1.
+   *
+   * @param b base
+   * @param e exponent
+   * @return b^e
+   */
+  public static int intPow(int b, int e) {
+    int result = 1;
+    int currPow = b;
+    while (e > 0) {
+      if ((e & 1) != 0) { result *= currPow; }
+      currPow = currPow * currPow;
+      e >>= 1;
+    }
+    return result;
+  }
+}",3.0,5,42,8,101.0,Very Long (41+),Short (6-10),Very Long (41+) | Short (6-10),INTPOW,"Inputs: b_1_SYMINT,e_2_SYMINT
+
+(-9223372036854775808(don't care),-2147483646)  --> Return Value: 1
+(-9223372036854775808(don't care),1)  --> Return Value: -9223372036854775808
+(-9223372036854775808(don't care),2)  --> Return Value: 0
+",1.7504751682281494
+96,"public class CHECKFROMINDEXSIZE {
+/**
+     * Checks if the sub-range from fromIndex (inclusive) to fromIndex + size (exclusive) is
+     * within the bounds of range from 0 (inclusive) to length (exclusive).
+     *
+     * <p>This function provides the functionality of
+     * {@code java.utils.Objects.checkFromIndexSize} introduced in JDK 9. The
+     * <a href=""https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Objects.html#checkFromIndexSize(int,int,int)"">Objects</a>
+     * javadoc has been reproduced for reference.
+     *
+     * <p>The sub-range is defined to be out of bounds if any of the following inequalities
+     * is true:
+     * <ul>
+     * <li>{@code fromIndex < 0}
+     * <li>{@code size < 0}
+     * <li>{@code fromIndex + size > length}, taking into account integer overflow
+     * <li>{@code length < 0}, which is implied from the former inequalities
+     * </ul>
+     *
+     * @param fromIndex the lower-bound (inclusive) of the sub-interval
+     * @param size the size of the sub-range
+     * @param length the upper-bound (exclusive) of the range
+     * @return the fromIndex
+     * @throws IndexOutOfBoundsException if the sub-range is out of bounds
+     */
+    public static int checkFromIndexSize(int fromIndex, int size, int length) {
+        // check for any negatives,
+        // or overflow safe length check given the values are all positive
+        // remaining = length - fromIndex
+        if ((fromIndex | size | length) < 0 || size > length - fromIndex) {
+            throw new IndexOutOfBoundsException(
+                // Note: %<d is 'relative indexing' to re-use the last argument
+                String.format(""Range [%d, %<d + %d) out of bounds for length %d"",
+                    fromIndex, size, length));
+        }
+        return fromIndex;
+    }
+}",3.0,14,94,5,,Very Long (41+),Very Short (2-5),Very Long (41+) | Very Short (2-5),CHECKFROMINDEXSIZE,"Inputs: fromIndex_1_SYMINT,size_2_SYMINT,length_3_SYMINT
+
+demo.Distance.distance(-2147483648,0,0)  --> ""java.lang.IndexOutOfBoundsException: Range [0, 0 + 0) out of bounds for length 0...""
+demo.Distance.distance(1,0,0)  --> ""java.lang.IndexOutOfBoundsException: Range [0, 0 + 0) out of bounds for length 0...""
+(0,0,0)  --> Return Value: 0
+",1.4925615787506104

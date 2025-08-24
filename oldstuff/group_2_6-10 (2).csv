@@ -1,0 +1,1153 @@
+Parameter,Function,Test Case,cyclomatic_complexity
+"(
+        int n, boolean isDirected, boolean createLoops, boolean createMultipleEdges)","public class ComputeMaximumAllowedEdges {
+static <V, E> int computeMaximumAllowedEdges(
+        int n, boolean isDirected, boolean createLoops, boolean createMultipleEdges)
+    {
+        if (n == 0) {
+            return 0;
+        }
+
+        int maxAllowedEdges;
+        try {
+            if (isDirected) {
+                maxAllowedEdges = Math.multiplyExact(n, n - 1);
+            } else {
+                // assume undirected
+                if (n % 2 == 0) {
+                    maxAllowedEdges = Math.multiplyExact(n / 2, n - 1);
+                } else {
+                    maxAllowedEdges = Math.multiplyExact(n, (n - 1) / 2);
+                }
+            }
+
+            if (createLoops) {
+                if (createMultipleEdges) {
+                    return Integer.MAX_VALUE;
+                } else {
+                    if (isDirected) {
+                        maxAllowedEdges = Math.addExact(maxAllowedEdges, Math.multiplyExact(2, n));
+                    } else {
+                        // assume undirected
+                        maxAllowedEdges = Math.addExact(maxAllowedEdges, n);
+                    }
+                }
+            } else {
+                if (createMultipleEdges) {
+                    if (n > 1) {
+                        return Integer.MAX_VALUE;
+                    }
+                }
+            }
+        } catch (ArithmeticException e) {
+            return Integer.MAX_VALUE;
+        }
+        return maxAllowedEdges;
+    }
+}","@Test
+    public void testMaximumAllowedEdges()
+    {
+        // undirected graphs
+        boolean isDirected = false;
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, true));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, true));
+
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, false));
+        assertEquals(
+            1, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, true));
+
+        assertEquals(
+            45, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, false));
+        assertEquals(
+            55, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, false));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, true));
+
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(200000, isDirected, false, false));
+
+        // directed graphs
+        isDirected = true;
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, false, true));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(0, isDirected, true, true));
+
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, false));
+        assertEquals(
+            2, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, false));
+        assertEquals(
+            0, GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(1, isDirected, true, true));
+
+        assertEquals(
+            90, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, false));
+        assertEquals(
+            110, GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, false));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, false, true));
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(10, isDirected, true, true));
+
+        assertEquals(
+            Integer.MAX_VALUE,
+            GnmRandomGraphGenerator.computeMaximumAllowedEdges(200000, isDirected, false, false));
+    }",10
+"(boolean declarer,
+			int gameValue, int numberOfPlayers)","public class GetTournamentGameValue {
+public static final int getTournamentGameValue(boolean declarer,
+			int gameValue, int numberOfPlayers) {
+
+		int result = 0;
+
+		if (declarer) {
+			// calculation for declarer of the game
+			if (gameValue > 0) {
+
+				result = gameValue + 50;
+			} else {
+
+				result = gameValue - 50;
+			}
+		} else {
+			// calculation for opponents
+			if (gameValue < 0) {
+
+				if (numberOfPlayers == 3) {
+
+					result = 40;
+				} else if (numberOfPlayers == 4) {
+
+					result = 30;
+				}
+			}
+		}
+
+		return result;
+	}
+}","@Test
+    public void getTournamentGameValue001() {
+
+        assertThat(SkatConstants.getTournamentGameValue(true, 18, 3)).isEqualTo(68);
+        assertThat(SkatConstants.getTournamentGameValue(true, 18, 4)).isEqualTo(68);
+        assertThat(SkatConstants.getTournamentGameValue(true, -36, 3)).isEqualTo(-86);
+        assertThat(SkatConstants.getTournamentGameValue(true, -36, 4)).isEqualTo(-86);
+        assertThat(SkatConstants.getTournamentGameValue(true, 20, 3)).isEqualTo(70);
+        assertThat(SkatConstants.getTournamentGameValue(true, 20, 4)).isEqualTo(70);
+        assertThat(SkatConstants.getTournamentGameValue(true, -40, 3)).isEqualTo(-90);
+        assertThat(SkatConstants.getTournamentGameValue(true, -40, 4)).isEqualTo(-90);
+        assertThat(SkatConstants.getTournamentGameValue(false, 18, 3)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, 18, 4)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, -36, 3)).isEqualTo(40);
+        assertThat(SkatConstants.getTournamentGameValue(false, -36, 4)).isEqualTo(30);
+        assertThat(SkatConstants.getTournamentGameValue(false, 20, 3)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, 20, 4)).isEqualTo(0);
+        assertThat(SkatConstants.getTournamentGameValue(false, -40, 3)).isEqualTo(40);
+        assertThat(SkatConstants.getTournamentGameValue(false, -40, 4)).isEqualTo(30);
+    }",6
+"(double currentHeading, int currentX, int currentY, int targetX,
+			int targetY)","public class CalculateHeadingToPoint {
+public static double calculateHeadingToPoint(double currentHeading, int currentX, int currentY, int targetX,
+			int targetY) {
+		// throw new RuntimeException(""implement me!"");
+		if(currentX == targetX && currentY == targetY)
+			return 0.0;
+		double degreess = Math.atan2(targetY - currentY, targetX - currentX) / Math.PI * 180.00;
+		if (degreess < 0)
+			degreess += 360.00;
+		currentHeading = 90.00 - currentHeading;
+		if (currentHeading < 0)
+			currentHeading += 360.00;
+		double ans = currentHeading - degreess;
+		if (ans < 0)
+			ans += 360.00;
+		return ans;
+	}
+}","@Test
+    public void calculateHeadingToPointTest() {
+        assertEquals(0.0, TurtleSoup.calculateHeadingToPoint(0.0, 0, 0, 0, 1), 0.001);
+        assertEquals(0.0, TurtleSoup.calculateHeadingToPoint(0.0, 0, 0, 0, 0), 0.001);
+        assertEquals(90.0, TurtleSoup.calculateHeadingToPoint(0.0, 0, 0, 1, 0), 0.001);
+        assertEquals(359.0, TurtleSoup.calculateHeadingToPoint(1.0, 4, 5, 4, 6), 0.001);
+    }",6
+"(int x, int y, int m)","public class PowMod {
+public static int powMod(int x, int y, int m) {
+		if (x < 0)
+			throw new IllegalArgumentException(""Negative base not supported"");
+		if (y < 0)
+			throw new IllegalArgumentException(""Modular reciprocal not supported"");
+		if (m <= 0)
+			throw new IllegalArgumentException(""Modulus must be positive"");
+		if (m == 1)
+			return 0;
+		
+		// Exponentiation by squaring
+		int z = 1;
+		for (; y != 0; y >>>= 1) {
+			if ((y & 1) != 0)
+				z = (int)((long)z * x % m);
+			x = (int)((long)x * x % m);
+		}
+		return z;
+	}
+}","@Test public void testPowMod() {
+		assertEquals(0, Library.powMod(0, 0, 1));
+		assertEquals(0, Library.powMod(1, 0, 1));
+		assertEquals(0, Library.powMod(0, 1, 1));
+		assertEquals(0, Library.powMod(1, 1, 1));
+		assertEquals(0, Library.powMod(2, 3, 1));
+		assertEquals(1, Library.powMod(0, 0, 2));
+		assertEquals(1, Library.powMod(1, 0, 2));
+		assertEquals(1, Library.powMod(2, 0, 2));
+		assertEquals(0, Library.powMod(0, 1, 2));
+		assertEquals(1, Library.powMod(1, 1, 2));
+		assertEquals(0, Library.powMod(2, 1, 2));
+		assertEquals(0, Library.powMod(0, 2, 2));
+		assertEquals(1, Library.powMod(1, 2, 2));
+		assertEquals(0, Library.powMod(2, 2, 2));
+		assertEquals(1, Library.powMod(2, 2, 3));
+		assertEquals(4, Library.powMod(4, 3, 5));
+		assertEquals(3, Library.powMod(7, 7, 10));
+		assertEquals(326216098, Library.powMod(78051657, 234602, 456087413));
+		assertEquals(1488576545, Library.powMod(2147480000, 2147483645, 2147483647));
+	}",7
+(int n),"public class ListTotients {
+public static int[] listTotients(int n) {
+		if (n < 0)
+			throw new IllegalArgumentException(""Negative array size"");
+		int[] result = new int[n + 1];
+		for (int i = 0; i <= n; i++)
+			result[i] = i;
+		
+		for (int i = 2; i <= n; i++) {
+			if (result[i] == i) {  // i is prime
+				for (int j = i; j <= n; j += i)
+					result[j] -= result[j] / i;
+			}
+		}
+		return result;
+	}
+}","@Test(expected=IllegalArgumentException.class)
+	public void testListTotientsInvalid1() {
+		Library.listTotients(-3000);
+	}",6
+(int n),"public class ListTotients {
+public static int[] listTotients(int n) {
+		if (n < 0)
+			throw new IllegalArgumentException(""Negative array size"");
+		int[] result = new int[n + 1];
+		for (int i = 0; i <= n; i++)
+			result[i] = i;
+		
+		for (int i = 2; i <= n; i++) {
+			if (result[i] == i) {  // i is prime
+				for (int j = i; j <= n; j += i)
+					result[j] -= result[j] / i;
+			}
+		}
+		return result;
+	}
+}","@Test(expected=IllegalArgumentException.class)
+	public void testListTotientsInvalid0() {
+		Library.listTotients(-1);
+	}",6
+(int n),"public class ListTotients {
+public static int[] listTotients(int n) {
+		if (n < 0)
+			throw new IllegalArgumentException(""Negative array size"");
+		int[] result = new int[n + 1];
+		for (int i = 0; i <= n; i++)
+			result[i] = i;
+		
+		for (int i = 2; i <= n; i++) {
+			if (result[i] == i) {  // i is prime
+				for (int j = i; j <= n; j += i)
+					result[j] -= result[j] / i;
+			}
+		}
+		return result;
+	}
+}","@Test public void testListTotients() {
+		int[] totients = Library.listTotients(1000);
+		for (int i = 1; i < totients.length; i++)
+			assertEquals(Library.totient(i), totients[i]);
+	}",6
+"(boolean implicit, double value, double currentValue)","public class ComputeTargetQui {
+public static double computeTargetQui(boolean implicit, double value, double currentValue) {
+    // We want Qui to change based on value. What's the target value, Qui'?
+    if (implicit) {
+      // Target is really 1, or 0, depending on whether value is positive or negative.
+      // This wouldn't account for the strength though. Instead the target is a function
+      // of the current value and strength. If the current value is c, and value is positive
+      // then the target is somewhere between c and 1 depending on the strength. If current
+      // value is already >= 1, there's no effect. Similarly for negative values.
+      if (value > 0.0f && currentValue < 1.0) {
+        double diff = 1.0 - Math.max(0.0, currentValue);
+        return currentValue + (value / (1.0 + value)) * diff;
+      }
+      if (value < 0.0f && currentValue > 0.0) {
+        double diff = -Math.min(1.0, currentValue);
+        return currentValue + (value / (value - 1.0)) * diff;
+      }
+      // No change
+      return Double.NaN;
+    } else {
+      // Non-implicit -- value is supposed to be the new value
+      return value;
+    }
+  }
+}","@Test
+  public void testImplicitQui() {
+    assertNaN(ALSUtils.computeTargetQui(true, 0.0, 1.0));
+    assertNaN(ALSUtils.computeTargetQui(true, 0.0, 0.0));
+    assertNaN(ALSUtils.computeTargetQui(true, 0.0, -1.0));
+    assertNaN(ALSUtils.computeTargetQui(true, 0.5, 1.0));
+    assertNaN(ALSUtils.computeTargetQui(true, -0.5, 0.0));
+    assertEquals(0.75, ALSUtils.computeTargetQui(true, 1.0, 0.5));
+    assertEquals(0.25, ALSUtils.computeTargetQui(true, -1.0, 0.5));
+    for (double d : new double[] { -1.0 , 0.0, 0.5, 1.0, 2.0 }) {
+      assertEquals(d, ALSUtils.computeTargetQui(false, d, 0.0));
+    }
+  }",6
+(double p),"public class GaussInverseCdf {
+public static double gaussInverseCdf(double p) {
+        final double P_LOW  = 0.02425D;
+        final double P_HIGH = 1.0D - P_LOW;
+        final double ICDF_A[] =
+            { -3.969683028665376e+01,  2.209460984245205e+02,
+              -2.759285104469687e+02,  1.383577518672690e+02,
+              -3.066479806614716e+01,  2.506628277459239e+00 };
+        final double ICDF_B[] =
+            { -5.447609879822406e+01,  1.615858368580409e+02,
+              -1.556989798598866e+02,  6.680131188771972e+01,
+              -1.328068155288572e+01 };
+        final double ICDF_C[] =
+            { -7.784894002430293e-03, -3.223964580411365e-01,
+              -2.400758277161838e+00, -2.549732539343734e+00,
+              4.374664141464968e+00,  2.938163982698783e+00 };
+        final double ICDF_D[] =
+            { 7.784695709041462e-03,  3.224671290700398e-01,
+              2.445134137142996e+00,  3.754408661907416e+00 };
+        
+        // Define break-points.
+        // variable for result
+        double z;
+
+        if(p == 0) {
+            z = Double.NEGATIVE_INFINITY;
+        }
+        else if(p == 1) {
+            z = Double.POSITIVE_INFINITY;
+        }
+        else if(Double.isNaN(p) || p < 0 || p > 1) {
+            z = Double.NaN;
+        }
+        else if( p < P_LOW ) { // Rational approximation for lower region:
+          double q  = Math.sqrt(-2*Math.log(p));
+          z = (((((ICDF_C[0]*q+ICDF_C[1])*q+ICDF_C[2])*q+ICDF_C[3])*q+ICDF_C[4])*q+ICDF_C[5]) / ((((ICDF_D[0]*q+ICDF_D[1])*q+ICDF_D[2])*q+ICDF_D[3])*q+1);
+        }
+        else if ( P_HIGH < p ) { // Rational approximation for upper region:
+          double q  = Math.sqrt(-2*Math.log(1-p));
+          z = -(((((ICDF_C[0]*q+ICDF_C[1])*q+ICDF_C[2])*q+ICDF_C[3])*q+ICDF_C[4])*q+ICDF_C[5]) / ((((ICDF_D[0]*q+ICDF_D[1])*q+ICDF_D[2])*q+ICDF_D[3])*q+1);
+        } 
+        else { // Rational approximation for central region:
+          double q = p - 0.5D;
+          double r = q * q;
+          z = (((((ICDF_A[0]*r+ICDF_A[1])*r+ICDF_A[2])*r+ICDF_A[3])*r+ICDF_A[4])*r+ICDF_A[5])*q / (((((ICDF_B[0]*r+ICDF_B[1])*r+ICDF_B[2])*r+ICDF_B[3])*r+ICDF_B[4])*r+1);
+        }
+        
+        return z;
+    }
+}","@Test
+    public void testGaussInverseCdf() {
+        logger.info(""GaussInverseCdf"");
+        double p = 0.32;
+        double expResult = -0.46769879942903;
+        double result = ContinuousDistributions.gaussInverseCdf(p);
+        assertEquals(expResult, result, Constants.DOUBLE_ACCURACY_HIGH);
+    }",8
+"(double p, double mu, double sigma)","public class NormalQuantile {
+public static double normalQuantile(double p, double mu, double sigma) {
+        // The inverse of cdf.
+        if(sigma<0) {
+            throw new IllegalArgumentException(""The sigma parameter must be positive."");
+        }    
+        else if(sigma==0) {
+            return mu;
+        }
+        
+        double r;
+        double val;
+            
+        double q=p - 0.5;
+
+        if (0.075 <= p && p <= 0.925) {
+            r = 0.180625 - q * q;
+            val = q * (((((((r * 2509.0809287301226727 + 33430.575583588128105) * r + 67265.770927008700853) * r
+                + 45921.953931549871457) * r + 13731.693765509461125) * r + 1971.5909503065514427) * r + 133.14166789178437745) * r
+                + 3.387132872796366608) / (((((((r * 5226.495278852854561 + 28729.085735721942674) * r + 39307.89580009271061) * r
+                + 21213.794301586595867) * r + 5394.1960214247511077) * r + 687.1870074920579083) * r + 42.313330701600911252) * r + 1);
+        }
+        else { /* closer than 0.075 from {0,1} boundary */
+            /* r = min(p, 1-p) < 0.075 */
+            if (q > 0) {
+                r = 1 - p;
+            }
+            else {
+                r = p;/* = R_DT_Iv(p) ^=  p */
+            }
+            
+            r = Math.sqrt(-Math.log(r)); /* r = sqrt(-log(r))  <==>  min(p, 1-p) = exp( - r^2 ) */
+
+            if (r <= 5.0) { /* <==> min(p,1-p) >= exp(-25) ~= 1.3888e-11 */
+                r += -1.6;
+                val = (((((((r * 7.7454501427834140764e-4 + 0.0227238449892691845833) * r + 0.24178072517745061177) * r
+                    + 1.27045825245236838258) * r + 3.64784832476320460504) * r + 5.7694972214606914055) * r
+                    + 4.6303378461565452959) * r + 1.42343711074968357734) / (((((((r * 1.05075007164441684324e-9 + 5.475938084995344946e-4) * r
+                    + 0.0151986665636164571966) * r + 0.14810397642748007459) * r + 0.68976733498510000455) * r + 1.6763848301838038494) * r
+                    + 2.05319162663775882187) * r + 1.0);
+            }
+            else { /* very close to  0 or 1 */
+                r += -5.0;
+                val = (((((((r * 2.01033439929228813265e-7 + 2.71155556874348757815e-5) * r + 0.0012426609473880784386) * r
+                    + 0.026532189526576123093) * r + 0.29656057182850489123) * r + 1.7848265399172913358) * r + 5.4637849111641143699) * r
+                    + 6.6579046435011037772) / (((((((r * 2.04426310338993978564e-15 + 1.4215117583164458887e-7)* r
+                    + 1.8463183175100546818e-5) * r + 7.868691311456132591e-4) * r + 0.0148753612908506148525) * r
+                    + 0.13692988092273580531) * r + 0.59983220655588793769) * r + 1.0);
+            }
+
+            if (q < 0.0) {
+                val = -val;
+            }
+            /* return (q >= 0.)? r : -r ;*/
+        }
+        return mu + sigma * val;    
+    }
+}","@Test
+    public void testNormalQuantile() {
+        logger.info(""normalQuantile"");
+        double p = 0.32;
+        double mu = 1.0;
+        double sigma = 1.0;
+        double expResult = 0.53230120088549;
+        double result = ContinuousDistributions.normalQuantile(p, mu, sigma);
+        assertEquals(expResult, result, Constants.DOUBLE_ACCURACY_HIGH);
+    }",8
+"(long now, int maxLatency, int txCount)","public class CalculateExpiry {
+static long calculateExpiry(long now, int maxLatency, int txCount) {
+		if (now < 0) throw new IllegalArgumentException();
+		if (maxLatency <= 0) throw new IllegalArgumentException();
+		if (txCount < 0) throw new IllegalArgumentException();
+		// The maximum round-trip time is twice the maximum latency
+		long roundTrip = maxLatency * 2L;
+		// The interval between transmissions is roundTrip * 2 ^ txCount
+		for (int i = 0; i < txCount; i++) {
+			roundTrip <<= 1;
+			if (roundTrip < 0) return Long.MAX_VALUE;
+		}
+		// The expiry time is the current time plus the interval
+		long expiry = now + roundTrip;
+		return expiry < 0 ? Long.MAX_VALUE : expiry;
+	}
+}","@Test
+	public void testIntervalsIncreaseExponentially() {
+		long first = ExponentialBackoff.calculateExpiry(0, ONE_HOUR, 0);
+		long second = ExponentialBackoff.calculateExpiry(0, ONE_HOUR, 1);
+		long third = ExponentialBackoff.calculateExpiry(0, ONE_HOUR, 2);
+		long fourth = ExponentialBackoff.calculateExpiry(0, ONE_HOUR, 3);
+		assertEquals(third, fourth / 2);
+		assertEquals(second, third / 2);
+		assertEquals(first, second / 2);
+	}",6
+"(long now, int maxLatency, int txCount)","public class CalculateExpiry {
+static long calculateExpiry(long now, int maxLatency, int txCount) {
+		if (now < 0) throw new IllegalArgumentException();
+		if (maxLatency <= 0) throw new IllegalArgumentException();
+		if (txCount < 0) throw new IllegalArgumentException();
+		// The maximum round-trip time is twice the maximum latency
+		long roundTrip = maxLatency * 2L;
+		// The interval between transmissions is roundTrip * 2 ^ txCount
+		for (int i = 0; i < txCount; i++) {
+			roundTrip <<= 1;
+			if (roundTrip < 0) return Long.MAX_VALUE;
+		}
+		// The expiry time is the current time plus the interval
+		long expiry = now + roundTrip;
+		return expiry < 0 ? Long.MAX_VALUE : expiry;
+	}
+}","@Test
+	public void testIntervalIsAddedToCurrentTime() {
+		long now = System.currentTimeMillis();
+		long fromZero = ExponentialBackoff.calculateExpiry(0, ONE_HOUR, 0);
+		long fromNow = ExponentialBackoff.calculateExpiry(now, ONE_HOUR, 0);
+		assertEquals(now, fromNow - fromZero);
+	}",6
+"(long now, int maxLatency, int txCount)","public class CalculateExpiry {
+static long calculateExpiry(long now, int maxLatency, int txCount) {
+		if (now < 0) throw new IllegalArgumentException();
+		if (maxLatency <= 0) throw new IllegalArgumentException();
+		if (txCount < 0) throw new IllegalArgumentException();
+		// The maximum round-trip time is twice the maximum latency
+		long roundTrip = maxLatency * 2L;
+		// The interval between transmissions is roundTrip * 2 ^ txCount
+		for (int i = 0; i < txCount; i++) {
+			roundTrip <<= 1;
+			if (roundTrip < 0) return Long.MAX_VALUE;
+		}
+		// The expiry time is the current time plus the interval
+		long expiry = now + roundTrip;
+		return expiry < 0 ? Long.MAX_VALUE : expiry;
+	}
+}","@Test
+	public void testFirstIntervalEqualsRoundTripTime() {
+		long first = ExponentialBackoff.calculateExpiry(0, ONE_HOUR, 0);
+		assertEquals(2 * ONE_HOUR, first);
+	}",6
+"(long now, int maxLatency, int txCount)","public class CalculateExpiry {
+static long calculateExpiry(long now, int maxLatency, int txCount) {
+		if (now < 0) throw new IllegalArgumentException();
+		if (maxLatency <= 0) throw new IllegalArgumentException();
+		if (txCount < 0) throw new IllegalArgumentException();
+		// The maximum round-trip time is twice the maximum latency
+		long roundTrip = maxLatency * 2L;
+		// The interval between transmissions is roundTrip * 2 ^ txCount
+		for (int i = 0; i < txCount; i++) {
+			roundTrip <<= 1;
+			if (roundTrip < 0) return Long.MAX_VALUE;
+		}
+		// The expiry time is the current time plus the interval
+		long expiry = now + roundTrip;
+		return expiry < 0 ? Long.MAX_VALUE : expiry;
+	}
+}","@Test
+	public void testTransmissionCountOverflow() {
+		int maxLatency = Integer.MAX_VALUE; // RTT will not overflow
+		long expiry = ExponentialBackoff.calculateExpiry(0, maxLatency, 0);
+		assertEquals(Integer.MAX_VALUE * 2L, expiry); // No overflow
+		expiry = ExponentialBackoff.calculateExpiry(0, maxLatency, 31);
+		assertEquals(Integer.MAX_VALUE * (2L << 31), expiry); // No overflow
+		expiry = ExponentialBackoff.calculateExpiry(0, maxLatency, 32);
+		assertEquals(Long.MAX_VALUE, expiry); // Overflow caught
+		expiry = ExponentialBackoff.calculateExpiry(0, maxLatency, 33);
+		assertEquals(Long.MAX_VALUE, expiry); // Overflow caught
+	}",6
+"(long now, int maxLatency, int txCount)","public class CalculateExpiry {
+static long calculateExpiry(long now, int maxLatency, int txCount) {
+		if (now < 0) throw new IllegalArgumentException();
+		if (maxLatency <= 0) throw new IllegalArgumentException();
+		if (txCount < 0) throw new IllegalArgumentException();
+		// The maximum round-trip time is twice the maximum latency
+		long roundTrip = maxLatency * 2L;
+		// The interval between transmissions is roundTrip * 2 ^ txCount
+		for (int i = 0; i < txCount; i++) {
+			roundTrip <<= 1;
+			if (roundTrip < 0) return Long.MAX_VALUE;
+		}
+		// The expiry time is the current time plus the interval
+		long expiry = now + roundTrip;
+		return expiry < 0 ? Long.MAX_VALUE : expiry;
+	}
+}","@Test
+	public void testCurrentTimeOverflow() {
+		int maxLatency = Integer.MAX_VALUE; // RTT will not overflow
+		long now = Long.MAX_VALUE - (Integer.MAX_VALUE * (2L << 31));
+		long expiry = ExponentialBackoff.calculateExpiry(now, maxLatency, 0);
+		assertEquals(now + Integer.MAX_VALUE * 2L, expiry); // No overflow
+		expiry = ExponentialBackoff.calculateExpiry(now - 1, maxLatency, 31);
+		assertEquals(Long.MAX_VALUE - 1, expiry); // No overflow
+		expiry = ExponentialBackoff.calculateExpiry(now, maxLatency, 31);
+		assertEquals(Long.MAX_VALUE, expiry); // No overflow
+		expiry = ExponentialBackoff.calculateExpiry(now + 1, maxLatency, 32);
+		assertEquals(Long.MAX_VALUE, expiry); // Overflow caught
+	}",6
+"(int number, int base)","public class ConvertBase {
+public static String convertBase(int number, int base) {
+    // special case
+    if (number == 0)
+      return ""0"";
+
+    if (base > 62)
+      throw new IllegalArgumentException(""base must be 62 or less: base="" + base);
+    if (base <= 0)
+      throw new IllegalArgumentException(""base must be greater than zero: base="" + base);
+
+    StringBuffer conversion = new StringBuffer();
+
+    if (base == 1) {
+      for (int i = 0; i < number; i++)
+        conversion.append(""1"");
+      return conversion.toString();
+    }
+
+    String digits = ""0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"";
+    while (number > 0) {
+      int digitIndex = number % base;
+      conversion.insert(0, digits.charAt(digitIndex));
+      number = number / base;
+    }
+    return conversion.toString();
+  }
+}","@Test
+  public void testConvertBase() {
+    assertEquals(""0"", BaseConversion.convertBase(0, 1));
+    assertEquals(""11111"", BaseConversion.convertBase(5, 1));
+    assertEquals(""101"", BaseConversion.convertBase(5, 2));
+    assertEquals(""12"", BaseConversion.convertBase(5, 3));
+    assertEquals(""11"", BaseConversion.convertBase(5, 4));
+    assertEquals(""10"", BaseConversion.convertBase(5, 5));
+    assertEquals(""5"", BaseConversion.convertBase(5, 6));
+
+    assertEquals(""1111111111111111"", BaseConversion.convertBase(16, 1));
+    assertEquals(""10000"", BaseConversion.convertBase(16, 2));
+    assertEquals(""121"", BaseConversion.convertBase(16, 3));
+    assertEquals(""100"", BaseConversion.convertBase(16, 4));
+    assertEquals(""31"", BaseConversion.convertBase(16, 5));
+    assertEquals(""24"", BaseConversion.convertBase(16, 6));
+    assertEquals(""22"", BaseConversion.convertBase(16, 7));
+    assertEquals(""20"", BaseConversion.convertBase(16, 8));
+    assertEquals(""17"", BaseConversion.convertBase(16, 9));
+    assertEquals(""16"", BaseConversion.convertBase(16, 10));
+    assertEquals(""15"", BaseConversion.convertBase(16, 11));
+    assertEquals(""14"", BaseConversion.convertBase(16, 12));
+    assertEquals(""13"", BaseConversion.convertBase(16, 13));
+    assertEquals(""12"", BaseConversion.convertBase(16, 14));
+    assertEquals(""11"", BaseConversion.convertBase(16, 15));
+    assertEquals(""10"", BaseConversion.convertBase(16, 16));
+    assertEquals(""G"", BaseConversion.convertBase(16, 17));
+
+    assertEquals(""4000"", BaseConversion.convertBase(953312, 62));
+    assertEquals(""C00"", BaseConversion.convertBase(46128, 62));
+    assertEquals(""90"", BaseConversion.convertBase(558, 62));
+    assertEquals(""2"", BaseConversion.convertBase(2, 62));
+    assertEquals(""4C92"", BaseConversion.convertBase(1000000, 62));
+
+  }",7
+"(double d, double direction)","public class NextAfter {
+public static double nextAfter(double d, double direction) {
+
+        // handling of some important special cases
+        if (Double.isNaN(d) || Double.isNaN(direction)) {
+            return Double.NaN;
+        } else if (d == direction) {
+            return direction;
+        } else if (Double.isInfinite(d)) {
+            return (d < 0) ? -Double.MAX_VALUE : Double.MAX_VALUE;
+        } else if (d == 0) {
+            return (direction < 0) ? -Double.MIN_VALUE : Double.MIN_VALUE;
+        }
+        // special cases MAX_VALUE to infinity and  MIN_VALUE to 0
+        // are handled just as normal numbers
+        // can use raw bits since already dealt with infinity and NaN
+        final long bits = Double.doubleToRawLongBits(d);
+        final long sign = bits & 0x8000000000000000L;
+        if ((direction < d) ^ (sign == 0L)) {
+            return Double.longBitsToDouble(sign | ((bits & 0x7fffffffffffffffL) + 1));
+        } else {
+            return Double.longBitsToDouble(sign | ((bits & 0x7fffffffffffffffL) - 1));
+        }
+
+    }
+}","@Test
+    public void testNextAfter() {
+        // 0x402fffffffffffff 0x404123456789abcd -> 4030000000000000
+        Assert.assertEquals(16.0, FastMath.nextUp(15.999999999999998), 0.0);
+
+        // 0xc02fffffffffffff 0x404123456789abcd -> c02ffffffffffffe
+        Assert.assertEquals(-15.999999999999996, FastMath.nextAfter(-15.999999999999998, 34.27555555555555), 0.0);
+
+        // 0x402fffffffffffff 0x400123456789abcd -> 402ffffffffffffe
+        Assert.assertEquals(15.999999999999996, FastMath.nextDown(15.999999999999998), 0.0);
+
+        // 0xc02fffffffffffff 0x400123456789abcd -> c02ffffffffffffe
+        Assert.assertEquals(-15.999999999999996, FastMath.nextAfter(-15.999999999999998, 2.142222222222222), 0.0);
+
+        // 0x4020000000000000 0x404123456789abcd -> 4020000000000001
+        Assert.assertEquals(8.000000000000002, FastMath.nextAfter(8.0, 34.27555555555555), 0.0);
+
+        // 0xc020000000000000 0x404123456789abcd -> c01fffffffffffff
+        Assert.assertEquals(-7.999999999999999, FastMath.nextAfter(-8.0, 34.27555555555555), 0.0);
+
+        // 0x4020000000000000 0x400123456789abcd -> 401fffffffffffff
+        Assert.assertEquals(7.999999999999999, FastMath.nextAfter(8.0, 2.142222222222222), 0.0);
+
+        // 0xc020000000000000 0x400123456789abcd -> c01fffffffffffff
+        Assert.assertEquals(-7.999999999999999, FastMath.nextAfter(-8.0, 2.142222222222222), 0.0);
+
+        // 0x3f2e43753d36a223 0x3f2e43753d36a224 -> 3f2e43753d36a224
+        Assert.assertEquals(2.308922399667661E-4, FastMath.nextAfter(2.3089223996676606E-4, 2.308922399667661E-4), 0.0);
+
+        // 0x3f2e43753d36a223 0x3f2e43753d36a223 -> 3f2e43753d36a223
+        Assert.assertEquals(2.3089223996676606E-4, FastMath.nextAfter(2.3089223996676606E-4, 2.3089223996676606E-4), 0.0);
+
+        // 0x3f2e43753d36a223 0x3f2e43753d36a222 -> 3f2e43753d36a222
+        Assert.assertEquals(2.3089223996676603E-4, FastMath.nextAfter(2.3089223996676606E-4, 2.3089223996676603E-4), 0.0);
+
+        // 0x3f2e43753d36a223 0xbf2e43753d36a224 -> 3f2e43753d36a222
+        Assert.assertEquals(2.3089223996676603E-4, FastMath.nextAfter(2.3089223996676606E-4, -2.308922399667661E-4), 0.0);
+
+        // 0x3f2e43753d36a223 0xbf2e43753d36a223 -> 3f2e43753d36a222
+        Assert.assertEquals(2.3089223996676603E-4, FastMath.nextAfter(2.3089223996676606E-4, -2.3089223996676606E-4), 0.0);
+
+        // 0x3f2e43753d36a223 0xbf2e43753d36a222 -> 3f2e43753d36a222
+        Assert.assertEquals(2.3089223996676603E-4, FastMath.nextAfter(2.3089223996676606E-4, -2.3089223996676603E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0x3f2e43753d36a224 -> bf2e43753d36a222
+        Assert.assertEquals(-2.3089223996676603E-4, FastMath.nextAfter(-2.3089223996676606E-4, 2.308922399667661E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0x3f2e43753d36a223 -> bf2e43753d36a222
+        Assert.assertEquals(-2.3089223996676603E-4, FastMath.nextAfter(-2.3089223996676606E-4, 2.3089223996676606E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0x3f2e43753d36a222 -> bf2e43753d36a222
+        Assert.assertEquals(-2.3089223996676603E-4, FastMath.nextAfter(-2.3089223996676606E-4, 2.3089223996676603E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0xbf2e43753d36a224 -> bf2e43753d36a224
+        Assert.assertEquals(-2.308922399667661E-4, FastMath.nextAfter(-2.3089223996676606E-4, -2.308922399667661E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0xbf2e43753d36a223 -> bf2e43753d36a223
+        Assert.assertEquals(-2.3089223996676606E-4, FastMath.nextAfter(-2.3089223996676606E-4, -2.3089223996676606E-4), 0.0);
+
+        // 0xbf2e43753d36a223 0xbf2e43753d36a222 -> bf2e43753d36a222
+        Assert.assertEquals(-2.3089223996676603E-4, FastMath.nextAfter(-2.3089223996676606E-4, -2.3089223996676603E-4), 0.0);
+
+    }",7
+"(double d, double direction)","public class NextAfter {
+public static double nextAfter(double d, double direction) {
+
+        // handling of some important special cases
+        if (Double.isNaN(d) || Double.isNaN(direction)) {
+            return Double.NaN;
+        } else if (d == direction) {
+            return direction;
+        } else if (Double.isInfinite(d)) {
+            return (d < 0) ? -Double.MAX_VALUE : Double.MAX_VALUE;
+        } else if (d == 0) {
+            return (direction < 0) ? -Double.MIN_VALUE : Double.MIN_VALUE;
+        }
+        // special cases MAX_VALUE to infinity and  MIN_VALUE to 0
+        // are handled just as normal numbers
+        // can use raw bits since already dealt with infinity and NaN
+        final long bits = Double.doubleToRawLongBits(d);
+        final long sign = bits & 0x8000000000000000L;
+        if ((direction < d) ^ (sign == 0L)) {
+            return Double.longBitsToDouble(sign | ((bits & 0x7fffffffffffffffL) + 1));
+        } else {
+            return Double.longBitsToDouble(sign | ((bits & 0x7fffffffffffffffL) - 1));
+        }
+
+    }
+}","@Test
+    public void testDoubleNextAfterSpecialCases() {
+        Assert.assertEquals(-Double.MAX_VALUE,FastMath.nextAfter(Double.NEGATIVE_INFINITY, 0D), 0D);
+        Assert.assertEquals(Double.MAX_VALUE,FastMath.nextAfter(Double.POSITIVE_INFINITY, 0D), 0D);
+        Assert.assertEquals(Double.NaN,FastMath.nextAfter(Double.NaN, 0D), 0D);
+        Assert.assertEquals(Double.POSITIVE_INFINITY,FastMath.nextAfter(Double.MAX_VALUE, Double.POSITIVE_INFINITY), 0D);
+        Assert.assertEquals(Double.NEGATIVE_INFINITY,FastMath.nextAfter(-Double.MAX_VALUE, Double.NEGATIVE_INFINITY), 0D);
+        Assert.assertEquals(Double.MIN_VALUE, FastMath.nextAfter(0D, 1D), 0D);
+        Assert.assertEquals(-Double.MIN_VALUE, FastMath.nextAfter(0D, -1D), 0D);
+        Assert.assertEquals(0D, FastMath.nextAfter(Double.MIN_VALUE, -1), 0D);
+        Assert.assertEquals(0D, FastMath.nextAfter(-Double.MIN_VALUE, 1), 0D);
+    }",7
+(int var1),"public class Norm {
+public static short norm(int var1) throws ArithmeticException
+    {
+    	if(var1==0)
+    		throw new ArithmeticException(""Value can not be 0"");
+    	    	
+    	int currValue=var1;    	
+    	if(var1<0)
+    	{
+    		if(var1<=0xC0000000)
+    			return 0;
+    		    		
+    		currValue=~(var1-1);
+    	}
+    	
+    	short count=-1;
+    	//check 16 bits sequence
+    	if(currValue>>16!=0)
+    		currValue=currValue>>16;
+    	else
+    		count+=16;
+    	
+    	//check 8 bits sequence
+    	if(currValue>>8!=0)
+    		currValue=currValue>>8;
+    	else
+    		count+=8;
+    	
+    	//check 4 bits sequence
+    	if(currValue>>4!=0)
+    		currValue=currValue>>4;
+    	else
+    		count+=4;
+    	
+    	//check 2 bits sequence
+    	if(currValue>>2!=0)
+    		currValue=currValue>>2;
+    	else
+    		count+=2;
+    	
+    	//check 1 bits sequence
+    	if(currValue>>1==0)
+    		count+=1;
+    	
+    	return count;
+    }
+}","@Test
+    public void testNorm() {    
+    	//positive values
+    	assertEquals(0, BasicFunctions.norm(0x40000000));
+
+        assertEquals(8, BasicFunctions.norm(0x00400000));
+        
+        assertEquals(17, BasicFunctions.norm(0x00002000));
+        
+        assertEquals(26, BasicFunctions.norm(0x00000010));
+        
+        //negative values
+        assertEquals(2, BasicFunctions.norm(0xF0000000));
+
+        assertEquals(7, BasicFunctions.norm(0xFF800000));
+        
+        assertEquals(16, BasicFunctions.norm(0xFFFFC000));
+        
+        assertEquals(25, BasicFunctions.norm(0xFFFFFFE0));
+    }",9
+"(int dividend, int divisor)","public class RemainderUnsigned {
+public static int remainderUnsigned(int dividend, int divisor) {
+        if (divisor >= 0) {
+            if (dividend >= 0) {
+                return dividend % divisor;
+            }
+            // The implementation is a Java port of algorithm described in the book
+            // ""Hacker's Delight"" (section ""Unsigned short division from signed division"").
+            final int q = ((dividend >>> 1) / divisor) << 1;
+            dividend -= q * divisor;
+            if (dividend < 0 || dividend >= divisor) {
+                dividend -= divisor;
+            }
+            return dividend;
+        }
+        return dividend >= 0 || dividend < divisor ? dividend : dividend - divisor;
+    }
+}","@Test
+    void testRemainderUnsignedInt() {
+        Assertions.assertEquals(36, ArithmeticUtils.remainderUnsigned(-2147479015, 63));
+        Assertions.assertEquals(6, ArithmeticUtils.remainderUnsigned(-2147479015, 25));
+    }",6
+"(int dividend, int divisor)","public class RemainderUnsigned {
+public static int remainderUnsigned(int dividend, int divisor) {
+        if (divisor >= 0) {
+            if (dividend >= 0) {
+                return dividend % divisor;
+            }
+            // The implementation is a Java port of algorithm described in the book
+            // ""Hacker's Delight"" (section ""Unsigned short division from signed division"").
+            final int q = ((dividend >>> 1) / divisor) << 1;
+            dividend -= q * divisor;
+            if (dividend < 0 || dividend >= divisor) {
+                dividend -= divisor;
+            }
+            return dividend;
+        }
+        return dividend >= 0 || dividend < divisor ? dividend : dividend - divisor;
+    }
+}","@Test
+    void testRemainderUnsignedLongSpecialCases() {
+        long[] longs = getLongSpecialCases();
+        for (long dividend : longs) {
+            for (long divisor : longs) {
+                if (divisor == 0L) {
+                    try {
+                        ArithmeticUtils.remainderUnsigned(dividend, divisor);
+                        Assertions.fail(""Should have failed with ArithmeticException: division by zero"");
+                    } catch (ArithmeticException e) {
+                        // Success.
+                    }
+                } else {
+                    Assertions.assertEquals(remainderUnsignedExpected(dividend, divisor), ArithmeticUtils.remainderUnsigned(dividend, divisor));
+                }
+            }
+        }
+    }",6
+"(int dividend, int divisor)","public class RemainderUnsigned {
+public static int remainderUnsigned(int dividend, int divisor) {
+        if (divisor >= 0) {
+            if (dividend >= 0) {
+                return dividend % divisor;
+            }
+            // The implementation is a Java port of algorithm described in the book
+            // ""Hacker's Delight"" (section ""Unsigned short division from signed division"").
+            final int q = ((dividend >>> 1) / divisor) << 1;
+            dividend -= q * divisor;
+            if (dividend < 0 || dividend >= divisor) {
+                dividend -= divisor;
+            }
+            return dividend;
+        }
+        return dividend >= 0 || dividend < divisor ? dividend : dividend - divisor;
+    }
+}","@Test
+    void testRemainderUnsignedIntSpecialCases() {
+        int[] ints = getIntSpecialCases();
+        for (int dividend : ints) {
+            for (int divisor : ints) {
+                if (divisor == 0) {
+                    Assertions.assertThrows(ArithmeticException.class,
+                        () -> ArithmeticUtils.remainderUnsigned(dividend, divisor)
+                    );
+                } else {
+                    Assertions.assertEquals(remainderUnsignedExpected(dividend, divisor), ArithmeticUtils.remainderUnsigned(dividend, divisor));
+                }
+            }
+        }
+    }",6
+"(int dividend, int divisor)","public class DivideUnsigned {
+public static int divideUnsigned(int dividend, int divisor) {
+        if (divisor >= 0) {
+            if (dividend >= 0) {
+                return dividend / divisor;
+            }
+            // The implementation is a Java port of algorithm described in the book
+            // ""Hacker's Delight"" (section ""Unsigned short division from signed division"").
+            int q = ((dividend >>> 1) / divisor) << 1;
+            dividend -= q * divisor;
+            if (dividend < 0L || dividend >= divisor) {
+                q++;
+            }
+            return q;
+        }
+        return dividend >= 0 || dividend < divisor ? 0 : 1;
+    }
+}","@Test
+    void testDivideUnsignedLongSpecialCases() {
+        long[] longs = getLongSpecialCases();
+        for (long dividend : longs) {
+            for (long divisor : longs) {
+                if (divisor == 0L) {
+                    Assertions.assertThrows(ArithmeticException.class,
+                        () -> ArithmeticUtils.divideUnsigned(dividend, divisor)
+                    );
+                } else {
+                    Assertions.assertEquals(divideUnsignedExpected(dividend, divisor), ArithmeticUtils.divideUnsigned(dividend, divisor));
+                }
+            }
+        }
+    }",6
+"(int dividend, int divisor)","public class RemainderUnsigned {
+public static int remainderUnsigned(int dividend, int divisor) {
+        if (divisor >= 0) {
+            if (dividend >= 0) {
+                return dividend % divisor;
+            }
+            // The implementation is a Java port of algorithm described in the book
+            // ""Hacker's Delight"" (section ""Unsigned short division from signed division"").
+            final int q = ((dividend >>> 1) / divisor) << 1;
+            dividend -= q * divisor;
+            if (dividend < 0 || dividend >= divisor) {
+                dividend -= divisor;
+            }
+            return dividend;
+        }
+        return dividend >= 0 || dividend < divisor ? dividend : dividend - divisor;
+    }
+}","@Test
+    void testRemainderUnsignedLong() {
+        Assertions.assertEquals(48L, ArithmeticUtils.remainderUnsigned(-2147479015L, 63L));
+    }",6
+"(int dividend, int divisor)","public class DivideUnsigned {
+public static int divideUnsigned(int dividend, int divisor) {
+        if (divisor >= 0) {
+            if (dividend >= 0) {
+                return dividend / divisor;
+            }
+            // The implementation is a Java port of algorithm described in the book
+            // ""Hacker's Delight"" (section ""Unsigned short division from signed division"").
+            int q = ((dividend >>> 1) / divisor) << 1;
+            dividend -= q * divisor;
+            if (dividend < 0L || dividend >= divisor) {
+                q++;
+            }
+            return q;
+        }
+        return dividend >= 0 || dividend < divisor ? 0 : 1;
+    }
+}","@Test
+    void testDivideUnsignedLong() {
+        Assertions.assertEquals(292805461453366231L, ArithmeticUtils.divideUnsigned(-2147479015L, 63L));
+    }",6
+"(int dividend, int divisor)","public class DivideUnsigned {
+public static int divideUnsigned(int dividend, int divisor) {
+        if (divisor >= 0) {
+            if (dividend >= 0) {
+                return dividend / divisor;
+            }
+            // The implementation is a Java port of algorithm described in the book
+            // ""Hacker's Delight"" (section ""Unsigned short division from signed division"").
+            int q = ((dividend >>> 1) / divisor) << 1;
+            dividend -= q * divisor;
+            if (dividend < 0L || dividend >= divisor) {
+                q++;
+            }
+            return q;
+        }
+        return dividend >= 0 || dividend < divisor ? 0 : 1;
+    }
+}","@Test
+    void testDivideUnsignedInt() {
+        Assertions.assertEquals(34087115, ArithmeticUtils.divideUnsigned(-2147479015, 63));
+        Assertions.assertEquals(85899531, ArithmeticUtils.divideUnsigned(-2147479015, 25));
+        Assertions.assertEquals(2147483646, ArithmeticUtils.divideUnsigned(-3, 2));
+        Assertions.assertEquals(330382098, ArithmeticUtils.divideUnsigned(-16, 13));
+        Assertions.assertEquals(306783377, ArithmeticUtils.divideUnsigned(-16, 14));
+        Assertions.assertEquals(2, ArithmeticUtils.divideUnsigned(-1, 2147483647));
+        Assertions.assertEquals(2, ArithmeticUtils.divideUnsigned(-2, 2147483647));
+        Assertions.assertEquals(1, ArithmeticUtils.divideUnsigned(-3, 2147483647));
+        Assertions.assertEquals(1, ArithmeticUtils.divideUnsigned(-16, 2147483647));
+        Assertions.assertEquals(1, ArithmeticUtils.divideUnsigned(-16, 2147483646));
+    }",6
+"(int dividend, int divisor)","public class DivideUnsigned {
+public static int divideUnsigned(int dividend, int divisor) {
+        if (divisor >= 0) {
+            if (dividend >= 0) {
+                return dividend / divisor;
+            }
+            // The implementation is a Java port of algorithm described in the book
+            // ""Hacker's Delight"" (section ""Unsigned short division from signed division"").
+            int q = ((dividend >>> 1) / divisor) << 1;
+            dividend -= q * divisor;
+            if (dividend < 0L || dividend >= divisor) {
+                q++;
+            }
+            return q;
+        }
+        return dividend >= 0 || dividend < divisor ? 0 : 1;
+    }
+}","@Test
+    void testDivideUnsignedIntSpecialCases() {
+        int[] ints = getIntSpecialCases();
+        for (int dividend : ints) {
+            for (int divisor : ints) {
+                if (divisor == 0) {
+                    Assertions.assertThrows(ArithmeticException.class,
+                        () -> ArithmeticUtils.divideUnsigned(dividend, divisor)
+                    );
+                } else {
+                    Assertions.assertEquals(divideUnsignedExpected(dividend, divisor), ArithmeticUtils.divideUnsigned(dividend, divisor));
+                }
+            }
+        }
+    }",6
+(long time_ms),"public class GetReadableTime {
+public static String getReadableTime(long time_ms) {
+        StringBuilder output = new StringBuilder();
+        long time_delta = time_ms;
+
+        int milliseconds = (int) (time_delta % 1000);
+        time_delta /= 1000;
+        int seconds = (int) (time_delta % 60);
+        time_delta /= 60;
+        int minutes = (int) (time_delta % 60);
+        time_delta /= 60;
+        int hours = (int) (time_delta % 24);
+        int days = (int) (time_delta / 24);
+
+        if (days != 0) {
+            output.append(days);
+            output.append("" day"");
+            if (days > 1) {
+                output.append(""s"");
+            }
+        }
+        if ((hours != 0) || (minutes != 0)) {
+            if (output.length() > 0) {
+                // Use zero-padded hours here as it's longer than a day.
+                output.append(String.format("" %02d:%02d:%02d"", hours, minutes, seconds));
+            } else {
+                // Don't pad hours if less than a day.
+                output.append(String.format(""%d:%02d:%02d"", hours, minutes, seconds));
+            }
+        } else if (output.length() > 0) {
+            /*
+             * If a day+ with zero hours and zero minutes, just report the days.
+             * E.g. ""1 day"", and not ""1 day 35 ms"".
+             */
+            return output.toString();
+        } else if (seconds != 0) {
+            output.append(String.format(""%d.%d seconds"", seconds, milliseconds));
+        } else if (milliseconds != 0) {
+            output.append(String.format(""%d ms"", milliseconds));
+        }
+
+        return (output.length() == 0 ? ""0 ms"" : output.toString());
+    }
+}","@Test
+    public void testValues() {
+        int i;
+        long[] values = {
+            0, 100, 1000, 1500, 64000, 124531, 3651782, 86400000, 86434349,
+            1075634299, 86480001, 86400001
+        };
+        String[] expected = {
+            ""0 ms"", ""100 ms"", ""1.0 seconds"", ""1.500 seconds"", ""0:01:04"",
+            ""0:02:04"", ""1:00:51"", ""1 day"", ""1 day"",
+            ""12 days 10:47:14"", ""1 day 00:01:20"", ""1 day""
+        };
+
+        for (i = 0; i < values.length; i++) {
+            assertEquals(expected[i], StringUtils.getReadableTime(values[i]));
+        }
+    }",9
+"(int a, int b, int c)","public class Triangle {
+public static int triangle(int a, int b, int c) {
+        if (a <= 0 || b <= 0 || c <= 0) {
+            return 0;
+        }
+
+        // If sum of any two edges is greater than the length of the third edge
+        if (a == b && b == c) {
+            return 1;
+        } else if (a + b > c && b + c > a && a + c > b) {
+            return 2;
+        }
+        return 0;
+    }
+}","@Test
+    public void testTriangle() {
+        Map<int[], Integer> mapIO = new HashMap<int[], Integer>() {{
+            put(new int[]{3, 3, 3}, 1);
+            put(new int[]{3, 5, 4}, 2);
+        }};
+
+        for (Map.Entry<int[], Integer> io : mapIO.entrySet()) {
+            int[] i = io.getKey();
+            int ret = Triangle.triangle(i[0], i[1], i[2]);
+            Assert.assertEquals(io.getValue().intValue(), ret);
+        }
+    }",9

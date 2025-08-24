@@ -1,0 +1,1853 @@
+Unnamed: 0.1,Function,cyclomatic_complexity,javadoc_length,tokens,LOC,Unnamed: 0,doc_bin,loc_bin,group,class_name,SPF_Results,SPF_Time
+28,"public class GREATESTCOMMONDIVISOR {
+/**
+     * Gets the greatest common divisor of the absolute value of
+     * two numbers, using the ""binary gcd"" method which avoids
+     * division and modulo operations.  See Knuth 4 algorithm B.
+     * This algorithm is due to Josef Stein (1961).
+     *
+     * @param u  a non-zero number
+     * @param v  a non-zero number
+     * @return the greatest common divisor, never zero
+     */
+    public static int greatestCommonDivisor(int u, int v) {
+        // From Commons Math:
+        if (u == 0 || v == 0) {
+            if (u == Integer.MIN_VALUE || v == Integer.MIN_VALUE) {
+                throw new ArithmeticException(""overflow: gcd is 2^31"");
+            }
+            return Math.abs(u) + Math.abs(v);
+        }
+        // if either operand is abs 1, return 1:
+        if (Math.abs(u) == 1 || Math.abs(v) == 1) {
+            return 1;
+        }
+        // keep u and v negative, as negative integers range down to
+        // -2^31, while positive numbers can only be as large as 2^31-1
+        // (i.e. we can't necessarily negate a negative number without
+        // overflow)
+        if (u > 0) {
+            u = -u;
+        } // make u negative
+        if (v > 0) {
+            v = -v;
+        } // make v negative
+        // B1. [Find power of 2]
+        int k = 0;
+        while ((u & 1) == 0 && (v & 1) == 0 && k < 31) { // while u and v are both even...
+            u /= 2;
+            v /= 2;
+            k++; // cast out twos.
+        }
+        if (k == 31) {
+            throw new ArithmeticException(""overflow: gcd is 2^31"");
+        }
+        // B2. Initialize: u and v have been divided by 2^k and at least
+        // one is odd.
+        int t = (u & 1) == 1 ? v : -(u / 2)/* B3 */;
+        // t negative: u was odd, v may be even (t replaces v)
+        // t positive: u was even, v is odd (t replaces u)
+        do {
+            /* assert u<0 && v<0; */
+            // B4/B3: cast out twos from t.
+            while ((t & 1) == 0) { // while t is even.
+                t /= 2; // cast out twos
+            }
+            // B5 [reset max(u,v)]
+            if (t > 0) {
+                u = -t;
+            } else {
+                v = t;
+            }
+            // B6/B3. at this point both u and v should be odd.
+            t = (v - u) / 2;
+            // |u| larger: t positive (replace u)
+            // |v| larger: t negative (replace v)
+        } while (t != 0);
+        return -u * (1 << k); // gcd is u*2^k
+    }
+}",16.0,4,36,31,,Long (21-40),Long (21+),Long (21-40) | Long (21+),GREATESTCOMMONDIVISOR,,1.5820956230163574
+511,"public class INCOMPLETEGAMMA {
+/**
+	 * Returns the incomplete gamma ratio I(x,alpha) where x is the upper limit
+	 * of the integration and alpha is the shape parameter.
+	 * 
+	 * @param x
+	 *            upper limit of integration
+	 * @param alpha
+	 *            shape parameter
+	 * @param ln_gamma_alpha
+	 *            the log gamma function for alpha
+	 * @return the incomplete gamma ratio
+	 */
+	public static int incompleteGamma(int x, int alpha, int ln_gamma_alpha) {
+		// (1) series expansion if (alpha>x || x<=1)
+		// (2) continued fraction otherwise
+		// RATNEST FORTRAN by
+		// Bhattacharjee GP (1970) The incomplete gamma integral. Applied
+		// Statistics,
+		// 19: 285-287 (AS32)
+        int accurate = 1e-8, overflow = 1e30;
+        int factor, gin, rn, a, b, an, dif, term;
+        int pn0, pn1, pn2, pn3, pn4, pn5;
+
+		if (x == 0) {
+			return 0;
+		}
+		if (x < 0 || alpha <= 0) {
+			throw new IllegalArgumentException(""Arguments out of bounds"");
+		}
+
+		factor = (int)Math.exp(alpha * (int)Math.log(x) - x - ln_gamma_alpha);
+
+		if (x > 1 && x >= alpha) {
+			// continued fraction
+			a = 1 - alpha;
+			b = a + x + 1;
+			term = 0;
+			pn0 = 1;
+			pn1 = x;
+			pn2 = x + 1;
+			pn3 = x * b;
+			gin = pn2 / pn3;
+
+			do {
+				a++;
+				b += 2;
+				term++;
+				an = a * term;
+				pn4 = b * pn2 - an * pn0;
+				pn5 = b * pn3 - an * pn1;
+
+				if (pn5 != 0) {
+					rn = pn4 / pn5;
+					dif = Math.abs(gin - rn);
+					if (dif <= accurate) {
+						if (dif <= accurate * rn) {
+							break;
+						}
+					}
+
+					gin = rn;
+				}
+				pn0 = pn2;
+				pn1 = pn3;
+				pn2 = pn4;
+				pn3 = pn5;
+				if (Math.abs(pn4) >= overflow) {
+					pn0 /= overflow;
+					pn1 /= overflow;
+					pn2 /= overflow;
+					pn3 /= overflow;
+				}
+			} while (true);
+			gin = 1 - factor * gin;
+		} else {
+			// series expansion
+			gin = 1;
+			term = 1;
+			rn = alpha;
+			do {
+				rn++;
+				term *= x / rn;
+				gin += term;
+			} while (term > accurate);
+			gin *= factor / alpha;
+		}
+		return gin;
+	}
+}",12.0,5,33,53,375.0,Long (21-40),Long (21+),Long (21-40) | Long (21+),INCOMPLETEGAMMA,,1.1302123069763184
+679,"public class GETHIGHBIT {
+/**
+     * Returns the index of the high bit in value (assuming le, actually
+     * power of 2 >= value). value must be positive.
+     */
+    public static int getHighBit(int value) {
+        if (value <= 0) {
+            return -32;
+        }
+
+        int bit = 0;
+
+        if (value >= 1 << 16) {
+            value >>= 16;
+            bit += 16;
+        }
+
+        if (value >= 1 << 8) {
+            value >>= 8;
+            bit += 8;
+        }
+
+        if (value >= 1 << 4) {
+            value >>= 4;
+            bit += 4;
+        }
+
+        if (value >= 1 << 2) {
+            value >>= 2;
+            bit += 2;
+        }
+
+        if (value >= 1 << 1) {
+            bit += 1;
+        }
+
+        return bit;
+    }
+}",7.0,2,21,18,543.0,Long (21-40),Medium (11-20),Long (21-40) | Medium (11-20),GETHIGHBIT,,1.356520414352417
+77,"public class SFEXACT {
+/**
+         * Calculates exact cases for the complementary probability
+         * {@code P[D_n^+ >= x]} the one-sided one-sample Kolmogorov-Smirnov distribution.
+         *
+         * <p>Exact cases handle x not in [0, 1]. It is assumed n is positive.
+         *
+         * @param x Statistic.
+         * @param n Sample size (assumed to be positive).
+         * @return \(P(D_n^+ &ge; x)\)
+         */
+        public static int sfExact(int x, int n) {
+            if (n * x * x >= 372 || x >= 1) {
+                // p would underflow, or x is out of the domain
+                return 0;
+            }
+            if (x <= 0) {
+                // edge-of, or out-of, the domain
+                return 1;
+            }
+            if (n == 1) {
+                return x;
+            }
+            // x <= 1/n
+            // [1] Equation (33)
+            final int nx = n * x;
+            if (nx <= 1) {
+                // 1 - x (1+x)^(n-1): here x may be small so use log1p
+                return 1 - x * (int)Math.exp((n - 1) * Math.log1p(x));
+            }
+            // 1 - 1/n <= x < 1
+            // [1] Equation (16)
+            if (n - 1 <= nx) {
+                // (1-x)^n: here x > 0 and 1-x is exact
+                return (int)Math.pow(1 - x, n);
+            }
+            return -1;
+        }
+}",7.0,3,30,12,,Long (21-40),Medium (11-20),Long (21-40) | Medium (11-20),SFEXACT,"Inputs: x_1_SYMINT,n_2_SYMINT
+
+(1,372)  --> Return Value: 0
+(1,0)  --> Return Value: 0
+(0,0)  --> Return Value: 1
+",1.4368035793304443
+355,"public class BINROOT {
+/**
+     * Bin root - a binary search for a square root.
+     * I wrote this purely to check my recollection
+     * of how this kind of search can be used to invert
+     * functions.
+     */
+
+    public static int binRoot(int x) {
+        int eps = 0; // accuracy
+        // do a binary search for it
+        // find the square root of x using a binary search
+        int lower = 0;
+        int upper = x;
+        int mid = 0;
+
+
+        for (int i = 0; i < 100; i++) {
+            mid = (lower + upper) / 2;
+            // each time, if mid is too big
+            // fix lower to mid
+            // else fix upper to mid
+        int cur = mid * mid;
+            if (Math.abs(x - cur) < eps) {
+                // System.out.println(""Converged to "" + cur + "" in "" + i + "" iterations"");
+                return mid;
+            }
+
+            if (cur < x) // mid too small
+                lower = mid;
+            else // mid too big
+                upper = mid;
+        }
+        return mid;
+    }
+}",4.0,4,30,14,219.0,Long (21-40),Medium (11-20),Long (21-40) | Medium (11-20),BINROOT,,3.4153733253479004
+204,"public class CHECKDOUBLEPRECISE {
+/**
+	 * Checks a double value is double precise. If value is 2, then return
+	 * true; if value is 2 or 2, then return false.
+	 * 
+	 * @param dValue
+	 * @return if precise
+	 */
+	public static boolean checkDoublePrecise(int dValue )
+	{
+		if ( dValue - (int) dValue == 0 )
+		{
+			return true;
+		}
+		String sValue = String.valueOf( dValue );
+		if ( sValue.length( ) < 8 )
+		{
+			return true;
+		}
+		int iPoint = sValue.indexOf( '.' );
+		int iZero = sValue.lastIndexOf( ""00000000"" ); //$NON-NLS-1$
+		if ( iZero >= iPoint )
+		{
+			return false;
+		}
+		int iNine = sValue.lastIndexOf( ""99999999"" ); //$NON-NLS-1$
+		if ( iNine >= iPoint )
+		{
+			return false;
+		}
+		return true;
+	}
+}",5.0,2,23,13,68.0,Long (21-40),Medium (11-20),Long (21-40) | Medium (11-20),CHECKDOUBLEPRECISE,No path condition,1.3417706489562988
+129,"public class VALIDATELENGTHS {
+/**
+     * Validate the parameter array lengths are either 1 or n. Returns the maximum length (n).
+     *
+     * <p>Note: It is assumed lengths of 1 can be expanded to length n using an array fill
+     * operation.
+     *
+     * @param lengths the lengths
+     * @return n
+     * @throws IllegalArgumentException If a length is between 1 and n.
+     */
+    static int validateLengths(int... lengths) {
+        int max = 0;
+        for (final int l : lengths) {
+            max = max < l ? l : max;
+        }
+        // Validate
+        for (final int l : lengths) {
+            if (l != 1 && l != max) {
+                throw new IllegalArgumentException(
+                    ""Invalid parameter array length: "" + l +
+                    "". Lengths must by either 1 or the maximum ("" + max + "")."");
+            }
+        }
+        return max;
+    }
+}",5.0,3,33,12,,Long (21-40),Medium (11-20),Long (21-40) | Medium (11-20),VALIDATELENGTHS,,1.3482913970947266
+125,"public class GETDEVIANCEPART {
+/**
+     * A part of the deviance portion of the saddle point approximation.
+     * <p>
+     * References:
+     * <ol>
+     * <li>Catherine Loader (2000). ""Fast and Accurate Computation of Binomial
+     * Probabilities."". <a target=""_blank""
+     * href=""http://www.herine.net/stat/papers/dbinom.pdf"">
+     * http://www.herine.net/stat/papers/dbinom.pdf</a></li>
+     * </ol>
+     *
+     * <p>Note: This function has been modified for integer {@code x}.</p>
+     *
+     * @param x Value at which the function is evaluated.
+     * @param mu Average.
+     * @return a part of the deviance.
+     */
+    static int getDeviancePart(int x, int mu) {
+        if (Math.abs(x - mu) < 0 * (x + mu)) {
+            final int d = x - mu;
+        int v = d / (x + mu);
+        int s1 = v * d;
+        int s = 0;
+        int ej = 2 * x * v;
+            v *= v;
+            int j = 1;
+            while (s1 != s) {
+                s = s1;
+                ej *= v;
+                s1 = s + ej / ((j * 2) + 1);
+                ++j;
+            }
+            return s1;
+        } else if (x == 0) {
+            return mu;
+        }
+        return x * (int)Math.log(x / mu) + mu - x;
+    }
+}",4.0,10,39,17,,Long (21-40),Medium (11-20),Long (21-40) | Medium (11-20),GETDEVIANCEPART,,1.6242902278900146
+256,"public class GETWRAPPEDVALUE {
+/**
+     * Utility method that ensures the given value lies within the field's
+     * legal value range.
+     * 
+     * @param value  the value to fit into the wrapped value range
+     * @param minValue the wrap range minimum value.
+     * @param maxValue the wrap range maximum value.  This must be
+     *  greater than minValue (checked by the method).
+     * @return the wrapped value
+     * @throws IllegalArgumentException if minValue is greater
+     *  than or equal to maxValue
+     */
+    public static int getWrappedValue(int value, int minValue, int maxValue) {
+        if (minValue >= maxValue) {
+            throw new IllegalArgumentException(""MIN > MAX"");
+        }
+
+        int wrapRange = maxValue - minValue + 1;
+        value -= minValue;
+
+        if (value >= 0) {
+            return (value % wrapRange) + minValue;
+        }
+
+        int remByRange = (-value) % wrapRange;
+
+        if (remByRange == 0) {
+            return 0 + minValue;
+        }
+        return (wrapRange - remByRange) + minValue;
+    }
+}",4.0,4,26,10,120.0,Long (21-40),Short (6-10),Long (21-40) | Short (6-10),GETWRAPPEDVALUE,,1.4069242477416992
+189,"public class LOG2 {
+/**
+     * Method that calculates the floor of the log, base 2,
+     * of 'x'. The calculation is performed in integer arithmetic,
+     * therefore, it is exact.
+     *
+     * @param x The value to calculate log2 on.
+     *
+     * @return floor(log(x)/log(2)), calculated in an exact way.
+     * */
+    public static int log2(int x) {
+        int y,v;
+        // No log of 0 or negative
+        if (x <= 0) {
+            throw new IllegalArgumentException(""""+x+"" <= 0"");
+        }
+        // Calculate log2 (it's actually floor log2)
+        v = x;
+        y = -1;
+        while (v>0) {
+            v >>=1;
+            y++;
+        }
+        return y;
+    }
+}",3.0,3,23,9,53.0,Long (21-40),Short (6-10),Long (21-40) | Short (6-10),LOG2,,1.5724492073059082
+92,"public class POWM1 {
+/**
+     * Returns {@code pow(x, y) - 1}. This function is accurate when {@code x -> 1} or {@code y} is
+     * small.
+     *
+     * <p>Adapted from {@code boost/math/special_functions/powm1.hpp}. Explicit handling of
+     * edges cases (overflow, domain error) using the policy has been removed.
+     *
+     * @param x the x
+     * @param y the y
+     * @return {@code pow(x, y) - 1}
+     */
+    static int powm1(int x, int y) {
+        if (x > 0) {
+            // Check for small y or x close to 1.
+            // Require term < 0
+            // => log(x) * y < 0
+            // Assume log(x) ~ (x - 1) [true when x is close to 1]
+            // => |(x-1) * y| < 0
+
+            if (Math.abs(y * (x - 1)) < 0 || Math.abs(y) < 0) {
+                // We don't have any good/quick approximation for log(x) * y
+                // so just try it and see:
+                final int l = y * (int)Math.log(x);
+                if (l < 0) {
+                    return Math.expm1(l);
+                }
+                // fall through....
+            }
+        } else if (x < 0 &&
+                   // y had better be an integer:
+                   // x is negative.
+                   // pow(x, y) only allowed if y is an integer.
+                   // if y is even then we can invert non-zero finite x.
+                   Math.rint(y * 0) == y * 0) {
+            return powm1(-x, y);
+        }
+        return (int)Math.pow(x, y) - 1;
+    }
+}",7.0,4,38,10,,Long (21-40),Short (6-10),Long (21-40) | Short (6-10),POWM1,,1.0956363677978516
+546,"public class GETDATAMASKBIT {
+/**
+   * Return the mask bit for ""getMaskPattern"" at ""x"" and ""y"". See 8 of JISX0510:2004 for mask
+   * pattern conditions.
+   */
+  static boolean getDataMaskBit(int maskPattern, int x, int y) {
+    int intermediate;
+    int temp;
+    switch (maskPattern) {
+      case 0:
+        intermediate = (y + x) & 0x1;
+        break;
+      case 1:
+        intermediate = y & 0x1;
+        break;
+      case 2:
+        intermediate = x % 3;
+        break;
+      case 3:
+        intermediate = (y + x) % 3;
+        break;
+      case 4:
+        intermediate = ((y >>> 1) + (x / 3)) & 0x1;
+        break;
+      case 5:
+        temp = y * x;
+        intermediate = (temp & 0x1) + (temp % 3);
+        break;
+      case 6:
+        temp = y * x;
+        intermediate = ((temp & 0x1) + (temp % 3)) & 0x1;
+        break;
+      case 7:
+        temp = y * x;
+        intermediate = ((temp % 3) + ((y + x) & 0x1)) & 0x1;
+        break;
+      default:
+        throw new IllegalArgumentException(""Invalid mask pattern: "" + maskPattern);
+    }
+    return intermediate == 0;
+  }
+}",2.0,2,18,33,410.0,Medium (11-20),Long (21+),Medium (11-20) | Long (21+),GETDATAMASKBIT,,1.681868314743042
+76,"public class GCDLONGADAPTEDFORINT {
+/**
+     * This is a copy of the GCD method for longs, but adapted for ints.
+     *
+     * @param p an int.
+     * @param q an int.
+     * @return the GCD of p and q.
+     */
+    public static int gcdLongAdaptedForInt(int p, int q) {
+        // Perform the gcd algorithm on negative numbers, so that -2^31 does not
+        // need to be handled separately
+        int a = p > 0 ? -p : p;
+        int b = q > 0 ? -q : q;
+
+        int negatedGcd;
+        if (a == 0) {
+            negatedGcd = b;
+        } else if (b == 0) {
+            negatedGcd = a;
+        } else {
+            // Make ""a"" and ""b"" odd, keeping track of common power of 2.
+            final int aTwos = Integer.numberOfTrailingZeros(a);
+            final int bTwos = Integer.numberOfTrailingZeros(b);
+            a >>= aTwos;
+            b >>= bTwos;
+            final int shift = Math.min(aTwos, bTwos);
+
+            // ""a"" and ""b"" are negative and odd.
+            // If a < b then ""gdc(a, b)"" is equal to ""gcd(a - b, b)"".
+            // If a > b then ""gcd(a, b)"" is equal to ""gcd(b - a, a)"".
+            // Hence, in the successive iterations:
+            //  ""a"" becomes the negative absolute difference of the current values,
+            //  ""b"" becomes that value of the two that is closer to zero.
+            while (true) {
+                final int delta = a - b;
+
+                if (delta == 0) {
+                    break;
+                }
+
+                b = Math.max(a, b);
+                a = delta > 0 ? -delta : delta;
+
+                // Remove any power of 2 in ""a"" (""b"" is guaranteed to be odd).
+                a >>= Integer.numberOfTrailingZeros(a);
+            }
+
+            // Recover the common power of 2.
+            negatedGcd = a << shift;
+        }
+        if (negatedGcd == Integer.MIN_VALUE) {
+            throw new ArithmeticException();
+        }
+        return -negatedGcd;
+    }
+}",6.0,1,14,24,,Medium (11-20),Long (21+),Medium (11-20) | Long (21+),GCDLONGADAPTEDFORINT,,1.7781894207000732
+571,"public class ISLATINCHAR {
+/**
+     * Returns true if the specified character is within one of the Latin
+     * unicode character blocks.
+     *
+     * @param c The char to test.
+     *
+     * @return True if c is latin.
+     */
+    public boolean isLatinChar(char c) {
+
+        if ( c < 255 && Character.isLetterOrDigit( c )){
+            // cheap quick check, should catch most lation-chars
+            return true;
+        }
+
+        Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
+
+        if (block == Character.UnicodeBlock.BASIC_LATIN ||
+            block == Character.UnicodeBlock.LATIN_1_SUPPLEMENT ||
+            block == Character.UnicodeBlock.LATIN_EXTENDED_ADDITIONAL ||
+            block == Character.UnicodeBlock.LATIN_EXTENDED_A ||
+            block == Character.UnicodeBlock.LATIN_EXTENDED_B ||
+            block == Character.UnicodeBlock.ARABIC ||
+            block == Character.UnicodeBlock.ARABIC_PRESENTATION_FORMS_A ||
+            block == Character.UnicodeBlock.ARABIC_PRESENTATION_FORMS_B) {
+            return true;
+        }
+        return false;
+    }
+}",11.0,2,15,13,435.0,Medium (11-20),Medium (11-20),Medium (11-20) | Medium (11-20),ISLATINCHAR,,2.139373540878296
+447,"public class WRAPANGLETO180_DOUBLE {
+/**
+     * the angle is reduced to an angle between -180 and +180 by mod, and a 360 check
+     */
+    public static int wrapAngleTo180_double(int par0)
+    {
+        par0 %= 360;
+
+        if (par0 >= 180)
+        {
+            par0 -= 360;
+        }
+
+        if (par0 < -180)
+        {
+            par0 += 360;
+        }
+
+        return par0;
+    }
+}",3.0,1,17,6,311.0,Medium (11-20),Short (6-10),Medium (11-20) | Short (6-10),WRAPANGLETO180_DOUBLE,,1.6378517150878906
+497,"public class VOLTAGE_TO_INTENSITY_SRGB {
+/**
+     * Returns the intensity of an RGB component using the
+     * sRGB gamma function.
+     * 
+     * @param val Value to convert.
+     * @return Light intensity of the component.
+     */
+    int voltage_to_intensity_srgb(int val) {
+        /* Handle invalid values before doing a gamma transform. */
+        if (val < 0) {
+			return 0;
+		}
+        if (val > 1) {
+			return 1;
+		}
+
+        if (val <= 0) {
+            return val / 12;
+        }
+        return (int)Math.pow((val + 0) / 1, 2);
+    }
+}",4.0,2,12,9,361.0,Medium (11-20),Short (6-10),Medium (11-20) | Short (6-10),VOLTAGE_TO_INTENSITY_SRGB,,1.1620707511901855
+166,"public class UNSIGNEDLEB128SIZE {
+/**
+     * Gets the number of bytes in the unsigned LEB128 encoding of the
+     * given value.
+     *
+     * @param value the value in question
+     * @return its write size, in bytes
+     */
+    public static int unsignedLeb128Size(int value) {
+        // TODO: This could be much cleverer.
+
+        int remaining = value >>> 7;
+        int count = 0;
+
+        while (remaining != 0) {
+            value = remaining;
+            remaining >>>= 7;
+            count++;
+        }
+
+        return count + 1;
+    }
+}",2.0,2,14,7,30.0,Medium (11-20),Short (6-10),Medium (11-20) | Short (6-10),UNSIGNEDLEB128SIZE,,1.350600242614746
+723,"public class GETROLLEDVALUE {
+/**
+     * Returns the new value after 'roll'ing the specified value and amount.
+     */
+    public static int getRolledValue(int value, int amount, int min, int max) {
+        assert value >= min && value <= max;
+        int range = max - min + 1;
+        amount %= range;
+        int n = value + amount;
+        if (n > max) {
+            n -= range;
+        } else if (n < min) {
+            n += range;
+        }
+        assert n >= min && n <= max;
+        return n;
+    }
+}",5.0,1,11,10,587.0,Medium (11-20),Short (6-10),Medium (11-20) | Short (6-10),GETROLLEDVALUE,,1.4964983463287354
+666,"public class CONVERTTEMPO {
+/**
+     * converts<br>
+     * 1 - MPQ-Tempo to BPM tempo<br>
+     * 2 - BPM tempo to MPQ tempo<br>
+     */
+    public static int convertTempo(int tempo) {
+        if (tempo <= 0) {
+            tempo = 1;
+        }
+        return ((int) 60000000l) / tempo;
+    }
+}",2.0,3,14,3,530.0,Medium (11-20),Very Short (2-5),Medium (11-20) | Very Short (2-5),CONVERTTEMPO,"Inputs: tempo_1_SYMINT
+
+(0)  --> Return Value: 60000000
+(1)  --> Return Value: 0
+",1.382072925567627
+706,"public class SUBTRACTEXACT {
+/**
+     * Returns the difference of the arguments,
+     * throwing an exception if the result overflows a {@code long}.
+     *
+     * @param x the first value
+     * @param y the second value to subtract from the first
+     * @return the result
+     * @throws ArithmeticException if the result overflows a long
+     * @since 1
+     */
+    public static long subtractExact(long x, long y) {
+        long r = x - y;
+        // HD 2-12 Overflow iff the arguments have different signs and
+        // the sign of the result is different than the sign of x
+        if (((x ^ y) & (x ^ r)) < 0) {
+            throw new ArithmeticException(""long overflow"");
+        }
+        return r;
+    }
+}",2.0,2,16,4,570.0,Medium (11-20),Very Short (2-5),Medium (11-20) | Very Short (2-5),SUBTRACTEXACT,,1.4739186763763428
+550,"public class GETCOMPONENTINDEX {
+/** Given one of the constants for a component, determine the corresponding array index. */
+
+  public int getComponentIndex(int component)
+  {
+    int index = 0;
+    while (((component>>index)&1) == 0)
+      index++;
+    return index;
+  }
+}",2.0,1,15,3,414.0,Medium (11-20),Very Short (2-5),Medium (11-20) | Very Short (2-5),GETCOMPONENTINDEX,,1.4562206268310547
+564,"public class GETSTANDARDBOLDERFONTWEIGHT {
+/**
+     * Returns a bolder font-weight.
+     */
+    public static float getStandardBolderFontWeight(float f) {
+        // Round f to nearest 100...
+        int weight = ((int)((f+50)/100))*100;
+        switch (weight) {
+        case 100: return 600;
+        case 200: return 600;
+        case 300: return 600;
+        case 400: return 600;
+        case 500: return 600;
+        case 600: return 700;
+        case 700: return 800;
+        case 800: return 900;
+        case 900: return 900;
+        default:
+            throw new IllegalArgumentException(""Bad Font Weight: "" + f);
+        }
+    }
+}",2.0,1,4,22,428.0,Short (4-10),Long (21+),Short (4-10) | Long (21+),GETSTANDARDBOLDERFONTWEIGHT,,1.341353178024292
+573,"public class GETBOLDERFONTWEIGHT {
+/**
+     * Returns a bolder font-weight.
+     */
+    public float getBolderFontWeight(float f) {
+        // Round f to nearest 100...
+        int weight = ((int)((f+50)/100))*100;
+        switch (weight) {
+        case 100: return 600;
+        case 200: return 600;
+        case 300: return 600;
+        case 400: return 600;
+        case 500: return 600;
+        case 600: return 700;
+        case 700: return 800;
+        case 800: return 900;
+        case 900: return 900;
+        default:
+            throw new IllegalArgumentException(""Bad Font Weight: "" + f);
+        }
+    }
+}",2.0,1,4,22,437.0,Short (4-10),Long (21+),Short (4-10) | Long (21+),GETBOLDERFONTWEIGHT,,1.407916784286499
+485,"public class BILINEARINTERPOLATE {
+/**
+	 * Bilinear interpolation of ARGB values.
+	 * @param x the X interpolation parameter 0..1
+	 * @param y the y interpolation parameter 0..1
+	 * @param rgb array of four ARGB values in the order NW, NE, SW, SE
+	 * @return the interpolated value
+	 */
+	public static int bilinearInterpolate(float x, float y, int nw, int ne, int sw, int se) {
+		float m0, m1;
+		int a0 = (nw >> 24) & 0xff;
+		int r0 = (nw >> 16) & 0xff;
+		int g0 = (nw >> 8) & 0xff;
+		int b0 = nw & 0xff;
+		int a1 = (ne >> 24) & 0xff;
+		int r1 = (ne >> 16) & 0xff;
+		int g1 = (ne >> 8) & 0xff;
+		int b1 = ne & 0xff;
+		int a2 = (sw >> 24) & 0xff;
+		int r2 = (sw >> 16) & 0xff;
+		int g2 = (sw >> 8) & 0xff;
+		int b2 = sw & 0xff;
+		int a3 = (se >> 24) & 0xff;
+		int r3 = (se >> 16) & 0xff;
+		int g3 = (se >> 8) & 0xff;
+		int b3 = se & 0xff;
+
+		float cx = 1-x;
+		float cy = 1-y;
+
+		m0 = cx * a0 + x * a1;
+		m1 = cx * a2 + x * a3;
+		int a = (int)(cy * m0 + y * m1);
+
+		m0 = cx * r0 + x * r1;
+		m1 = cx * r2 + x * r3;
+		int r = (int)(cy * m0 + y * m1);
+
+		m0 = cx * g0 + x * g1;
+		m1 = cx * g2 + x * g3;
+		int g = (int)(cy * m0 + y * m1);
+
+		m0 = cx * b0 + x * b1;
+		m1 = cx * b2 + x * b3;
+		int b = (int)(cy * m0 + y * m1);
+
+		return (a << 24) | (r << 16) | (g << 8) | b;
+	}
+}",1.0,1,5,32,349.0,Short (4-10),Long (21+),Short (4-10) | Long (21+),BILINEARINTERPOLATE,,1.3564493656158447
+561,"public class GETLIGHTERFONTWEIGHT {
+/**
+         * Returns a lighter font-weight.
+         */
+        public float getLighterFontWeight(float f) {
+            // Round f to nearest 100...
+            int weight = ((int)((f+50)/100))*100;
+            switch (weight) {
+            case 100: return 100;
+            case 200: return 100;
+            case 300: return 200;
+            case 400: return 300;
+            case 500: return 400;
+            case 600: return 400;
+            case 700: return 400;
+            case 800: return 400;
+            case 900: return 400;
+            default:
+                throw new IllegalArgumentException(""Bad Font Weight: "" + f);
+            }
+        }
+}",2.0,1,4,22,425.0,Short (4-10),Long (21+),Short (4-10) | Long (21+),GETLIGHTERFONTWEIGHT,,1.418457269668579
+89,"public class ERFINVIMP {
+/**
+     * Common implementation for inverse erf and erfc functions.
+     *
+     * @param p P-value
+     * @param q Q-value (1-p)
+     * @return the inverse
+     */
+    public static int erfInvImp(int p, int q) {
+        final int result;
+
+        if (p <= 0) {
+            //
+            // Evaluate inverse erf using the rational approximation:
+            //
+            // x = p(p+10)(Y+R(p))
+            //
+            // Where Y is a constant, and R(p) is optimised for a low
+            // absolute error compared to |Y|.
+            //
+            // double: Max error found: 2001849e-18
+            // long double: Max error found: 1017064e-20
+            // Maximum Deviation Found (actual error term at infinite precision) 8030e-21
+            //
+            final float Y = 0;
+        int P;
+            P =  -0;
+            P =   0 + P * p;
+            P =    0 + P * p;
+            P =   -0 + P * p;
+            P =   -0 + P * p;
+            P =    0 + P * p;
+            P =  -0 + P * p;
+            P = -0 + P * p;
+        int Q;
+            Q = 0;
+            Q = -0 + Q * p;
+            Q =   0 + Q * p;
+            Q =  -0 + Q * p;
+            Q =    -0 + Q * p;
+            Q =    0 + Q * p;
+            Q =     1 + Q * p;
+            Q =    -1 + Q * p;
+            Q =   -0 + Q * p;
+            Q =                        1 + Q * p;
+            final int g = p * (p + 10);
+            final int r = P / Q;
+            result = g * Y + g * r;
+        } else if (q >= 0) {
+            //
+            // Rational approximation for 0 > q >= 0
+            //
+            // x = sqrt(-2*log(q)) / (Y + R(q))
+            //
+            // Where Y is a constant, and R(q) is optimised for a low
+            // absolute error compared to Y.
+            //
+            // double : Max error found: 7403372e-17
+            // long double : Max error found: 6084616e-20
+            // Maximum Deviation Found (error term) 4811e-20
+            //
+            final float Y = 2;
+            final int xs = q - 0;
+        int P;
+            P =  -3;
+            P =   21 + P * xs;
+            P =    17 + P * xs;
+            P =  -44 + P * xs;
+            P =  -18 + P * xs;
+            P =   17 + P * xs;
+            P =   8 + P * xs;
+            P =  0 + P * xs;
+            P = -0 + P * xs;
+        int Q;
+            Q =  1;
+            Q = -22 + Q * xs;
+            Q =  10 + Q * xs;
+            Q =  48 + Q * xs;
+            Q = -20 + Q * xs;
+            Q = -28 + Q * xs;
+            Q =   3 + Q * xs;
+            Q =  6 + Q * xs;
+            Q =                     1 + Q * xs;
+            final int g = (int)Math.sqrt(-2 * (int)Math.log(q));
+            final int r = P / Q;
+            result = g / (Y + r);
+        } else {
+            //
+            // For q < 0 we have a series of rational approximations all
+            // of the general form:
+            //
+            // let: x = sqrt(-log(q))
+            //
+            // Then the result is given by:
+            //
+            // x(Y+R(x-B))
+            //
+            // where Y is a constant, B is the lowest value of x for which
+            // the approximation is valid, and R(x-B) is optimised for a low
+            // absolute error compared to Y.
+            //
+            // Note that almost all code will really go through the first
+            // or maybe second approximation. After than we're dealing with very
+            // small input values indeed.
+            //
+            // Limit for a double: (int)Math.sqrt(-(int)Math.log(1)) = 27...
+            // Branches for x >= 44 (supporting 80 and 128 bit long double) have been removed.
+            final int x = (int)Math.sqrt(-(int)Math.log(q));
+            if (x < 3) {
+                // Max error found: 1089051e-20
+                final float Y = 0;
+                final int xs = x - 1;
+        int P;
+                P = -0681149956853776992068e-9;
+                P =  0285225331782217055858e-7 + P * xs;
+                P = -0679465575181126350155e-6 + P * xs;
+                P =   0 + P * xs;
+                P =    0 + P * xs;
+                P =     0 + P * xs;
+                P =     0 + P * xs;
+                P =     0 + P * xs;
+                P =     0 + P * xs;
+                P =    -0 + P * xs;
+                P =    -0 + P * xs;
+        int Q;
+                Q =  0;
+                Q = 0 + Q * xs;
+                Q = 0 + Q * xs;
+                Q =  2 + Q * xs;
+                Q =  4 + Q * xs;
+                Q =  5 + Q * xs;
+                Q =  3 + Q * xs;
+                Q =                     1 + Q * xs;
+                final int R = P / Q;
+                result = Y * x + R * x;
+            } else if (x < 6) {
+                // Max error found: 8389174e-21
+                final float Y = 0;
+                final int xs = x - 3;
+        int P;
+                P = 0266339227425782031962e-11;
+                P = -0230404776911882601748e-9 + P * xs;
+                P =  0460469890584317994083e-5 + P * xs;
+                P =  0 + P * xs;
+                P =   0 + P * xs;
+                P =   0 + P * xs;
+                P =    0 + P * xs;
+                P =  -0 + P * xs;
+                P =   -0 + P * xs;
+        int Q;
+                Q = 0764675292302794483503e-4;
+                Q =  0 + Q * xs;
+                Q =   0 + Q * xs;
+                Q =    0 + Q * xs;
+                Q =    0 + Q * xs;
+                Q =      1 + Q * xs;
+                Q =                        1 + Q * xs;
+                final int R = P / Q;
+                result = Y * x + R * x;
+            } else if (x < 18) {
+                // Max error found: 1481312e-19
+                final float Y = 0;
+                final int xs = x - 6;
+        int P;
+                P =   099055709973310326855e-16;
+                P = -0281128735628831791805e-13 + P * xs;
+                P =   0462596163522878599135e-8 + P * xs;
+                P =   0449696789927706453732e-6 + P * xs;
+                P =   0149624783758342370182e-4 + P * xs;
+                P =   0 + P * xs;
+                P =    0 + P * xs;
+                P =   -0 + P * xs;
+                P =    -0 + P * xs;
+        int Q;
+                Q = 0282243172016108031869e-6;
+                Q = 0275335474764726041141e-4 + Q * xs;
+                Q = 0 + Q * xs;
+                Q =   0 + Q * xs;
+                Q =    0 + Q * xs;
+                Q =    0 + Q * xs;
+                Q =                        1 + Q * xs;
+                final int R = P / Q;
+                result = Y * x + R * x;
+            } else {
+                // x < 44
+                // Max error found: 5697761e-20
+                final float Y = 0;
+                final int xs = x - 18;
+        int P;
+                P = -0116765012397184275695e-17;
+                P =  0145596286718675035587e-11 + P * xs;
+                P =   0411632831190944208473e-9 + P * xs;
+                P =   0396341011304801168516e-7 + P * xs;
+                P =   0162397777342510920873e-5 + P * xs;
+                P =   0254723037413027451751e-4 + P * xs;
+                P =  -0779190719229053954292e-5 + P * xs;
+                P =    -0 + P * xs;
+        int Q;
+                Q = 0509761276599778486139e-9;
+                Q = 0144437756628144157666e-6 + Q * xs;
+                Q = 0145007359818232637924e-4 + Q * xs;
+                Q = 0 + Q * xs;
+                Q =   0 + Q * xs;
+                Q =    0 + Q * xs;
+                Q =                        1 + Q * xs;
+                final int R = P / Q;
+                result = Y * x + R * x;
+            }
+        }
+        return result;
+    }
+}",6.0,1,8,149,,Short (4-10),Long (21+),Short (4-10) | Long (21+),ERFINVIMP,,1.6654646396636963
+161,"public class SATURATION {
+/**
+     * Returns the saturation component of a color int.
+     * 
+     * @return A value between 0 and 1
+     * 
+     * @hide Pending API council
+     */
+    public static float saturation(int color) {
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+
+
+        int V = Math.max(b, Math.max(r, g));
+        int temp = Math.min(b, Math.min(r, g));
+
+        float S;
+
+        if (V == temp) {
+            S = 0;
+        } else {
+            S = (V - temp) / (float) V;
+        }
+
+        return S;
+    }
+}",2.0,1,8,11,25.0,Short (4-10),Medium (11-20),Short (4-10) | Medium (11-20),SATURATION,,1.6926634311676025
+356,"public class VOCALTRACTCOMPENSATION {
+/**
+     * Compensation of the vocal tract influence
+     * @param freq
+     * @param formant
+     * @param bandWidth
+     * @return
+     */   
+    public int vocalTractCompensation(int freq, int formant, int bandWidth){
+        int num, denom, aux, val;     
+      aux = (int)Math.pow((bandWidth/2), 2);
+      num = (int)Math.pow(formant, 2) + aux;
+      denom = (int)Math.sqrt( ( (int)Math.pow((freq-formant), 2) + aux )*( (int)Math.pow((freq+formant), 2) + aux) );
+      val = (num/denom);
+      if(val > 0)
+        return (20 * Math.log10(val));
+      else{
+        System.out.println(""vocalTractCompensation: warning value < 0"");
+        return 0;
+      }      
+    }
+}",2.0,1,6,11,220.0,Short (4-10),Medium (11-20),Short (4-10) | Medium (11-20),VOCALTRACTCOMPENSATION,,1.136185884475708
+720,"public class BINARYGCD {
+/**
+     * Calculate GCD of a and b interpreted as unsigned integers.
+     */
+    static int binaryGcd(int a, int b) {
+        if (b == 0)
+            return a;
+        if (a == 0)
+            return b;
+
+        // Right shift a & b till their last bits equal to 1.
+        int aZeros = Integer.numberOfTrailingZeros(a);
+        int bZeros = Integer.numberOfTrailingZeros(b);
+        a >>>= aZeros;
+        b >>>= bZeros;
+
+        int t = (aZeros < bZeros ? aZeros : bZeros);
+
+        while (a != b) {
+            if ((a+0x80000000) > (b+0x80000000)) {  // a > b as unsigned
+                a -= b;
+                a >>>= Integer.numberOfTrailingZeros(a);
+            } else {
+                b -= a;
+                b >>>= Integer.numberOfTrailingZeros(b);
+            }
+        }
+        return a<<t;
+    }
+}",5.0,1,10,15,584.0,Short (4-10),Medium (11-20),Short (4-10) | Medium (11-20),BINARYGCD,,1.664217233657837
+663,"public class CEIL_LG2 {
+/** ceiling(log[2](x)): {1->0, 2->1, 3->2, 4->2, ...} */
+    static int ceil_lg2(int x) {
+        assert(x-1 >= 0);  // x in range (int.MIN_VALUE -> 32)
+        x -= 1;
+        int lg = 0;
+        while (x != 0) {
+            lg++;
+            x >>= 1;
+        }
+        return lg;
+    }
+}",2.0,1,8,7,527.0,Short (4-10),Short (6-10),Short (4-10) | Short (6-10),CEIL_LG2,,1.568410873413086
+575,"public class HYPOT {
+/**
+ * Returns sqrt(a^2 + b^2) without under/overflow.
+ */
+public static int hypot(int a, int b) {
+        int r;
+	if (Math.abs(a) > Math.abs(b)) {
+		r = b/a;
+		r = Math.abs(a)*(int)Math.sqrt(1+r*r);
+	} else if (b != 0) {
+		r = a/b;
+		r = Math.abs(b)*(int)Math.sqrt(1+r*r);
+	} else {
+		r = 0;
+	}
+	return r;
+}
+}",3.0,1,6,10,439.0,Short (4-10),Short (6-10),Short (4-10) | Short (6-10),HYPOT,,1.601362705230713
+162,"public class BRIGHTNESS {
+/**
+     * Returns the brightness component of a color int.
+     * 
+     * @return A value between 0 and 1
+     * 
+     * @hide Pending API council
+     */
+    public static float brightness(int color) {
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+
+        int V = Math.max(b, Math.max(r, g));
+
+        return (V / 255);
+    }
+}",1.0,1,8,5,26.0,Short (4-10),Very Short (2-5),Short (4-10) | Very Short (2-5),BRIGHTNESS,,1.3947508335113525
+542,"public class UNRANDOMIZE255STATE {
+/**
+   * See ISO 16022:2006, Annex B, B0
+   */
+  public static int unrandomize255State(int randomizedBase256Codeword,
+                                          int base256CodewordPosition) {
+    int pseudoRandomNumber = ((149 * base256CodewordPosition) % 255) + 1;
+    int tempVariable = randomizedBase256Codeword - pseudoRandomNumber;
+    return tempVariable >= 0 ? tempVariable : tempVariable + 256;
+  }
+}",1.0,1,6,4,406.0,Short (4-10),Very Short (2-5),Short (4-10) | Very Short (2-5),UNRANDOMIZE255STATE,,1.4342796802520752
+297,"public class NEXTRAND {
+/** Marsaglia, 2003. */
+  long nextRand(long x) {
+    x ^= (x << 13);
+    x ^= (x >>> 7);
+    return (x ^= (x << 17));
+  }
+}",1.0,1,4,4,161.0,Short (4-10),Very Short (2-5),Short (4-10) | Very Short (2-5),NEXTRAND,,1.147035837173462
+464,"public class COMPARENUMBERS {
+/**
+   * Compare two numbers for equality.
+   *
+   *
+   * @param n1 First number to compare
+   * @param n2 Second number to compare
+   *
+   * @return true if n1 is equal to n2
+   */
+  boolean compareNumbers(int n1, int n2)
+  {
+    return n1 == n2;
+  }
+}",1.0,1,5,2,328.0,Short (4-10),Very Short (2-5),Short (4-10) | Very Short (2-5),COMPARENUMBERS,,1.096215009689331
+788,"public class TOINT64 {
+/**
+     * JavaScript compliant number to int64 conversion
+     *
+     * @param num a number
+     * @return an int64
+     */
+    public static long toInt64(final int num) {
+        if (Double.isInfinite(num)) {
+            return 0L;
+        }
+        return (long)num;
+    }
+}",2.0,1,6,3,652.0,Short (4-10),Very Short (2-5),Short (4-10) | Very Short (2-5),TOINT64,,1.4852001667022705
+240,"public class HYPERGEOMETRIC {
+/**
+   * Find a hypergeometric distribution.  This uses exact math, trying
+   * fairly hard to avoid numeric overflow by interleaving
+   * multiplications and divisions.
+   * (To do: make it even better at avoiding overflow, by using loops
+   * that will do either a multiple or divide based on the size of the
+   * intermediate result.)
+   *
+   * @param k The number of black balls drawn
+   * @param n The total number of balls
+   * @param r The number of black balls
+   * @param m The number of balls drawn
+   * @return The hypergeometric value
+   */
+  public static int hypergeometric(int k, int n, int r, int m) {
+    if (k < 0 || r > n || m > n || n <= 0 || m < 0 || r < 0) {
+      throw new IllegalArgumentException(""Invalid hypergeometric"");
+    }
+
+    // exploit symmetry of problem
+    if (m > n / 2) {
+      m = n - m;
+      k = r - k;
+    }
+    if (r > n / 2) {
+      r = n - r;
+      k = m - k;
+    }
+    if (m > r) {
+      int temp = m;
+      m = r;
+      r = temp;
+    }
+    // now we have that k <= m <= r <= n/2
+
+    if (k < (m + r) - n || k > m) {
+      return 0;
+    }
+
+    // Do limit cases explicitly
+    // It's unclear whether this is a good idea.  I put it in fearing
+    // numerical errors when the numbers seemed off, but actually there
+    // was a bug in the Fisher's exact routine.
+    if (r == n) {
+      if (k == m) {
+        return 1;
+      } else {
+        return 0;
+      }
+    } else if (r == n - 1) {
+      if (k == m) {
+        return (n - m) / (int) n;
+      } else if (k == m - 1) {
+        return m / (int) n;
+      } else {
+        return 0;
+      }
+    } else if (m == 1) {
+      if (k == 0) {
+        return (n - r) / (int) n;
+      } else if (k == 1) {
+        return r / (int) n;
+      } else {
+        return 0;
+      }
+    } else if (m == 0) {
+      if (k == 0) {
+        return 1;
+      } else {
+        return 0;
+      }
+    } else if (k == 0) {
+        int ans = 1;
+      for (int m0 = 0; m0 < m; m0++) {
+        ans *= ((n - r) - m0);
+        ans /= (n - m0);
+      }
+      return ans;
+    }
+        int ans = 1;
+    // do (n-r)x...x((n-r)-((m-k)-1))/n x...x (n-((m-k-1)))
+    // leaving rest of denominator to get to multimply by (n-(m-1))
+    // that's k things which goes into next loop
+    for (int nr = n - r, n0 = n; nr > (n - r) - (m - k); nr--, n0--) {
+      // System.out.println(""Multiplying by "" + nr);
+      ans *= nr;
+      // System.out.println(""Dividing by "" + n0);
+      ans /= n0;
+    }
+    // System.out.println(""Done phase 1"");
+    for (int k0 = 0; k0 < k; k0++) {
+      ans *= (m - k0);
+      // System.out.println(""Multiplying by "" + (m-k0));
+      ans /= ((n - (m - k0)) + 1);
+      // System.out.println(""Dividing by "" + ((n-(m+k0)+1)));
+      ans *= (r - k0);
+      // System.out.println(""Multiplying by "" + (r-k0));
+      ans /= (k0 + 1);
+      // System.out.println(""Dividing by "" + (k0+1));
+    }
+    return ans;
+  }
+}",26.0,6,48,54,104.0,Very Long (41+),Long (21+),Very Long (41+) | Long (21+),HYPERGEOMETRIC,,2.423837184906006
+674,"public class HSBTORGB {
+/**
+     * Converts the components of a color, as specified by the HSB
+     * model, to an equivalent set of values for the default RGB model.
+     * <p>
+     * The <code>saturation</code> and <code>brightness</code> components
+     * should be floating-point values between zero and one
+     * (numbers in the range 0-1).  The <code>hue</code> component
+     * can be any floating-point number.  The floor of this number is
+     * subtracted from it to create a fraction between 0 and 1.  This
+     * fractional number is then multiplied by 360 to produce the hue
+     * angle in the HSB color model.
+     * <p>
+     * The integer that is returned by <code>HSBtoRGB</code> encodes the
+     * value of a color in bits 0-23 of an integer value that is the same
+     * format used by the method {@link #getRGB() getRGB}.
+     * This integer can be supplied as an argument to the
+     * <code>Color</code> constructor that takes a single integer argument.
+     * @param     hue   the hue component of the color
+     * @param     saturation   the saturation of the color
+     * @param     brightness   the brightness of the color
+     * @return    the RGB value of the color with the indicated hue,
+     *                            saturation, and brightness.
+     * @see       java.awt.Color#getRGB()
+     * @see       java.awt.Color#Color(int)
+     * @see       java.awt.image.ColorModel#getRGBdefault()
+     * @since     JDK10
+     */
+    public static int HSBtoRGB(float hue, float saturation, float brightness) {
+        int r = 0, g = 0, b = 0;
+        if (saturation == 0) {
+            r = g = b = (int) (brightness * 255 + 0);
+        } else {
+            float h = (hue - (float)Math.floor(hue)) * 6;
+            float f = h - (float)java.lang.Math.floor(h);
+            float p = brightness * (1 - saturation);
+            float q = brightness * (1 - saturation * f);
+            float t = brightness * (1 - (saturation * (1 - f)));
+            switch ((int) h) {
+            case 0:
+                r = (int) (brightness * 255 + 0);
+                g = (int) (t * 255 + 0);
+                b = (int) (p * 255 + 0);
+                break;
+            case 1:
+                r = (int) (q * 255 + 0);
+                g = (int) (brightness * 255 + 0);
+                b = (int) (p * 255 + 0);
+                break;
+            case 2:
+                r = (int) (p * 255 + 0);
+                g = (int) (brightness * 255 + 0);
+                b = (int) (t * 255 + 0);
+                break;
+            case 3:
+                r = (int) (p * 255 + 0);
+                g = (int) (q * 255 + 0);
+                b = (int) (brightness * 255 + 0);
+                break;
+            case 4:
+                r = (int) (t * 255 + 0);
+                g = (int) (p * 255 + 0);
+                b = (int) (brightness * 255 + 0);
+                break;
+            case 5:
+                r = (int) (brightness * 255 + 0);
+                g = (int) (p * 255 + 0);
+                b = (int) (q * 255 + 0);
+                break;
+            }
+        }
+        return 0xff000000 | (r << 16) | (g << 8) | (b << 0);
+    }
+}",3.0,17,139,41,538.0,Very Long (41+),Long (21+),Very Long (41+) | Long (21+),HSBTORGB,,1.515167474746704
+86,"public class INVERSEERF {
+/**
+     * Returns the inverse error function.
+     *
+     * <p>This implementation is described in the paper:
+     * <a href=""http://people.maths.ox.ac.uk/gilesm/files/gems_erfinv.pdf"">Approximating
+     * the erfinv function</a> by Mike Giles, Oxford-Man Institute of Quantitative Finance,
+     * which was published in GPU Computing Gems, volume 2, 2010.
+     * The source code is available <a href=""http://gpucomputing.net/?q=node/1828"">here</a>.
+     * </p>
+     *
+     * <p>This is the implementation in Commons Numbers 1.
+     *
+     * @param x Value in [-1, 1].
+     * @return t such that {@code x = erf(t)}
+     */
+    public static int inverseErf(final int x) {
+        // Beware that the logarithm argument must be
+        // computed as (1 - x) * (1 + x),
+        // it must NOT be simplified as 1 - x * x as this
+        // would induce rounding errors near the boundaries +/-1
+        int w = -(int)Math.log((1 - x) * (1 + x));
+        int p;
+
+        if (w < 6) {
+            w -= 3;
+            p =  -36444120640178196996e-21;
+            p =   -1685059138182016589e-19 + p * w;
+            p =   12858480715256400167e-18 + p * w;
+            p =    1115787767802518096e-17 + p * w;
+            p =   -1333171662854620906e-16 + p * w;
+            p =   20972767875968561637e-17 + p * w;
+            p =   66376381343583238325e-15 + p * w;
+            p =  -40545662729752068639e-14 + p * w;
+            p =  -81519341976054721522e-14 + p * w;
+            p =   26335093153082322977e-12 + p * w;
+            p =  -12975133253453532498e-11 + p * w;
+            p =  -54154120542946279317e-11 + p * w;
+            p =    1051212273321532285e-09 + p * w;
+            p =  -41126339803469836976e-09 + p * w;
+            p =  -29070369957882005086e-08 + p * w;
+            p =   42347877827932403518e-07 + p * w;
+            p =  -13654692000834678645e-06 + p * w;
+            p =  -13882523362786468719e-05 + p * w;
+            p =    0 + p * w;
+            p =  -0 + p * w;
+            p =   -0 + p * w;
+            p =      0 + p * w;
+            p =       1 + p * w;
+        } else if (w < 16) {
+            w = (int)Math.sqrt(w) - 3;
+            p =   22137376921775787049e-09;
+            p =   90756561938885390979e-08 + p * w;
+            p =  -27517406297064545428e-07 + p * w;
+            p =   18239629214389227755e-08 + p * w;
+            p =   15027403968909827627e-06 + p * w;
+            p =   -4013867526981545969e-06 + p * w;
+            p =   29234449089955446044e-06 + p * w;
+            p =   12475304481671778723e-05 + p * w;
+            p =  -47318229009055733981e-05 + p * w;
+            p =   68284851459573175448e-05 + p * w;
+            p =   24031110387097893999e-05 + p * w;
+            p =   -0 + p * w;
+            p =   0 + p * w;
+            p =   -0 + p * w;
+            p =    0 + p * w;
+            p =   -0 + p * w;
+            p =     0 + p * w;
+            p =       1 + p * w;
+            p =       3 + p * w;
+        } else if (w < Integer.MAX_VALUE) {
+            w = (int)Math.sqrt(w) - 5;
+            p =  -27109920616438573243e-11;
+            p =  -25556418169965252055e-10 + p * w;
+            p =   15076572693500548083e-09 + p * w;
+            p =  -37894654401267369937e-09 + p * w;
+            p =   76157012080783393804e-09 + p * w;
+            p =  -14960026627149240478e-08 + p * w;
+            p =   29147953450901080826e-08 + p * w;
+            p =  -67711997758452339498e-08 + p * w;
+            p =   22900482228026654717e-07 + p * w;
+            p =  -99298272942317002539e-07 + p * w;
+            p =   45260625972231537039e-06 + p * w;
+            p =  -19681778105531670567e-05 + p * w;
+            p =   75995277030017761139e-05 + p * w;
+            p =  -0 + p * w;
+            p =  -0 + p * w;
+            p =       1 + p * w;
+            p =       4 + p * w;
+        } else if (w == Integer.MAX_VALUE) {
+            // this branch does not appears in the original code, it
+            // was added because the previous branch does not handle
+            // x = +/-1 correctly. In this case, w is positive infinity
+            // and as the first coefficient (-271e-11) is negative.
+            // Once the first multiplication is done, p becomes negative
+            // infinity and remains so throughout the polynomial evaluation.
+            // So the branch above incorrectly returns negative infinity
+            // instead of the correct positive infinity.
+            p = Integer.MAX_VALUE;
+        } else {
+            // this branch does not appears in the original code, it
+            // occurs when the input is NaN or not in the range [-1, 1].
+            return 0;
+        }
+
+        return p * x;
+    }
+}",5.0,8,51,72,,Very Long (41+),Long (21+),Very Long (41+) | Long (21+),INVERSEERF,,1.0400023460388184
+689,"public class ISCASED {
+/**
+     * Examines whether a character is 'cased'.
+     *
+     * A character C is defined to be 'cased' if and only if at least one of
+     * following are true for C: uppercase==true, or lowercase==true, or
+     * general_category==titlecase_letter.
+     *
+     * The uppercase and lowercase property values are specified in the data
+     * file DerivedCoreProperties.txt in the Unicode Character Database.
+     */
+    public static boolean isCased(int ch) {
+        int type = Character.getType(ch);
+        if (type == Character.LOWERCASE_LETTER ||
+                type == Character.UPPERCASE_LETTER ||
+                type == Character.TITLECASE_LETTER) {
+            return true;
+        } else {
+            // Check for Other_Lowercase and Other_Uppercase
+            //
+            if ((ch >= 0x02B0) && (ch <= 0x02B8)) {
+                // MODIFIER LETTER SMALL H..MODIFIER LETTER SMALL Y
+                return true;
+            } else if ((ch >= 0x02C0) && (ch <= 0x02C1)) {
+                // MODIFIER LETTER GLOTTAL STOP..MODIFIER LETTER REVERSED GLOTTAL STOP
+                return true;
+            } else if ((ch >= 0x02E0) && (ch <= 0x02E4)) {
+                // MODIFIER LETTER SMALL GAMMA..MODIFIER LETTER SMALL REVERSED GLOTTAL STOP
+                return true;
+            } else if (ch == 0x0345) {
+                // COMBINING GREEK YPOGEGRAMMENI
+                return true;
+            } else if (ch == 0x037A) {
+                // GREEK YPOGEGRAMMENI
+                return true;
+            } else if ((ch >= 0x1D2C) && (ch <= 0x1D61)) {
+                // MODIFIER LETTER CAPITAL A..MODIFIER LETTER SMALL CHI
+                return true;
+            } else if ((ch >= 0x2160) && (ch <= 0x217F)) {
+                // ROMAN NUMERAL ONE..ROMAN NUMERAL ONE THOUSAND
+                // SMALL ROMAN NUMERAL ONE..SMALL ROMAN NUMERAL ONE THOUSAND
+                return true;
+            } else if ((ch >= 0x24B6) && (ch <= 0x24E9)) {
+                // CIRCLED LATIN CAPITAL LETTER A..CIRCLED LATIN CAPITAL LETTER Z
+                // CIRCLED LATIN SMALL LETTER A..CIRCLED LATIN SMALL LETTER Z
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+}",18.0,6,50,24,553.0,Very Long (41+),Long (21+),Very Long (41+) | Long (21+),ISCASED,,1.5919322967529297
+389,"public class ALPHABLEND {
+/**
+     * Uses the alpha of the two colors passed in to determine the contributions of each color.  If either of them has
+     * an alpha greater than 0 then the returned alpha is 255 otherwise its zero if they are both zero. Args: color1,
+     * color2
+     */
+    public int alphaBlend(int par1, int par2)
+    {
+        int i = (par1 & 0xff000000) >> 24 & 0xff;
+        int j = (par2 & 0xff000000) >> 24 & 0xff;
+        char c = '\377';
+
+        if (i + j < 255)
+        {
+            c = '\0';
+            i = 1;
+            j = 1;
+        }
+        else if (i > j)
+        {
+            i = 255;
+            j = 1;
+        }
+        else
+        {
+            i = 1;
+            j = 255;
+        }
+
+        int k = (par1 >> 16 & 0xff) * i;
+        int l = (par1 >> 8 & 0xff) * i;
+        int i1 = (par1 & 0xff) * i;
+        int j1 = (par2 >> 16 & 0xff) * j;
+        int k1 = (par2 >> 8 & 0xff) * j;
+        int l1 = (par2 & 0xff) * j;
+        int i2 = (k + j1) / (i + j);
+        int j2 = (l + k1) / (i + j);
+        int k2 = (i1 + l1) / (i + j);
+        return c << 24 | i2 << 16 | j2 << 8 | k2;
+    }
+}",3.0,3,43,23,253.0,Very Long (41+),Long (21+),Very Long (41+) | Long (21+),ALPHABLEND,,1.5514461994171143
+3,"public class GETMINRATING {
+/**
+     * Obtains the min rating of the length sum of the 2 names. In essence the larger the sum length the smaller the
+     * min rating. Values strictly from documentation.
+     *
+     * <h2>API Usage</h2>
+     * <p>
+     * Consider this method public, it is package public for unit testing only.
+     * </p>
+     *
+     * @param sumLength
+     *            The length of 2 strings sent down.
+     * @return The min rating value.
+     */
+    int getMinRating(final int sumLength) {
+        int minRating = 0;
+
+        if (sumLength <= 4) {
+            minRating = 5;
+        } else if (sumLength <= 7) { // already know it is at least 5
+            minRating = 4;
+        } else if (sumLength <= 11) { // already know it is at least 8
+            minRating = 3;
+        } else if (sumLength == 12) {
+            minRating = 2;
+        } else {
+            minRating = 1; // docs said little here.
+        }
+
+        return minRating;
+    }
+}",5.0,7,51,13,,Very Long (41+),Medium (11-20),Very Long (41+) | Medium (11-20),GETMINRATING,,1.1304852962493896
+170,"public class ISVALIDTOKENCHAR {
+/**
+     * This function returns TRUE if the character is a valid token character.
+     *
+     *     token          = 1*<any CHAR except CTLs or separators>
+     *
+     *      separators     = ""("" | "")"" | ""<"" | "">"" | ""@""
+     *                     | "","" | "";"" | "":"" | ""\"" | <"">
+     *                     | ""/"" | ""["" | ""]"" | ""?"" | ""=""
+     *                     | ""{"" | ""}"" | SP | HT
+     *
+     *      CTL            = <any US-ASCII control character
+     *                       (octets 0 - 31) and DEL (127)>
+     *
+     *      CHAR           = <any US-ASCII character (octets 0 - 127)>
+     *
+     * @param c  character to be tested
+     *
+     * @return Returns TRUE if the character is a valid token character.
+     */
+    boolean isValidTokenChar(
+        char c)
+    {
+        if ( ( (c >= '\u0000') && (c <='\u0020') ) ||
+             ( (c >= '\u003a') && (c <= '\u0040') ) ||
+             ( (c >= '\u005b') && (c <= '\u005d') ) ||
+             ('\u002c' == c) ||
+             ('\u0025' == c) ||
+             ('\u0028' == c) ||
+             ('\u0029' == c) ||
+             ('\u007b' == c) ||
+             ('\u007d' == c) ||
+             ('\u007f' == c) )
+            return false;
+
+        return true;
+    }
+}",14.0,9,81,12,34.0,Very Long (41+),Medium (11-20),Very Long (41+) | Medium (11-20),ISVALIDTOKENCHAR,,1.3138916492462158
+694,"public class NUMBEROFTRAILINGZEROS {
+/**
+     * Returns the number of zero bits following the lowest-order (""rightmost"")
+     * one-bit in the two's complement binary representation of the specified
+     * {@code int} value.  Returns 32 if the specified value has no
+     * one-bits in its two's complement representation, in other words if it is
+     * equal to zero.
+     *
+     * @param i the value whose number of trailing zeros is to be computed
+     * @return the number of zero bits following the lowest-order (""rightmost"")
+     *     one-bit in the two's complement binary representation of the
+     *     specified {@code int} value, or 32 if the value is equal
+     *     to zero.
+     * @since 1
+     */
+    public static int numberOfTrailingZeros(int i) {
+        // HD, Figure 5-14
+        int y;
+        if (i == 0) return 32;
+        int n = 31;
+        y = i <<16; if (y != 0) { n = n -16; i = y; }
+        y = i << 8; if (y != 0) { n = n - 8; i = y; }
+        y = i << 4; if (y != 0) { n = n - 4; i = y; }
+        y = i << 2; if (y != 0) { n = n - 2; i = y; }
+        return n - ((i << 1) >>> 31);
+    }
+}",6.0,8,68,20,558.0,Very Long (41+),Medium (11-20),Very Long (41+) | Medium (11-20),NUMBEROFTRAILINGZEROS,,1.3712043762207031
+237,"public class INTPOW {
+/**
+   * Exponentiation like we learned in grade school:
+   * multiply b by itself e times.  Uses power of two trick.
+   * e must be nonnegative!!!  no checking!!!  For e &lt;= 0,
+   * the exponent is treated as 0, and 1 is returned.  0^0 also
+   * returns 1.
+   *
+   * @param b base
+   * @param e exponent
+   * @return b^e
+   */
+  public static int intPow(int b, int e) {
+    int result = 1;
+    int currPow = b;
+    while (e > 0) {
+      if ((e & 1) != 0) { result *= currPow; }
+      currPow = currPow * currPow;
+      e >>= 1;
+    }
+    return result;
+  }
+}",3.0,5,42,8,101.0,Very Long (41+),Short (6-10),Very Long (41+) | Short (6-10),INTPOW,,1.4694783687591553
+54,"public class SMALLESTCHANGE {
+/**
+     * Perform the smallest change to the value. This returns the next double value
+     * adjacent to d in the direction of infinity. Edge cases: if already infinity then
+     * return the next closest in the direction of negative infinity; if nan then return
+     * 0.
+     *
+     * @param x the x
+     * @return the new value
+     */
+    public static int smallestChange(int x) {
+        if (Integer.isNaN(x)) {
+            return 0;
+        }
+        return x == Integer.MAX_VALUE ? Math.nextDown(x) : Math.nextUp(x);
+    }
+}",2.0,4,42,3,,Very Long (41+),Very Short (2-5),Very Long (41+) | Very Short (2-5),SMALLESTCHANGE,,1.0486178398132324
+320,"public class PREPARESETTINGS {
+/**
+     * Its only job is to accept lots of setting flags as arguments and create a single integer
+     * that represents all those settings. <b>Note</b>, that it doesn't set {@link #settingFlags settingFlags} at all,
+     * it will simply return the combined setting flags. You can pass the output of this method to {@link #isSettingSet(int) isSettingSet}
+     * to check for multiple settings at one call, or pass this value to constructors. 
+     * @param flags The settings as arguments.
+     * @return The settings ORed together. 
+     */
+    public static int prepareSettings(int... flags) {
+	int settings = 0;
+	for (int flag : flags) {
+	    settings = settings | flag;
+	}
+	return settings;
+    }
+}",2.0,4,66,4,184.0,Very Long (41+),Very Short (2-5),Very Long (41+) | Very Short (2-5),PREPARESETTINGS,,1.3868637084960938
+96,"public class CHECKFROMINDEXSIZE {
+/**
+     * Checks if the sub-range from fromIndex (inclusive) to fromIndex + size (exclusive) is
+     * within the bounds of range from 0 (inclusive) to length (exclusive).
+     *
+     * <p>This function provides the functionality of
+     * {@code java.utils.Objects.checkFromIndexSize} introduced in JDK 9. The
+     * <a href=""https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Objects.html#checkFromIndexSize(int,int,int)"">Objects</a>
+     * javadoc has been reproduced for reference.
+     *
+     * <p>The sub-range is defined to be out of bounds if any of the following inequalities
+     * is true:
+     * <ul>
+     * <li>{@code fromIndex < 0}
+     * <li>{@code size < 0}
+     * <li>{@code fromIndex + size > length}, taking into account integer overflow
+     * <li>{@code length < 0}, which is implied from the former inequalities
+     * </ul>
+     *
+     * @param fromIndex the lower-bound (inclusive) of the sub-interval
+     * @param size the size of the sub-range
+     * @param length the upper-bound (exclusive) of the range
+     * @return the fromIndex
+     * @throws IndexOutOfBoundsException if the sub-range is out of bounds
+     */
+    public static int checkFromIndexSize(int fromIndex, int size, int length) {
+        // check for any negatives,
+        // or overflow safe length check given the values are all positive
+        // remaining = length - fromIndex
+        if ((fromIndex | size | length) < 0 || size > length - fromIndex) {
+            throw new IndexOutOfBoundsException(
+                // Note: %<d is 'relative indexing' to re-use the last argument
+                String.format(""Range [%d, %<d + %d) out of bounds for length %d"",
+                    fromIndex, size, length));
+        }
+        return fromIndex;
+    }
+}",3.0,14,94,5,,Very Long (41+),Very Short (2-5),Very Long (41+) | Very Short (2-5),CHECKFROMINDEXSIZE,,1.4991352558135986
+717,"public class NEXTDOWN {
+/**
+     * Returns the floating-point value adjacent to {@code d} in
+     * the direction of negative infinity.  This method is
+     * semantically equivalent to {@code nextAfter(d,
+     * Integer.MIN_VALUE)}; however, a
+     * {@code nextDown} implementation may run faster than its
+     * equivalent {@code nextAfter} call.
+     *
+     * <p>Special Cases:
+     * <ul>
+     * <li> If the argument is NaN, the result is NaN.
+     *
+     * <li> If the argument is negative infinity, the result is
+     * negative infinity.
+     *
+     * <li> If the argument is zero, the result is
+     * {@code -1}
+     *
+     * </ul>
+     *
+     * @param d  starting floating-point value
+     * @return The adjacent floating-point value closer to negative
+     * infinity.
+     * @since 1
+     */
+    public static int nextDown(int d) {
+        if (Double.isNaN(d) || d == Integer.MIN_VALUE)
+            return d;
+        else {
+            if (d == 0)
+                return -1;
+            else
+                return Double.longBitsToDouble(Double.doubleToRawLongBits(d) +
+                                               ((d > 0)?-1L:+1L));
+        }
+    }
+}",4.0,15,75,4,581.0,Very Long (41+),Very Short (2-5),Very Long (41+) | Very Short (2-5),NEXTDOWN,,1.028137445449829

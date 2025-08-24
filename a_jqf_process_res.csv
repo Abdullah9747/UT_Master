@@ -1,0 +1,389 @@
+Class_Name,Function,JQF_Test_Values,LLM_Result
+UnknownClass,getMask,"['[1994145609]', '[0]', '[5]', '[4]', '[2]']","import org.junit.Test;
+import org.junit.Assert;
+
+public class GetMaskTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1994145609, new Solution().getMask(1994145609));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, new Solution().getMask(0));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(5, new Solution().getMask(5));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(4, new Solution().getMask(4));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(2, new Solution().getMask(2));
+    }
+}"
+UnknownClass,intToHexDigitMsb0,['[1912603126]'],"import org.junit.Test;
+import org.junit.Assert;
+
+public class IntToHexDigitMsb0Test {
+
+    @Test
+    public void testCase1() {
+        int input = 1912603126;
+        String expected = ""Undefined"";
+        Assert.assertEquals(expected, None.intToHexDigitMsb0(input));
+    }
+}"
+UnknownClass,isNumeric,"['[232817336]', '[0]', '[14]', '[1]', '[11]', '[12]', '[7]', '[6]']","import org.junit.Test;
+import org.junit.Assert;
+
+public class IsNumericTest {
+
+    private boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(true, isNumeric(""232817336""));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(true, isNumeric(""0""));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(true, isNumeric(""14""));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(true, isNumeric(""1""));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(true, isNumeric(""11""));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(true, isNumeric(""12""));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(true, isNumeric(""7""));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(true, isNumeric(""6""));
+    }
+}"
+UnknownClass,getEuropeanDigit,"['[1593416713]', '[-1903241435]', '[39945]']","import org.junit.Test;
+import org.junit.Assert;
+
+public class GetEuropeanDigitTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, new Solution().getEuropeanDigit());
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, new Solution().getEuropeanDigit());
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(0, new Solution().getEuropeanDigit());
+    }
+
+    private static class Solution {
+        public int getEuropeanDigit() {
+            return 0;
+        }
+    }
+}"
+UnknownClass,usesAn,"['[ã²•]', '[E]', '[I]', '[H]', '[a]', '[O]']","import org.junit.Test;
+import org.junit.Assert;
+
+public class UsesAnTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(false, usesAn(""[ã²•]""));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(false, usesAn(""[E]""));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(false, usesAn(""[I]""));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(false, usesAn(""[H]""));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(true, usesAn(""[a]""));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(false, usesAn(""[O]""));
+    }
+}"
+UnknownClass,colorComponentAbsolute,"['[0.20089126, 0.90057516, 0.59151983, 0.7951877, 0.8842941]', '[0.99776626, 0.9203707, 0.03422326, 0.4619273, 0.54925454]', '[0.70955825, 0.1795479, 0.7939759, 0.81796944, 0.15713495]', '[0.56856704, 0.26478767, 0.90637493, 0.22982937, 0.5563394]', '[0.20089126, 0.16137838, 0.44442046, 0.044730008, 0.72527075]']","import org.junit.Test;
+import org.junit.Assert;
+
+public class ColorComponentAbsoluteTest {
+
+    private double colorComponentAbsolute(double input) {
+        return Math.abs(input);
+    }
+
+    @Test
+    public void testCase1() {
+        double[] input = {0.20089126, 0.90057516, 0.59151983, 0.7951877, 0.8842941};
+        double expected = 0.20089126;
+        Assert.assertEquals(expected, colorComponentAbsolute(input[0]), 0.00000001);
+    }
+
+    @Test
+    public void testCase2() {
+        double[] input = {0.99776626, 0.9203707, 0.03422326, 0.4619273, 0.54925454};
+        double expected = 0.99776626;
+        Assert.assertEquals(expected, colorComponentAbsolute(input[0]), 0.00000001);
+    }
+
+    @Test
+    public void testCase3() {
+        double[] input = {0.70955825, 0.1795479, 0.7939759, 0.81796944, 0.15713495};
+        double expected = 0.70955825;
+        Assert.assertEquals(expected, colorComponentAbsolute(input[0]), 0.00000001);
+    }
+
+    @Test
+    public void testCase4() {
+        double[] input = {0.56856704, 0.26478767, 0.90637493, 0.22982937, 0.5563394};
+        double expected = 0.56856704;
+        Assert.assertEquals(expected, colorComponentAbsolute(input[0]), 0.00000001);
+    }
+
+    @Test
+    public void testCase5() {
+        double[] input = {0.20089126, 0.16137838, 0.44442046, 0.044730008, 0.72527075};
+        double expected = 0.20089126;
+        Assert.assertEquals(expected, colorComponentAbsolute(input[0]), 0.00000001);
+    }
+}"
+UnknownClass,toJavaSecs,"['[-8498624097974006656]', '[9095902087563549767]']","import org.junit.Test;
+import org.junit.Assert;
+
+public class ToJavaSecsTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, toJavaSecs(-8498624097974006656L));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, toJavaSecs(9095902087563549767L));
+    }
+
+    private long toJavaSecs(long arg) {
+        // Placeholder implementation to allow compilation.
+        // The actual implementation is assumed to exist elsewhere.
+        return 0;
+    }
+}"
+UnknownClass,toPgSecs,"['[6531203690080990914]', '[-3845089849785029059]']","import org.junit.Test;
+import org.junit.Assert;
+
+public class ToPgSecsTest {
+
+    @Test
+    public void testCase1() {
+        long input = 6531203690080990914L;
+        long expected = 6530257000080990L;
+        Assert.assertEquals(expected, toPgSecs(input));
+    }
+
+    @Test
+    public void testCase2() {
+        long input = -3845089849785029059L;
+        long expected = -3845090796469829L;
+        Assert.assertEquals(expected, toPgSecs(input));
+    }
+
+    private long toPgSecs(long input) {
+        return input / 100000000L;
+    }
+}"
+UnknownClass,reverse,['[1602526665534058741]'],"import org.junit.Test;
+import org.junit.Assert;
+
+public class ReverseStringTest {
+
+    @Test
+    public void testCase1() {
+        String input = ""[1602526665534058741]"";
+        String expected = ""[1478504355662520616]"";
+        String actual = reverse(input);
+        Assert.assertEquals(expected, actual);
+    }
+
+    private String reverse(String s) {
+        return new StringBuilder(s).reverse().toString();
+    }
+}"
+UnknownClass,nextHighestPowerOfTwo,['[-73827611]'],"import org.junit.Test;
+import org.junit.Assert;
+
+public class NextHighestPowerOfTwoTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, nextHighestPowerOfTwo(-73827611));
+    }
+}"
+UnknownClass,bitCount,['[6213434489718269007]'],"import org.junit.Test;
+import org.junit.Assert;
+
+public class BitCountTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(35, Long.bitCount(6213434489718269007L));
+    }
+}"
+UnknownClass,calculateUnpinnedStepSize,"['[-1708994244]', '[90599560]', '[302921]']","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class CalculateUnpinnedStepSizeTest {
+
+    @Test
+    public void testCase1() {
+        // Since calculateUnpinnedStepSize is a void method and we have no way to observe its effects,
+        // we cannot assert anything meaningful.  We can only call the method.
+        calculateUnpinnedStepSize();
+    }
+
+    @Test
+    public void testCase2() {
+        // Since calculateUnpinnedStepSize is a void method and we have no way to observe its effects,
+        // we cannot assert anything meaningful.  We can only call the method.
+        calculateUnpinnedStepSize();
+    }
+
+    @Test
+    public void testCase3() {
+        // Since calculateUnpinnedStepSize is a void method and we have no way to observe its effects,
+        // we cannot assert anything meaningful.  We can only call the method.
+        calculateUnpinnedStepSize();
+    }
+
+    private void calculateUnpinnedStepSize() {
+        // This is a placeholder.  The actual method is assumed to exist.
+    }
+}"
+UnknownClass,decodeHexDigit,"['[춠]', '[J]', '[\x00]', '[8]', '[F]', '[e]']","import org.junit.Test;
+import org.junit.Assert;
+
+public class DecodeHexDigitTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(-1, decodeHexDigit('춠'));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(-1, decodeHexDigit('J'));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(-1, decodeHexDigit('\x00'));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(8, decodeHexDigit('8'));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(15, decodeHexDigit('F'));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(14, decodeHexDigit('e'));
+    }
+    
+    private int decodeHexDigit(char hexChar) {
+        if (hexChar >= '0' && hexChar <= '9') {
+            return hexChar - '0';
+        } else if (hexChar >= 'A' && hexChar <= 'F') {
+            return hexChar - 'A' + 10;
+        } else if (hexChar >= 'a' && hexChar <= 'f') {
+            return hexChar - 'a' + 10;
+        } else {
+            return -1;
+        }
+    }
+}"
+UnknownClass,compare,"['[0.8580642145852232, 0.2929983634658988]', '[0.0, 0.0]', '[0.05437772982182898, 0.5482594843991112]']","import org.junit.Test;
+import org.junit.Assert;
+
+public class CompareTest {
+
+    @Test
+    public void testCase1() {
+        double[] arr1 = {0.8580642145852232, 0.2929983634658988};
+        double[] arr2 = {0.0, 0.0};
+        int expected = 1;
+        Assert.assertEquals(expected, Solution.compare(arr1, arr2));
+    }
+
+    @Test
+    public void testCase2() {
+        double[] arr1 = {0.0, 0.0};
+        double[] arr2 = {0.05437772982182898, 0.5482594843991112};
+        int expected = -1;
+        Assert.assertEquals(expected, Solution.compare(arr1, arr2));
+    }
+
+    @Test
+    public void testCase3() {
+        double[] arr1 = {0.05437772982182898, 0.5482594843991112};
+        double[] arr2 = {0.8580642145852232, 0.2929983634658988};
+        int expected = -1;
+        Assert.assertEquals(expected, Solution.compare(arr1, arr2));
+    }
+}"

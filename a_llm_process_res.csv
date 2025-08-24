@@ -1,0 +1,1081 @@
+Class_Name,Function,LLM_Result_White_Box_Statement,LLM_Result_White_Box_Branch,LLM_Black_Box_Result_Statement,LLM_Black_Box_Result_Branch,LLM_Gray_Box_Result_Statement,LLM_Gray_Box_Result_Branch
+GETMASK,"public class GETMASK {
+/**
+     * Calculate bit mask for a given number of bits. The mask should enable to
+     * make a bitwise and to the given number of bits.
+     * @param numOfBits number of bits to calculate mask for.
+     * @return bit mask
+     */
+    public static int getMask(int numOfBits) {
+        int mask = 0x00;
+
+        switch (numOfBits) {
+        case 1:
+            mask = 0x01;
+            break;
+        case 2:
+            mask = 0x03;
+            break;
+        case 3:
+            mask = 0x07;
+            break;
+        case 4:
+            mask = 0x0F;
+            break;
+        case 5:
+            mask = 0x1F;
+            break;
+        case 6:
+            mask = 0x3F;
+            break;
+        case 7:
+            mask = 0x7F;
+            break;
+        case 8:
+            mask = 0xFF;
+            break;
+        }
+        return mask;
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class GETMASKTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, GETMASK.getMask(1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(3, GETMASK.getMask(2));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(7, GETMASK.getMask(3));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(15, GETMASK.getMask(4));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(31, GETMASK.getMask(5));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(63, GETMASK.getMask(6));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(127, GETMASK.getMask(7));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(255, GETMASK.getMask(8));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals(0, GETMASK.getMask(0));
+    }
+
+    @Test
+    public void testCase10() {
+        Assert.assertEquals(0, GETMASK.getMask(9));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class GETMASKTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, GETMASK.getMask(1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, GETMASK.getMask(9));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(15, GETMASK.getMask(4));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class GETMASK_ESTest {
+
+    @Test
+    public void testCase0() {
+        Assert.assertEquals(0, GETMASK.getMask(0));
+    }
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, GETMASK.getMask(1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(2147483647, GETMASK.getMask(31));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(-1, GETMASK.getMask(32));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class GETMASKTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, GETMASK.getMask(0));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(-1, GETMASK.getMask(32));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(31, GETMASK.getMask(5));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class GETMASKTest {
+
+    @Test
+    public void testCase0() {
+        Assert.assertEquals(0, GETMASK.getMask(0));
+    }
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, GETMASK.getMask(1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(2147483647, GETMASK.getMask(31));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class GETMASKTest {
+
+    @Test
+    public void testCase0() {
+        Assert.assertEquals(0, GETMASK.getMask(0));
+    }
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, GETMASK.getMask(1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(2147483647, GETMASK.getMask(31));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(-1, GETMASK.getMask(32));
+    }
+}"
+INTTOHEXDIGITMSB0,"public class INTTOHEXDIGITMSB0 {
+/**
+     * Converts the 4 lsb of an int to a hexadecimal digit encoded using the Msb0 bit ordering.
+     *
+     * <p>
+     * 0 returns '0'
+     * </p>
+     * <p>
+     * 1 returns '8'
+     * </p>
+     * <p>
+     * 10 returns '5' and so on...
+     * </p>
+     *
+     * @param nibble the 4 bits to convert
+     * @return a hexadecimal digit representing the 4 lsb of {@code nibble}
+     * @throws IllegalArgumentException if {@code nibble < 0} or {@code nibble > 15}
+     */
+    public static char intToHexDigitMsb0(final int nibble) {
+        switch (nibble) {
+        case 0x0:
+            return '0';
+        case 0x1:
+            return '8';
+        case 0x2:
+            return '4';
+        case 0x3:
+            return 'c';
+        case 0x4:
+            return '2';
+        case 0x5:
+            return 'a';
+        case 0x6:
+            return '6';
+        case 0x7:
+            return 'e';
+        case 0x8:
+            return '1';
+        case 0x9:
+            return '9';
+        case 0xA:
+            return '5';
+        case 0xB:
+            return 'd';
+        case 0xC:
+            return '3';
+        case 0xD:
+            return 'b';
+        case 0xE:
+            return '7';
+        case 0xF:
+            return 'f';
+        default:
+            throw new IllegalArgumentException(""nibble value not between 0 and 15: "" + nibble);
+        }
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class INTTOHEXDIGITMSB0Test {
+
+    @Test
+    public void testCase0() {
+        Assert.assertEquals('0', INTTOHEXDIGITMSB0.intToHexDigitMsb0(0));
+    }
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals('8', INTTOHEXDIGITMSB0.intToHexDigitMsb0(1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals('4', INTTOHEXDIGITMSB0.intToHexDigitMsb0(2));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals('c', INTTOHEXDIGITMSB0.intToHexDigitMsb0(3));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals('2', INTTOHEXDIGITMSB0.intToHexDigitMsb0(4));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals('a', INTTOHEXDIGITMSB0.intToHexDigitMsb0(5));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals('6', INTTOHEXDIGITMSB0.intToHexDigitMsb0(6));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals('e', INTTOHEXDIGITMSB0.intToHexDigitMsb0(7));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals('1', INTTOHEXDIGITMSB0.intToHexDigitMsb0(8));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals('9', INTTOHEXDIGITMSB0.intToHexDigitMsb0(9));
+    }
+
+    @Test
+    public void testCase10() {
+        Assert.assertEquals('5', INTTOHEXDIGITMSB0.intToHexDigitMsb0(10));
+    }
+
+    @Test
+    public void testCase11() {
+        Assert.assertEquals('d', INTTOHEXDIGITMSB0.intToHexDigitMsb0(11));
+    }
+
+    @Test
+    public void testCase12() {
+        Assert.assertEquals('3', INTTOHEXDIGITMSB0.intToHexDigitMsb0(12));
+    }
+
+    @Test
+    public void testCase13() {
+        Assert.assertEquals('b', INTTOHEXDIGITMSB0.intToHexDigitMsb0(13));
+    }
+
+    @Test
+    public void testCase14() {
+        Assert.assertEquals('7', INTTOHEXDIGITMSB0.intToHexDigitMsb0(14));
+    }
+
+    @Test
+    public void testCase15() {
+        Assert.assertEquals('f', INTTOHEXDIGITMSB0.intToHexDigitMsb0(15));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class INTTOHEXDIGITMSB0Test {
+
+    @Test
+    public void testCase0() {
+        Assert.assertEquals('0', INTTOHEXDIGITMSB0.intToHexDigitMsb0(0));
+    }
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals('8', INTTOHEXDIGITMSB0.intToHexDigitMsb0(1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals('4', INTTOHEXDIGITMSB0.intToHexDigitMsb0(2));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals('c', INTTOHEXDIGITMSB0.intToHexDigitMsb0(3));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals('2', INTTOHEXDIGITMSB0.intToHexDigitMsb0(4));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals('a', INTTOHEXDIGITMSB0.intToHexDigitMsb0(5));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals('6', INTTOHEXDIGITMSB0.intToHexDigitMsb0(6));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals('e', INTTOHEXDIGITMSB0.intToHexDigitMsb0(7));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals('1', INTTOHEXDIGITMSB0.intToHexDigitMsb0(8));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals('9', INTTOHEXDIGITMSB0.intToHexDigitMsb0(9));
+    }
+
+    @Test
+    public void testCase10() {
+        Assert.assertEquals('5', INTTOHEXDIGITMSB0.intToHexDigitMsb0(10));
+    }
+
+    @Test
+    public void testCase11() {
+        Assert.assertEquals('d', INTTOHEXDIGITMSB0.intToHexDigitMsb0(11));
+    }
+
+    @Test
+    public void testCase12() {
+        Assert.assertEquals('3', INTTOHEXDIGITMSB0.intToHexDigitMsb0(12));
+    }
+
+    @Test
+    public void testCase13() {
+        Assert.assertEquals('b', INTTOHEXDIGITMSB0.intToHexDigitMsb0(13));
+    }
+
+    @Test
+    public void testCase14() {
+        Assert.assertEquals('7', INTTOHEXDIGITMSB0.intToHexDigitMsb0(14));
+    }
+
+    @Test
+    public void testCase15() {
+        Assert.assertEquals('f', INTTOHEXDIGITMSB0.intToHexDigitMsb0(15));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCase16() {
+        INTTOHEXDIGITMSB0.intToHexDigitMsb0(-1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCase17() {
+        INTTOHEXDIGITMSB0.intToHexDigitMsb0(16);
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class INTTOHEXDIGITMSB0Test {
+
+    @Test
+    public void testCase0() {
+        Assert.assertEquals('0', INTTOHEXDIGITMSB0.intToHexDigitMsb0(0));
+    }
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals('1', INTTOHEXDIGITMSB0.intToHexDigitMsb0(1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals('9', INTTOHEXDIGITMSB0.intToHexDigitMsb0(9));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals('a', INTTOHEXDIGITMSB0.intToHexDigitMsb0(10));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals('f', INTTOHEXDIGITMSB0.intToHexDigitMsb0(15));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class INTTOHEXDIGITMSB0Test {
+
+    @Test
+    public void testCase0() {
+        Assert.assertEquals('0', INTTOHEXDIGITMSB0.intToHexDigitMsb0(0));
+    }
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals('A', INTTOHEXDIGITMSB0.intToHexDigitMsb0(10));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals('F', INTTOHEXDIGITMSB0.intToHexDigitMsb0(15));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class INTTOHEXDIGITMSB0Test {
+
+    @Test
+    public void testCase0() {
+        Assert.assertEquals('0', INTTOHEXDIGITMSB0.intToHexDigitMsb0(0));
+    }
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals('8', INTTOHEXDIGITMSB0.intToHexDigitMsb0(1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals('4', INTTOHEXDIGITMSB0.intToHexDigitMsb0(2));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals('c', INTTOHEXDIGITMSB0.intToHexDigitMsb0(3));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals('2', INTTOHEXDIGITMSB0.intToHexDigitMsb0(4));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals('a', INTTOHEXDIGITMSB0.intToHexDigitMsb0(5));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals('6', INTTOHEXDIGITMSB0.intToHexDigitMsb0(6));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals('e', INTTOHEXDIGITMSB0.intToHexDigitMsb0(7));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals('1', INTTOHEXDIGITMSB0.intToHexDigitMsb0(8));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals('9', INTTOHEXDIGITMSB0.intToHexDigitMsb0(9));
+    }
+
+    @Test
+    public void testCase10() {
+        Assert.assertEquals('5', INTTOHEXDIGITMSB0.intToHexDigitMsb0(10));
+    }
+
+    @Test
+    public void testCase11() {
+        Assert.assertEquals('d', INTTOHEXDIGITMSB0.intToHexDigitMsb0(11));
+    }
+
+    @Test
+    public void testCase12() {
+        Assert.assertEquals('3', INTTOHEXDIGITMSB0.intToHexDigitMsb0(12));
+    }
+
+    @Test
+    public void testCase13() {
+        Assert.assertEquals('b', INTTOHEXDIGITMSB0.intToHexDigitMsb0(13));
+    }
+
+    @Test
+    public void testCase14() {
+        Assert.assertEquals('7', INTTOHEXDIGITMSB0.intToHexDigitMsb0(14));
+    }
+
+    @Test
+    public void testCase15() {
+        Assert.assertEquals('f', INTTOHEXDIGITMSB0.intToHexDigitMsb0(15));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class INTTOHEXDIGITMSB0Test {
+
+    @Test
+    public void testCase0() {
+        Assert.assertEquals('0', INTTOHEXDIGITMSB0.intToHexDigitMsb0(0));
+    }
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals('8', INTTOHEXDIGITMSB0.intToHexDigitMsb0(1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals('4', INTTOHEXDIGITMSB0.intToHexDigitMsb0(2));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals('c', INTTOHEXDIGITMSB0.intToHexDigitMsb0(3));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals('2', INTTOHEXDIGITMSB0.intToHexDigitMsb0(4));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals('a', INTTOHEXDIGITMSB0.intToHexDigitMsb0(5));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals('6', INTTOHEXDIGITMSB0.intToHexDigitMsb0(6));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals('e', INTTOHEXDIGITMSB0.intToHexDigitMsb0(7));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals('1', INTTOHEXDIGITMSB0.intToHexDigitMsb0(8));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals('9', INTTOHEXDIGITMSB0.intToHexDigitMsb0(9));
+    }
+
+    @Test
+    public void testCase10() {
+        Assert.assertEquals('5', INTTOHEXDIGITMSB0.intToHexDigitMsb0(10));
+    }
+
+    @Test
+    public void testCase11() {
+        Assert.assertEquals('d', INTTOHEXDIGITMSB0.intToHexDigitMsb0(11));
+    }
+
+    @Test
+    public void testCase12() {
+        Assert.assertEquals('3', INTTOHEXDIGITMSB0.intToHexDigitMsb0(12));
+    }
+
+    @Test
+    public void testCase13() {
+        Assert.assertEquals('b', INTTOHEXDIGITMSB0.intToHexDigitMsb0(13));
+    }
+
+    @Test
+    public void testCase14() {
+        Assert.assertEquals('7', INTTOHEXDIGITMSB0.intToHexDigitMsb0(14));
+    }
+
+    @Test
+    public void testCase15() {
+        Assert.assertEquals('f', INTTOHEXDIGITMSB0.intToHexDigitMsb0(15));
+    }
+}"
+ISNUMERIC,"public class ISNUMERIC {
+/**
+     * Indicates whether the given SQL data type is a numberic type.
+     *
+     * @param type one of the constants from <code>java.sql.Types</code>
+     * @return <code>true</code> if the given type is <code>NUMERIC</code>,'
+     *         <code>DECIMAL</code>, <code>BIT</code>, <code>TINYINT</code>,
+     *         <code>SMALLINT</code>, <code>INTEGER</code>, <code>BIGINT</code>,
+     *         <code>REAL</code>, <code>DOUBLE</code>, or <code>FLOAT</code>;
+     *         <code>false</code> otherwise
+     */
+    public boolean isNumeric(int type) {
+        switch (type) {
+            case java.sql.Types.NUMERIC:
+            case java.sql.Types.DECIMAL:
+            case java.sql.Types.BIT:
+            case java.sql.Types.TINYINT:
+            case java.sql.Types.SMALLINT:
+            case java.sql.Types.INTEGER:
+            case java.sql.Types.BIGINT:
+            case java.sql.Types.REAL:
+            case java.sql.Types.DOUBLE:
+            case java.sql.Types.FLOAT:
+                return true;
+            default:
+                return false;
+        }
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class ISNUMERICTest {
+
+    @Test
+    public void testCase1() {
+        boolean result = new ISNUMERIC().isNumeric(java.sql.Types.NUMERIC);
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase2() {
+        boolean result = new ISNUMERIC().isNumeric(java.sql.Types.VARCHAR);
+        Assert.assertEquals(false, result);
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class ISNUMERICTest {
+
+    @Test
+    public void testCase0() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(0);
+        assertEquals(false, result);
+    }
+
+    @Test
+    public void testCase1() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(1);
+        assertEquals(false, result);
+    }
+
+    @Test
+    public void testCase2() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(2);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase3() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(3);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase4() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(4);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase5() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(5);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase6() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(6);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase7() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(7);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase8() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(8);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase9() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(9);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase10() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(16);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase11() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        boolean result = iSNUMERIC.isNumeric(-1);
+        assertEquals(false, result);
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class ISNUMERICTest {
+
+    @Test
+    public void testCase1() {
+        ISNUMERIC isnumeric = new ISNUMERIC();
+        boolean result = isnumeric.isNumeric(1);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase2() {
+        ISNUMERIC isnumeric = new ISNUMERIC();
+        boolean result = isnumeric.isNumeric(2);
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testCase3() {
+        ISNUMERIC isnumeric = new ISNUMERIC();
+        boolean result = isnumeric.isNumeric(3);
+        assertEquals(false, result);
+    }
+
+    @Test
+    public void testCase4() {
+        ISNUMERIC isnumeric = new ISNUMERIC();
+        boolean result = isnumeric.isNumeric(4);
+        assertEquals(false, result);
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class ISNUMERICTest {
+
+    @Test
+    public void testCase1() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        Assert.assertEquals(false, iSNUMERIC.isNumeric(-1));
+    }
+
+    @Test
+    public void testCase2() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        Assert.assertEquals(false, iSNUMERIC.isNumeric(0));
+    }
+
+    @Test
+    public void testCase3() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        Assert.assertEquals(true, iSNUMERIC.isNumeric(1));
+    }
+
+    @Test
+    public void testCase4() {
+        ISNUMERIC iSNUMERIC = new ISNUMERIC();
+        Assert.assertEquals(true, iSNUMERIC.isNumeric(2));
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+import java.sql.Types;
+
+public class ISNUMERICTest {
+
+    @Test
+    public void testCase1() {
+        boolean expected = true;
+        boolean actual = new ISNUMERIC().isNumeric(java.sql.Types.INTEGER);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testCase2() {
+        boolean expected = false;
+        boolean actual = new ISNUMERIC().isNumeric(java.sql.Types.VARCHAR);
+        assertEquals(expected, actual);
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class ISNUMERICTest {
+
+    @Test
+    public void testCase1() {
+        boolean expected = true;
+        boolean actual = new ISNUMERIC().isNumeric(java.sql.Types.INTEGER);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testCase2() {
+        boolean expected = false;
+        boolean actual = new ISNUMERIC().isNumeric(java.sql.Types.VARCHAR);
+        assertEquals(expected, actual);
+    }
+}"
+GETEUROPEANDIGIT,"public class GETEUROPEANDIGIT {
+/**
+     * Getting the digit values of characters like 'A' - 'Z', normal,
+     * half-width and full-width. This method assumes that the other digit
+     * characters are checked by the calling method.
+     * @param ch character to test
+     * @return -1 if ch is not a character of the form 'A' - 'Z', otherwise
+     *         its corresponding digit will be returned.
+     */
+    public static int getEuropeanDigit(int ch) {
+        if ((ch > 0x7a && ch < 0xff21)
+            || ch < 0x41 || (ch > 0x5a && ch < 0x61)
+            || ch > 0xff5a || (ch > 0xff3a && ch < 0xff41)) {
+            return -1;
+        }
+        if (ch <= 0x7a) {
+            // ch >= 0x41 or ch < 0x61
+            return ch + 10 - ((ch <= 0x5a) ? 0x41 : 0x61);
+        }
+        // ch >= 0xff21
+        if (ch <= 0xff3a) {
+            return ch + 10 - 0xff21;
+        }
+        // ch >= 0xff41 && ch <= 0xff5a
+        return ch + 10 - 0xff41;
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class GETEUROPEANDIGITTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(10, GETEUROPEANDIGIT.getEuropeanDigit(65));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(10, GETEUROPEANDIGIT.getEuropeanDigit(97));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(65296));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(48));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class GETEUROPEANDIGITTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(10, GETEUROPEANDIGIT.getEuropeanDigit(65));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(10, GETEUROPEANDIGIT.getEuropeanDigit(97));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(10, GETEUROPEANDIGIT.getEuropeanDigit(10410));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(10, GETEUROPEANDIGIT.getEuropeanDigit(12322));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(48));
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class GETEUROPEANDIGITTest {
+
+    @Test
+    public void testCase1() {
+        assertEquals(0, GETEUROPEANDIGIT.getEuropeanDigit(48));
+    }
+
+    @Test
+    public void testCase2() {
+        assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(65));
+    }
+
+    @Test
+    public void testCase3() {
+        assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(-1));
+    }
+
+    @Test
+    public void testCase4() {
+        assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(1634));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class GETEUROPEANDIGITTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(65));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, GETEUROPEANDIGIT.getEuropeanDigit(48));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(0));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class GETEUROPEANDIGITTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(10, GETEUROPEANDIGIT.getEuropeanDigit(65));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(35, GETEUROPEANDIGIT.getEuropeanDigit(90));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(64));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(122));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(10, GETEUROPEANDIGIT.getEuropeanDigit(65313));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(35, GETEUROPEANDIGIT.getEuropeanDigit(65338));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(0));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class GETEUROPEANDIGITTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, GETEUROPEANDIGIT.getEuropeanDigit(65));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(26, GETEUROPEANDIGIT.getEuropeanDigit(90));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(97));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(122));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(65296));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(27, GETEUROPEANDIGIT.getEuropeanDigit(65313));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(-1, GETEUROPEANDIGIT.getEuropeanDigit(0));
+    }
+}"

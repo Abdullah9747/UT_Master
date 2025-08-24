@@ -1,0 +1,10 @@
+target=demo.GetLongN
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method = demo.GetLongN.GetLongN(sym#sym)
+
+symbolic.dp=z3
+listener = .symbc.SymbolicListener
+
+search.multiple_errors=true
+

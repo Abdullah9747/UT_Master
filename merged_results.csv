@@ -1,0 +1,1578 @@
+Function,JQF_Test_Values,SPF_Test_Values,LLM_Result_JQF,LLM_Result_SPF,LLM_Result_Statement,LLM_Result_Branch,Class Name,,
+getMask,"['[1994145609]', '[0]', '[5]', '[4]', '[2]']","Inputs: numOfBits_1_SYMINT
+
+(1)  --> Return Value: 1
+(2)  --> Return Value: 3
+(3)  --> Return Value: 7
+(4)  --> Return Value: 15
+(5)  --> Return Value: 31
+(6)  --> Return Value: 63
+(7)  --> Return Value: 127
+(8)  --> Return Value: 255
+(0)  --> Return Value: 0
+","import org.junit.Test;
+import org.junit.Assert;
+
+public class GetMaskTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1994145609, new Solution().getMask(1994145609));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, new Solution().getMask(0));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(5, new Solution().getMask(5));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(4, new Solution().getMask(4));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(2, new Solution().getMask(2));
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, 1);
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(3, 3);
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(7, 7);
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(15, 15);
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(31, 31);
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(63, 63);
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(127, 127);
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(255, 255);
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals(0, 0);
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class UnknownClassTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0.0, calculateBonus(0.0, ""regular""), 0.00001);
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(7.5, calculateBonus(150.0, ""regular""), 0.00001);
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(0.0, calculateBonus(50.0, ""regular""), 0.00001);
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(15.0, calculateBonus(150.0, ""premium""), 0.00001);
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(1.0, calculateBonus(50.0, ""premium""), 0.00001);
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(0.0, calculateBonus(100.0, ""unknown""), 0.00001);
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(0.0, calculateBonus(100.0, """"), 0.00001);
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(0.0, calculateBonus(100.0, null), 0.00001);
+    }
+
+    private double calculateBonus(double sales, String level) {
+        if (level == null || level.isEmpty()) {
+            return 0.0;
+        }
+        switch (level) {
+            case ""regular"":
+                if (sales > 100) {
+                    return (sales - 100) * 0.15;
+                } else {
+                    return 0.0;
+                }
+            case ""premium"":
+                return sales * 0.1;
+            default:
+                return 0.0;
+        }
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class HypotheticalTest {
+
+    private String hypotheticalMethod(int num, boolean flag) {
+        if (num > 10 && flag) return ""Large Positive"";
+        if (num > 0 && flag) return ""Small Positive"";
+        if (num < -5 && !flag) return ""Large Negative"";
+        if (num < 0 && !flag) return ""Small Negative"";
+        return ""Other"";
+    }
+
+    @Test
+    public void testCase1() {
+        assertEquals(""Large Positive"", hypotheticalMethod(12, true));
+    }
+
+    @Test
+    public void testCase2() {
+        assertEquals(""Small Positive"", hypotheticalMethod(5, true));
+    }
+
+    @Test
+    public void testCase3() {
+        assertEquals(""Large Negative"", hypotheticalMethod(-6, false));
+    }
+
+    @Test
+    public void testCase4() {
+        assertEquals(""Small Negative"", hypotheticalMethod(-2, false));
+    }
+}",GETMASK,,
+intToHexDigitMsb0,['[1912603126]'],"Inputs: nibble_1_SYMINT
+
+(0)  --> Return Value: 48
+(1)  --> Return Value: 56
+(2)  --> Return Value: 52
+(3)  --> Return Value: 99
+(4)  --> Return Value: 50
+(5)  --> Return Value: 97
+(6)  --> Return Value: 54
+(7)  --> Return Value: 101
+(8)  --> Return Value: 49
+(9)  --> Return Value: 57
+(10)  --> Return Value: 53
+(11)  --> Return Value: 100
+(12)  --> Return Value: 51
+(13)  --> Return Value: 98
+(14)  --> Return Value: 55
+(15)  --> Return Value: 102
+demo.Distance.distance(-1)  --> ""java.lang.IllegalArgumentException: nibble value not between 0 and 15: 0...""
+","import org.junit.Test;
+import org.junit.Assert;
+
+public class IntToHexDigitMsb0Test {
+
+    @Test
+    public void testCase1() {
+        int input = 1912603126;
+        String expected = ""Undefined"";
+        Assert.assertEquals(expected, None.intToHexDigitMsb0(input));
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(48, 0);
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(56, 1);
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(52, 2);
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(99, 3);
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(50, 4);
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(97, 5);
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(54, 6);
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(101, 7);
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals(49, 8);
+    }
+
+    @Test
+    public void testCase10() {
+        Assert.assertEquals(57, 9);
+    }
+
+    @Test
+    public void testCase11() {
+        Assert.assertEquals(53, 10);
+    }
+
+    @Test
+    public void testCase12() {
+        Assert.assertEquals(100, 11);
+    }
+
+    @Test
+    public void testCase13() {
+        Assert.assertEquals(51, 12);
+    }
+
+    @Test
+    public void testCase14() {
+        Assert.assertEquals(98, 13);
+    }
+
+    @Test
+    public void testCase15() {
+        Assert.assertEquals(55, 14);
+    }
+
+    @Test
+    public void testCase16() {
+        Assert.assertEquals(102, 15);
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+import java.util.Arrays;
+
+public class SolutionTest {
+
+    @Test
+    public void testCase1() {
+        Solution solution = new Solution();
+        int[] nums = {2, 7, 11, 15};
+        int target = 9;
+        int[] expected = {0, 1};
+        int[] actual = solution.twoSum(nums, target);
+        Arrays.sort(expected);
+        Arrays.sort(actual);
+        Assert.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testCase2() {
+        Solution solution = new Solution();
+        int[] nums = {3, 2, 4};
+        int target = 6;
+        int[] expected = {1, 2};
+        int[] actual = solution.twoSum(nums, target);
+        Arrays.sort(expected);
+        Arrays.sort(actual);
+        Assert.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testCase3() {
+        Solution solution = new Solution();
+        int[] nums = {3, 3};
+        int target = 6;
+        int[] expected = {0, 1};
+        int[] actual = solution.twoSum(nums, target);
+        Arrays.sort(expected);
+        Arrays.sort(actual);
+        Assert.assertArrayEquals(expected, actual);
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class NoneTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertNull(null);
+    }
+}",INTTOHEXDIGITMSB0,,
+isNumeric,"['[232817336]', '[0]', '[14]', '[1]', '[11]', '[12]', '[7]', '[6]']","Inputs: type_1_SYMINT
+
+(-7)  --> Return Value: 1
+(-6)  --> Return Value: 1
+(-5)  --> Return Value: 1
+(-4)  --> Return Value: 0
+(-3)  --> Return Value: 0
+(-2)  --> Return Value: 0
+(-1)  --> Return Value: 0
+(0)  --> Return Value: 0
+(1)  --> Return Value: 0
+(2)  --> Return Value: 1
+(3)  --> Return Value: 1
+(4)  --> Return Value: 1
+(5)  --> Return Value: 1
+(6)  --> Return Value: 1
+(7)  --> Return Value: 1
+(8)  --> Return Value: 1
+(-8)  --> Return Value: 0
+","import org.junit.Test;
+import org.junit.Assert;
+
+public class IsNumericTest {
+
+    private boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(true, isNumeric(""232817336""));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(true, isNumeric(""0""));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(true, isNumeric(""14""));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(true, isNumeric(""1""));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(true, isNumeric(""11""));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(true, isNumeric(""12""));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(true, isNumeric(""7""));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(true, isNumeric(""6""));
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, myMethod(-7));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(1, myMethod(-6));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(1, myMethod(-5));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(0, myMethod(-4));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(0, myMethod(-3));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(0, myMethod(-2));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(0, myMethod(-1));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(0, myMethod(0));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals(0, myMethod(1));
+    }
+
+    @Test
+    public void testCase10() {
+        Assert.assertEquals(1, myMethod(2));
+    }
+
+    @Test
+    public void testCase11() {
+        Assert.assertEquals(1, myMethod(3));
+    }
+
+    @Test
+    public void testCase12() {
+        Assert.assertEquals(1, myMethod(4));
+    }
+
+    @Test
+    public void testCase13() {
+        Assert.assertEquals(1, myMethod(5));
+    }
+
+    @Test
+    public void testCase14() {
+        Assert.assertEquals(1, myMethod(6));
+    }
+
+    @Test
+    public void testCase15() {
+        Assert.assertEquals(1, myMethod(7));
+    }
+
+    @Test
+    public void testCase16() {
+        Assert.assertEquals(1, myMethod(8));
+    }
+
+    @Test
+    public void testCase17() {
+        Assert.assertEquals(0, myMethod(-8));
+    }
+
+    private int myMethod(int x) {
+        // Assume this method exists
+        return 0; 
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class NoneTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertNull(null);
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class NoneTest {
+
+    @Test
+    public void testCase1() {
+        Boolean input = true;
+        Object expected = null;
+        Object actual = null;
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testCase2() {
+        Boolean input = false;
+        Object expected = null;
+        Object actual = null;
+        assertEquals(expected, actual);
+    }
+}",ISNUMERIC,,
+getEuropeanDigit,"['[1593416713]', '[-1903241435]', '[39945]']","Inputs: ch_1_SYMINT
+
+(123)  --> Return Value: -1
+(0)  --> Return Value: -1
+(65371)  --> Return Value: -1
+(65)  --> Return Value: 10
+(65313)  --> Return Value: 10
+(97)  --> Return Value: 10
+(91)  --> Return Value: -1
+(65339)  --> Return Value: -1
+(65345)  --> Return Value: 10
+","import org.junit.Test;
+import org.junit.Assert;
+
+public class GetEuropeanDigitTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, new Solution().getEuropeanDigit());
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, new Solution().getEuropeanDigit());
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(0, new Solution().getEuropeanDigit());
+    }
+
+    private static class Solution {
+        public int getEuropeanDigit() {
+            return 0;
+        }
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(-1, someMethod(123));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(-1, someMethod(0));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(-1, someMethod(65371));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(10, someMethod(65));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(10, someMethod(65313));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(10, someMethod(97));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(-1, someMethod(91));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(-1, someMethod(65339));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals(10, someMethod(65345));
+    }
+
+
+    // Assume this method exists elsewhere
+    private int someMethod(int input) {
+        return 0; // Replace with actual implementation if available.
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class NoneTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertNull(null);
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class NoneTest {
+
+    @Test
+    public void testCase1() {
+        Boolean input = true;
+        Object expected = null;
+        Object actual = None.method(input);
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testCase2() {
+        Boolean input = false;
+        Object expected = null;
+        Object actual = None.method(input);
+        Assert.assertEquals(expected, actual);
+    }
+}",GETEUROPEANDIGIT,,
+usesAn,"['[ã²•]', '[E]', '[I]', '[H]', '[a]', '[O]']","Inputs: c_1_SYMINT
+
+(65)  --> Return Value: 1
+(69)  --> Return Value: 1
+(72)  --> Return Value: 1
+(73)  --> Return Value: 1
+(79)  --> Return Value: 1
+(97)  --> Return Value: 1
+(101)  --> Return Value: 1
+(104)  --> Return Value: 1
+(105)  --> Return Value: 1
+(111)  --> Return Value: 1
+(0)  --> Return Value: 0
+","import org.junit.Test;
+import org.junit.Assert;
+
+public class UsesAnTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(false, usesAn(""[ã²•]""));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(false, usesAn(""[E]""));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(false, usesAn(""[I]""));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(false, usesAn(""[H]""));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(true, usesAn(""[a]""));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(false, usesAn(""[O]""));
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, methodUnderTest(65));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(1, methodUnderTest(69));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(1, methodUnderTest(72));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(1, methodUnderTest(73));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(1, methodUnderTest(79));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(1, methodUnderTest(97));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(1, methodUnderTest(101));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(1, methodUnderTest(104));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals(1, methodUnderTest(105));
+    }
+
+    @Test
+    public void testCase10() {
+        Assert.assertEquals(1, methodUnderTest(111));
+    }
+
+    @Test
+    public void testCase11() {
+        Assert.assertEquals(0, methodUnderTest(0));
+    }
+
+    private int methodUnderTest(int input) {
+        // Assume this method exists and is on the classpath
+        return 0; 
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class SolutionTest {
+
+    public boolean isPositive(int number) {
+        return number > 0;
+    }
+
+    @Test
+    public void testCase1() {
+        assertEquals(true, isPositive(1));
+    }
+
+    @Test
+    public void testCase2() {
+        assertEquals(false, isPositive(-1));
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class SolutionTest {
+
+    @Test
+    public void testCase1() {
+        assertEquals(16, Solution.solution(6, true));
+    }
+
+    @Test
+    public void testCase2() {
+        assertEquals(-4, Solution.solution(6, false));
+    }
+
+    @Test
+    public void testCase3() {
+        assertEquals(8, Solution.solution(4, true));
+    }
+}",USESAN,,
+colorComponentAbsolute,"['[0.20089126, 0.90057516, 0.59151983, 0.7951877, 0.8842941]', '[0.99776626, 0.9203707, 0.03422326, 0.4619273, 0.54925454]', '[0.70955825, 0.1795479, 0.7939759, 0.81796944, 0.15713495]', '[0.56856704, 0.26478767, 0.90637493, 0.22982937, 0.5563394]', '[0.20089126, 0.16137838, 0.44442046, 0.044730008, 0.72527075]']","Inputs: value_1_SYMREAL,bLeft_2_SYMREAL,bRight_3_SYMREAL,tLeft_4_SYMREAL,tRight_5_SYMREAL
+
+(0.0f,1.0f,-9223372036854775808(don't care),-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0.0
+(0.0f,0.0f,0.0f,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0.0
+(0.5f,0.5f,0.0f,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0.0
+(0.5f,0.0f,0.5f,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0.0
+(0.5f,0.0f,0.0f,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0.0
+demo.Distance.distance(0.0f,0.0f,1.0f,1.0f,-9223372036854775808(don't care))  --> ""java.lang.ArithmeticException: div by 0...""
+demo.Distance.distance(0.5f,0.0f,1.0f,1.0f,-9223372036854775808(don't care))  --> ""java.lang.ArithmeticException: div by 0...""
+(0.0f,0.0f,1.0f,0.0f,1.0f)  --> Return Value: 1.0
+demo.Distance.distance(0.0f,0.0f,1.0f,0.0f,0.0f)  --> ""java.lang.ArithmeticException: div by 0...""
+demo.Distance.distance(0.5f,0.5f,1.0f,0.5f,0.0f)  --> ""java.lang.ArithmeticException: div by 0...""
+(0.5f,0.5f,1.0f,0.0f,1.0f)  --> Return Value: 1.0
+demo.Distance.distance(0.5f,0.5f,1.0f,0.0f,0.5f)  --> ""java.lang.ArithmeticException: div by 0...""
+demo.Distance.distance(0.5f,0.5f,1.0f,0.0f,0.0f)  --> ""java.lang.ArithmeticException: div by 0...""
+(0.5f,0.0f,1.0f,0.5f,1.0f)  --> Return Value: 1.0
+demo.Distance.distance(0.5f,0.0f,1.0f,0.5f,0.5f)  --> ""java.lang.ArithmeticException: div by 0...""
+demo.Distance.distance(0.5f,0.0f,1.0f,0.5f,0.0f)  --> ""java.lang.ArithmeticException: div by 0...""
+(0.5f,0.0f,1.0f,0.0f,1.0f)  --> Return Value: 1.0
+demo.Distance.distance(0.5f,0.0f,1.0f,0.0f,0.5f)  --> ""java.lang.ArithmeticException: div by 0...""
+demo.Distance.distance(0.5f,0.0f,1.0f,0.0f,0.0f)  --> ""java.lang.ArithmeticException: div by 0...""
+","import org.junit.Test;
+import org.junit.Assert;
+
+public class ColorComponentAbsoluteTest {
+
+    private double colorComponentAbsolute(double input) {
+        return Math.abs(input);
+    }
+
+    @Test
+    public void testCase1() {
+        double[] input = {0.20089126, 0.90057516, 0.59151983, 0.7951877, 0.8842941};
+        double expected = 0.20089126;
+        Assert.assertEquals(expected, colorComponentAbsolute(input[0]), 0.00000001);
+    }
+
+    @Test
+    public void testCase2() {
+        double[] input = {0.99776626, 0.9203707, 0.03422326, 0.4619273, 0.54925454};
+        double expected = 0.99776626;
+        Assert.assertEquals(expected, colorComponentAbsolute(input[0]), 0.00000001);
+    }
+
+    @Test
+    public void testCase3() {
+        double[] input = {0.70955825, 0.1795479, 0.7939759, 0.81796944, 0.15713495};
+        double expected = 0.70955825;
+        Assert.assertEquals(expected, colorComponentAbsolute(input[0]), 0.00000001);
+    }
+
+    @Test
+    public void testCase4() {
+        double[] input = {0.56856704, 0.26478767, 0.90637493, 0.22982937, 0.5563394};
+        double expected = 0.56856704;
+        Assert.assertEquals(expected, colorComponentAbsolute(input[0]), 0.00000001);
+    }
+
+    @Test
+    public void testCase5() {
+        double[] input = {0.20089126, 0.16137838, 0.44442046, 0.044730008, 0.72527075};
+        double expected = 0.20089126;
+        Assert.assertEquals(expected, colorComponentAbsolute(input[0]), 0.00000001);
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0.0, 0.0, 0.001);
+    }
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0.0, 0.0, 0.001);
+    }
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(0.0, 0.0, 0.001);
+    }
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(0.0, 0.0, 0.001);
+    }
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(0.0, 0.0, 0.001);
+    }
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(1.0, 1.0, 0.001);
+    }
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(1.0, 1.0, 0.001);
+    }
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(1.0, 1.0, 0.001);
+    }
+    @Test
+    public void testCase9() {
+        Assert.assertEquals(1.0, 1.0, 0.001);
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class NoneTest {
+
+    @Test
+    public void testCase1() {
+        assertNull(null);
+    }
+}","429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 40
+}
+]",COLORCOMPONENTABSOLUTE,,
+toJavaSecs,"['[-8498624097974006656]', '[9095902087563549767]']","Inputs: secs_1_SYMINT
+
+(-13165977601l)  --> Return Value: -12219292801
+(-13165977600l)  --> Return Value: -12219292800
+(0l)  --> Return Value: 946684800
+","import org.junit.Test;
+import org.junit.Assert;
+
+public class ToJavaSecsTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, toJavaSecs(-8498624097974006656L));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, toJavaSecs(9095902087563549767L));
+    }
+
+    private long toJavaSecs(long arg) {
+        // Placeholder implementation to allow compilation.
+        // The actual implementation is assumed to exist elsewhere.
+        return 0;
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(-12219292801L, MyClass.myMethod(-13165977601L));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(-12219292800L, MyClass.myMethod(-13165977600L));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(946684800L, MyClass.myMethod(0L));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class NoneTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertNull(null);
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class ExampleTest {
+
+    @Test
+    public void testCase1() {
+        Example example = new Example();
+        Assert.assertEquals(true, example.checkRange(1));
+    }
+
+    @Test
+    public void testCase2() {
+        Example example = new Example();
+        Assert.assertEquals(false, example.checkRange(11));
+    }
+
+    @Test
+    public void testCase3() {
+        Example example = new Example();
+        Assert.assertEquals(false, example.checkRange(-1));
+    }
+}",TOJAVASECS,,
+toPgSecs,"['[6531203690080990914]', '[-3845089849785029059]']","Inputs: secs_1_SYMINT
+
+(-12219292801l)  --> Return Value: -13165977601
+(-12219292800l)  --> Return Value: -13165977600
+(665609089l)  --> Return Value: -281075711
+","import org.junit.Test;
+import org.junit.Assert;
+
+public class ToPgSecsTest {
+
+    @Test
+    public void testCase1() {
+        long input = 6531203690080990914L;
+        long expected = 6530257000080990L;
+        Assert.assertEquals(expected, toPgSecs(input));
+    }
+
+    @Test
+    public void testCase2() {
+        long input = -3845089849785029059L;
+        long expected = -3845090796469829L;
+        Assert.assertEquals(expected, toPgSecs(input));
+    }
+
+    private long toPgSecs(long input) {
+        return input / 100000000L;
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(-13165977601L, MyClass.myMethod(-12219292801L));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(-13165977600L, MyClass.myMethod(-12219292800L));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(-281075711L, MyClass.myMethod(665609089L));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class SolutionTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(14, Solution.solve(1, 6));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(-5, Solution.solve(-1, 4));
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class MyTest {
+
+    @Test
+    public void testCase1() {
+        MyClass myObject = new MyClass();
+        myObject.myMethod(true);
+    }
+
+    @Test
+    public void testCase2() {
+        MyClass myObject = new MyClass();
+        myObject.myMethod(false);
+    }
+
+    private static class MyClass {
+        public void myMethod(boolean input) {
+        }
+    }
+}",TOPGSECS,,
+reverse,['[1602526665534058741]'],No path condition,"import org.junit.Test;
+import org.junit.Assert;
+
+public class ReverseStringTest {
+
+    @Test
+    public void testCase1() {
+        String input = ""[1602526665534058741]"";
+        String expected = ""[1478504355662520616]"";
+        String actual = reverse(input);
+        Assert.assertEquals(expected, actual);
+    }
+
+    private String reverse(String s) {
+        return new StringBuilder(s).reverse().toString();
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class YourClassNameTest { // Replace YourClassName with the actual class name
+
+    @Test
+    public void testCase1() {
+        // Add your test case here based on the provided input-output pairs.  
+        // Example: Assert.assertEquals(expectedReturnValue, YourClassName.yourMethod(arg1, arg2));
+    }
+
+    @Test
+    public void testCase2() {
+        // Add your test case here based on the provided input-output pairs.
+    }
+
+    // Add more testCaseN() methods as needed for each input-output pair.
+
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class ExampleTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, Example.absoluteValue(-1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, Example.absoluteValue(0));
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class SolutionTest {
+
+    @Test
+    public void testCase1() {
+        assertEquals(true, Solution.isPositiveAndEven(4));
+    }
+
+    @Test
+    public void testCase2() {
+        assertEquals(false, Solution.isPositiveAndEven(3));
+    }
+
+    @Test
+    public void testCase3() {
+        assertEquals(false, Solution.isPositiveAndEven(-2));
+    }
+
+    @Test
+    public void testCase4() {
+        assertEquals(1, Solution.nestedIfElse(6, 5));
+    }
+
+    @Test
+    public void testCase5() {
+        assertEquals(2, Solution.nestedIfElse(6, 12));
+    }
+
+    @Test
+    public void testCase6() {
+        assertEquals(3, Solution.nestedIfElse(2, 5));
+    }
+
+    @Test
+    public void testCase7() {
+        assertEquals(4, Solution.nestedIfElse(2, -1));
+    }
+
+    @Test
+    public void testCase8() {
+        assertEquals(true, Solution.simpleIf(true));
+    }
+
+    @Test
+    public void testCase9() {
+        assertEquals(false, Solution.simpleIf(false));
+    }
+}",REVERSE,,
+nextHighestPowerOfTwo,['[-73827611]'],No path condition,"import org.junit.Test;
+import org.junit.Assert;
+
+public class NextHighestPowerOfTwoTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, nextHighestPowerOfTwo(-73827611));
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class YourClassNameTest {
+
+    @Test
+    public void testCase1() {
+        // Replace with your actual test case
+        Assert.assertEquals(0, 0); 
+    }
+
+    @Test
+    public void testCase2() {
+        // Replace with your actual test case
+        Assert.assertEquals(0, 0);
+    }
+
+    @Test
+    public void testCase3() {
+        // Replace with your actual test case
+        Assert.assertEquals(0, 0);
+    }
+
+
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class NoneTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertNull(null);
+    }
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class NoneTest {
+
+    @Test
+    public void testCase1() {
+        assertNull(null);
+    }
+}",NEXTHIGHESTPOWEROFTWO,,
+bitCount,['[6213434489718269007]'],No path condition,"import org.junit.Test;
+import org.junit.Assert;
+
+public class BitCountTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(35, Long.bitCount(6213434489718269007L));
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+    @Test
+    public void testCase1() {
+        //Replace with actual method call and assertion
+        //Assert.assertEquals(expected, MyClass.myMethod(args)); 
+    }
+    @Test
+    public void testCase2() {
+        //Replace with actual method call and assertion
+        //Assert.assertEquals(expected, MyClass.myMethod(args));
+    }
+    @Test
+    public void testCase3() {
+        //Replace with actual method call and assertion
+        //Assert.assertEquals(expected, MyClass.myMethod(args));
+    }
+
+}","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class SomeTest {
+
+    @Test
+    public void testCase1() {
+        assertNull(new SomeClass().someMethod());
+    }
+
+    private static class SomeClass {
+        public Object someMethod() {
+            return null;
+        }
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class SomeTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertNull(null);
+    }
+}",BITCOUNT,,
+calculateUnpinnedStepSize,"['[-1708994244]', '[90599560]', '[302921]']","Inputs: currLimitMax_1_SYMINT
+
+(0)  --> Return Value: 1024
+(102400)  --> Return Value: 5120
+(409600)  --> Return Value: 10240
+","import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class CalculateUnpinnedStepSizeTest {
+
+    @Test
+    public void testCase1() {
+        // Since calculateUnpinnedStepSize is a void method and we have no way to observe its effects,
+        // we cannot assert anything meaningful.  We can only call the method.
+        calculateUnpinnedStepSize();
+    }
+
+    @Test
+    public void testCase2() {
+        // Since calculateUnpinnedStepSize is a void method and we have no way to observe its effects,
+        // we cannot assert anything meaningful.  We can only call the method.
+        calculateUnpinnedStepSize();
+    }
+
+    @Test
+    public void testCase3() {
+        // Since calculateUnpinnedStepSize is a void method and we have no way to observe its effects,
+        // we cannot assert anything meaningful.  We can only call the method.
+        calculateUnpinnedStepSize();
+    }
+
+    private void calculateUnpinnedStepSize() {
+        // This is a placeholder.  The actual method is assumed to exist.
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1024, 0);
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(5120, 102400);
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(10240, 409600);
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class ExampleTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(2, Example.myMethod(1, 1));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(-2, Example.myMethod(-1, 1));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(1, Example.myMethod(1, 0));
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class ExampleTest {
+
+    @Test
+    public void testCase1() {
+        Example example = new Example();
+        Assert.assertEquals(1, example.absDiff(2, 1));
+    }
+
+    @Test
+    public void testCase2() {
+        Example example = new Example();
+        Assert.assertEquals(1, example.absDiff(1, 2));
+    }
+}",CALCULATEUNPINNEDSTEPSIZE,,
+decodeHexDigit,"['[춠]', '[J]', '[\x00]', '[8]', '[F]', '[e]']","Inputs: c_1_SYMINT
+
+(0)  --> Return Value: -1
+(48)  --> Return Value: 0
+(58)  --> Return Value: -1
+(65)  --> Return Value: 10
+(71)  --> Return Value: -1
+(97)  --> Return Value: 10
+(103)  --> Return Value: -1
+","import org.junit.Test;
+import org.junit.Assert;
+
+public class DecodeHexDigitTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(-1, decodeHexDigit('춠'));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(-1, decodeHexDigit('J'));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(-1, decodeHexDigit('\x00'));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(8, decodeHexDigit('8'));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(15, decodeHexDigit('F'));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(14, decodeHexDigit('e'));
+    }
+    
+    private int decodeHexDigit(char hexChar) {
+        if (hexChar >= '0' && hexChar <= '9') {
+            return hexChar - '0';
+        } else if (hexChar >= 'A' && hexChar <= 'F') {
+            return hexChar - 'A' + 10;
+        } else if (hexChar >= 'a' && hexChar <= 'f') {
+            return hexChar - 'a' + 10;
+        } else {
+            return -1;
+        }
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(-1, someMethod(0));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, someMethod(48));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(-1, someMethod(58));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(10, someMethod(65));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(-1, someMethod(71));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(10, someMethod(97));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(-1, someMethod(103));
+    }
+
+    private int someMethod(int input) {
+        return 0; // Dummy implementation, replace with actual method if available.
+    }
+}","import org.junit.Test;
+import org.junit.Assert;
+
+public class NoneTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(null, null);
+    }
+}","429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 57
+}
+]",DECODEHEXDIGIT,,
+compare,"['[0.8580642145852232, 0.2929983634658988]', '[0.0, 0.0]', '[0.05437772982182898, 0.5482594843991112]']","Inputs: x_1_SYMINT,y_2_SYMINT
+
+(-1l,0l)  --> Return Value: 0
+(0l,0l)  --> Return Value: 0
+(0l,-1l)  --> Return Value: 0
+","import org.junit.Test;
+import org.junit.Assert;
+
+public class CompareTest {
+
+    @Test
+    public void testCase1() {
+        double[] arr1 = {0.8580642145852232, 0.2929983634658988};
+        double[] arr2 = {0.0, 0.0};
+        int expected = 1;
+        Assert.assertEquals(expected, Solution.compare(arr1, arr2));
+    }
+
+    @Test
+    public void testCase2() {
+        double[] arr1 = {0.0, 0.0};
+        double[] arr2 = {0.05437772982182898, 0.5482594843991112};
+        int expected = -1;
+        Assert.assertEquals(expected, Solution.compare(arr1, arr2));
+    }
+
+    @Test
+    public void testCase3() {
+        double[] arr1 = {0.05437772982182898, 0.5482594843991112};
+        double[] arr2 = {0.8580642145852232, 0.2929983634658988};
+        int expected = -1;
+        Assert.assertEquals(expected, Solution.compare(arr1, arr2));
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class MyClassTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, 0);
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, 0);
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(0, 0);
+    }
+}","429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 25
+}
+]","429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 53
+}
+]",COMPARE,,
+,,,,,,,,,

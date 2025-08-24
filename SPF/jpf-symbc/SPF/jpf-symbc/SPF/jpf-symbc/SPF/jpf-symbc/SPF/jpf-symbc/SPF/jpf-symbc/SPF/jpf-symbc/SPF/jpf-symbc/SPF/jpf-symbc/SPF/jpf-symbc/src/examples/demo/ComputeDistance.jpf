@@ -1,0 +1,10 @@
+target=demo.ComputeDistance
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method = demo.ComputeDistance.ComputeDistance(sym#sym#sym#sym)
+
+symbolic.dp=z3
+listener = .symbc.SymbolicListener
+
+search.multiple_errors=true
+

@@ -1,0 +1,61 @@
+Step 1
+======
+I am going to show you a Java method. Depending on what I give you, you may only have its signature, its Javadoc, or the entire implementation. Please:
+
+1. Summarize what the method is for.
+2. List its inputs (parameters) and outputs (return value).
+
+Here is what I know:
+{{METHOD_SIGNATURE}}
+{{OPTIONAL_JAVADOC_COMMENTS}}
+{{OPTIONAL_METHOD_BODY}}
+
+Now give me your analysis.
+
+Step 2
+======
+Generate a minimal set of test input values that collectively achieve 100% {{COVERAGE_TYPE}} coverage for the following Java method.
+
+Method Signature:
+{{METHOD_SIGNATURE}}
+
+Prior Analysis:
+{{PRIOR_ANALYSIS}}
+
+Requirements:
+1. Coverage Type: {{COVERAGE_TYPE}}
+2. Output: One test case per line, with only comma-separated argument values.
+3. No full JUnit code—just the raw inputs.
+
+Step 3
+======
+You are given a Java method, a prior analysis, and a list of test inputs (one per line, comma-separated). For each input, predict the method's expected return value.
+
+Method Signature:
+{{METHOD_SIGNATURE}}
+
+Prior Analysis:
+{{PRIOR_ANALYSIS}}
+
+Test Inputs:
+{{TEST_INPUTS}}
+
+Output format (one pair per line):
+Input: <arg1>, <arg2>, ...
+Expected Output: <value>
+
+Step 4
+======
+Generate a JUnit 4 test class for the following Java method using exactly the provided input–output pairs. Do not add or remove any test cases. Only output compilable Java code (including all necessary imports and the enclosing test class); no comments or explanations.
+
+Method Signature:
+{{METHOD_SIGNATURE}}
+
+Input–Output Pairs (one per line, format: comma-separated args -> expected return):
+{{TEST_PAIRS}}
+
+Requirements:
+- Use JUnit 4 (org.junit.Test and org.junit.Assert).
+- Name the test class appropriatly.
+- Name each test method testCaseN(), numbering sequentially.
+- Inside each test, call the method with the given args and use an appropriate `Assert` method to verify the expected return.

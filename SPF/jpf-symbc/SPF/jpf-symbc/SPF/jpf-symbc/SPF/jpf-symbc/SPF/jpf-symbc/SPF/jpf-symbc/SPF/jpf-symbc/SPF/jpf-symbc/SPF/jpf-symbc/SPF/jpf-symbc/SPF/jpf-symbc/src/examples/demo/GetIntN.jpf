@@ -1,0 +1,10 @@
+target=demo.GetIntN
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method = demo.GetIntN.GetIntN(sym#sym)
+
+symbolic.dp=z3
+listener = .symbc.SymbolicListener
+
+search.multiple_errors=true
+

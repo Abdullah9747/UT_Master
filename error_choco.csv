@@ -1,0 +1,50 @@
+Index,Class Name,Error 1 (er1),Error 2 (er2),Success Status
+0,GREATESTCOMMONDIVISOR,"RuntimeException: ## Error Choco does not support bitwise AND","ArithmeticException: overflow: gcd is 2^31 (Found 2 error conditions)",PARTIAL_SUCCESS
+1,INCOMPLETEGAMMA,"Error: bug in setConstraintIndex i:1 - Choco real constraint bug","JPF symbolic execution",FAILED
+2,GETHIGHBIT,"RuntimeException: ## Error Choco does not support bitwise SHIFT","JPF symbolic execution",FAILED
+3,SFEXACT,"No error","5 test cases generated successfully",SUCCESS
+4,BINROOT,"SKIPPED (Index 4)","SKIPPED (Index 4)",SKIPPED
+5,CHECKDOUBLEPRECISE,"No error","2 test cases generated successfully",SUCCESS
+6,VALIDATELENGTHS,"ClassCastException: ObjectList$Node cannot be cast to IntegerExpression","JPF symbolic execution",FAILED
+7,GETDEVIANCEPART,"Error: bug in setConstraintIndex i:2 - Choco real constraint bug","JPF symbolic execution",FAILED
+8,GETWRAPPEDVALUE,"RuntimeException: BinaryNonLinearSolution solution: l -9223372034707292160 op % r 2","IllegalArgumentException: MIN > MAX (Found 1 error condition)",PARTIAL_SUCCESS
+9,LOG2,"RuntimeException: ## Error Choco does not support bitwise SHIFT","IllegalArgumentException: 0 <= 0 (Found 1 error condition)",PARTIAL_SUCCESS
+10,POWM1,"No error","Cannot load application class demo.Distance",FAILED
+11,GETDATAMASKBIT,"RuntimeException: ## Error Choco does not support bitwise AND","JPF symbolic execution",FAILED
+12,GCDLONGADAPTEDFORINT,"RuntimeException: ## Error Choco does not support bitwise SHIFT","JPF symbolic execution",FAILED
+13,ISLATINCHAR,"RuntimeException: ## Error Choco does not support bitwise SHIFT","JPF symbolic execution",FAILED
+14,WRAPANGLETO180_DOUBLE,"RuntimeException: ## Error: SYMBOLIC DREM not supported","JPF symbolic execution",FAILED
+15,VOLTAGE_TO_INTENSITY_SRGB,"No error","Cannot load application class demo.Distance",FAILED
+16,UNSIGNEDLEB128SIZE,"RuntimeException: ## Error Choco does not support bitwise SHIFT","JPF symbolic execution",FAILED
+17,GETROLLEDVALUE,"RuntimeException: ## Error: Non Linear Integer Constraint not handled","AssertionError (Found 2 error conditions)",PARTIAL_SUCCESS
+18,CONVERTTEMPO,"Error: bug in setConstraintIndex i:1 - Choco real constraint bug","JPF symbolic execution",FAILED
+19,SUBTRACTEXACT,"AssertionError at ProblemChoco.makeIntVar","JPF symbolic execution",FAILED
+20,GETCOMPONENTINDEX,"RuntimeException: ## Error Choco does not support bitwise AND","JPF symbolic execution",FAILED
+21,GETSTANDARDBOLDERFONTWEIGHT,"No error","9 test cases generated successfully",SUCCESS
+22,GETBOLDERFONTWEIGHT,"No error","9 test cases generated successfully",SUCCESS
+23,BILINEARINTERPOLATE,"RuntimeException: ## Error Choco does not support bitwise SHIFT","JPF symbolic execution",FAILED
+24,GETLIGHTERFONTWEIGHT,"No error","9 test cases generated successfully",SUCCESS
+25,ERFINVIMP,"Error: bug in setConstraintIndex i:1 - Choco real constraint bug","JPF symbolic execution",FAILED
+26,SATURATION,"RuntimeException: ## Error Choco does not support bitwise SHIFT","JPF symbolic execution",FAILED
+27,VOCALTRACTCOMPENSATION,"RuntimeException: ## Error: Math.sqrt not supported","JPF symbolic execution",FAILED
+28,BINARYGCD,"RuntimeException: ## Error Choco does not support bitwise SHIFT","JPF symbolic execution",FAILED
+29,CEIL_LG2,"RuntimeException: ## Error Choco does not support bitwise SHIFT","JPF symbolic execution",FAILED
+30,HYPOT,"Error: bug in setConstraintIndex i:1 - Choco real constraint bug","JPF symbolic execution",FAILED
+31,BRIGHTNESS,"RuntimeException: ## Error Choco does not support bitwise SHIFT","JPF symbolic execution",FAILED
+32,UNRANDOMIZE255STATE,"RuntimeException: ## Error: Non Linear Integer Constraint not handled","JPF symbolic execution",FAILED
+33,NEXTRAND,"No error","Cannot load application class demo.Distance",FAILED
+34,COMPARENUMBERS,"No error","Cannot load application class demo.Distance",FAILED
+35,TOINT64,"No error","1 test case generated successfully",SUCCESS
+36,HYPERGEOMETRIC,"RuntimeException: ## Error Choco: non-lin int constraint","IllegalArgumentException: Invalid hypergeometric (Found 6 error conditions)",PARTIAL_SUCCESS
+37,HSBTORGB,"No error","Complex function with timeout (1 minute)",SUCCESS
+38,INVERSEERF,"RuntimeException: ## Error: Math.log not supported","JPF symbolic execution",FAILED
+39,ISCASED,"RuntimeException: ## Error Choco does not support bitwise SHIFT","JPF symbolic execution",FAILED
+40,ALPHABLEND,"RuntimeException: ## Error Choco does not support bitwise AND","JPF symbolic execution",FAILED
+41,GETMINRATING,"No error","Cannot load application class demo.Distance",FAILED
+42,ISVALIDTOKENCHAR,"No error","Cannot load application class demo.Distance",FAILED
+43,NUMBEROFTRAILINGZEROS,"RuntimeException: ## Error Choco does not support bitwise SHIFT","JPF symbolic execution",FAILED
+44,INTPOW,"RuntimeException: ## Error Choco does not support bitwise AND","JPF symbolic execution",FAILED
+45,SMALLESTCHANGE,"No error","ClassNotFoundException: java.lang.NoSuchMethodException (Found 1 error condition)",PARTIAL_SUCCESS
+46,PREPARESETTINGS,"ClassCastException: ObjectList$Node cannot be cast to IntegerExpression","JPF symbolic execution",FAILED
+47,CHECKFROMINDEXSIZE,"RuntimeException: ## Error Choco does not support bitwise OR","JPF symbolic execution",FAILED
+48,NEXTDOWN,"No error","1 test case generated successfully",SUCCESS

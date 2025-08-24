@@ -1,0 +1,1017 @@
+Class_Name,Function,LLM_Result
+GETLENFIELDSIZE,"public class GETLENFIELDSIZE {
+/**
+     * Used to determine the number of bytes that will be need to encode
+     * the length field of the GSSHeader.
+     */
+    public int getLenFieldSize(int len) {
+        int retVal = 1;
+        if (len < 128) {
+            retVal=1;
+        } else if (len < (1 << 8)) {
+            retVal=2;
+        } else if (len < (1 << 16)) {
+            retVal=3;
+        } else if (len < (1 << 24)) {
+            retVal=4;
+        } else {
+            retVal=5; // See getMaxMechTokenSize
+        }
+        return retVal;
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class GETLENFIELDSIZETest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1, GETLENFIELDSIZE.getLenFieldSize(0));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(1, GETLENFIELDSIZE.getLenFieldSize(127));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(2, GETLENFIELDSIZE.getLenFieldSize(128));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(2, GETLENFIELDSIZE.getLenFieldSize(16383));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(3, GETLENFIELDSIZE.getLenFieldSize(16384));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(3, GETLENFIELDSIZE.getLenFieldSize(2097151));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(4, GETLENFIELDSIZE.getLenFieldSize(2097152));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(4, GETLENFIELDSIZE.getLenFieldSize(268435455));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals(5, GETLENFIELDSIZE.getLenFieldSize(268435456));
+    }
+}"
+NORMALISEINDEX,"public class NORMALISEINDEX {
+/**
+     * This converts a possibly negative index to a real index into the array.
+     *
+     * @param i    the unnormalised index
+     * @param size the array size
+     * @return the normalised index
+     */
+    public static int normaliseIndex(int i, int size) {
+        int temp = i;
+        if (i < 0) {
+            i += size;
+        }
+        if (i < 0) {
+            throw new ArrayIndexOutOfBoundsException(""Negative array index ["" + temp + ""] too large for array size "" + size);
+        }
+        return i;
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class NORMALISEINDEXTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, NORMALISEINDEX.normaliseIndex(0, 5));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(4, NORMALISEINDEX.normaliseIndex(-1, 5));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(4, NORMALISEINDEX.normaliseIndex(-6, 5));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(0, NORMALISEINDEX.normaliseIndex(5, 5));
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testCase5() {
+        NORMALISEINDEX.normaliseIndex(-1, 0);
+    }
+}"
+NUMBEROFLEADINGZEROS,"public class NUMBEROFLEADINGZEROS {
+/**
+     * Returns the number of zero bits preceding the highest-order
+     * (""leftmost"") one-bit in the two's complement binary representation
+     * of the specified {@code long} value.  Returns 64 if the
+     * specified value has no one-bits in its two's complement representation,
+     * in other words if it is equal to zero.
+     *
+     * <p>Note that this method is closely related to the logarithm base 2.
+     * For all positive {@code long} values x:
+     * <ul>
+     * <li>floor(log<sub>2</sub>(x)) = {@code 63 - numberOfLeadingZeros(x)}
+     * <li>ceil(log<sub>2</sub>(x)) = {@code 64 - numberOfLeadingZeros(x - 1)}
+     * </ul>
+     *
+     * @param i the value whose number of leading zeros is to be computed
+     * @return the number of zero bits preceding the highest-order
+     *     (""leftmost"") one-bit in the two's complement binary representation
+     *     of the specified {@code long} value, or 64 if the value
+     *     is equal to zero.
+     * @since 1.5
+     */
+    public static int numberOfLeadingZeros(long i) {
+        // HD, Figure 5-6
+         if (i == 0)
+            return 64;
+        int n = 1;
+        int x = (int)(i >>> 32);
+        if (x == 0) { n += 32; x = (int)i; }
+        if (x >>> 16 == 0) { n += 16; x <<= 16; }
+        if (x >>> 24 == 0) { n +=  8; x <<=  8; }
+        if (x >>> 28 == 0) { n +=  4; x <<=  4; }
+        if (x >>> 30 == 0) { n +=  2; x <<=  2; }
+        n -= x >>> 31;
+        return n;
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class NUMBEROFLEADINGZEROSTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(64, NUMBEROFLEADINGZEROS.numberOfLeadingZeros(0L));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(63, NUMBEROFLEADINGZEROS.numberOfLeadingZeros(1L));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(0, NUMBEROFLEADINGZEROS.numberOfLeadingZeros(-1L));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(1, NUMBEROFLEADINGZEROS.numberOfLeadingZeros(9223372036854775807L));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(0, NUMBEROFLEADINGZEROS.numberOfLeadingZeros(-9223372036854775808L));
+    }
+}"
+ARABICCHARSHAPESDUEL,"public class ARABICCHARSHAPESDUEL {
+/**
+     * Returns true if character has duel shaping.
+     *
+     * @param c The character to test.
+     * @return True if the character is duel shaping, false otherwise.
+     */
+    public static boolean arabicCharShapesDuel(char c) {
+        int charVal = c;
+
+        if ((charVal == 0x0626)
+         || (charVal == 0x0628)
+         || (charVal >= 0x062A && charVal <= 0x062E)
+         || (charVal >= 0x0633 && charVal <= 0x063A)
+         || (charVal >= 0x0641 && charVal <= 0x0647)
+         || (charVal >= 0x0649 && charVal <= 0x064A)
+         || (charVal >= 0x0678 && charVal <= 0x0687)
+         || (charVal >= 0x069A && charVal <= 0x06BF)
+         || (charVal == 0x6C1)
+         || (charVal == 0x6CC)
+         || (charVal == 0x6CE)
+         || (charVal >= 0x06D0 && charVal <= 0x06D1)
+         || (charVal >= 0x06FA && charVal <= 0x06FC)) {
+            return true;
+        }
+        return false;
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class ARABICCHARSHAPESDUELTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(true, ARABICCHARSHAPESDUEL.arabicCharShapesDuel('ء'));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(true, ARABICCHARSHAPESDUEL.arabicCharShapesDuel('ا'));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(true, ARABICCHARSHAPESDUEL.arabicCharShapesDuel('ل'));
+    }
+}"
+COLORCOMPONENTABSOLUTE,"public class COLORCOMPONENTABSOLUTE {
+/**
+     * Defines a simple function for a color.
+     * 
+     * @param value
+     * @param bLeft under this value, the color is 0
+     * @param bRight up to this value, the color is 0
+     * @param tLeft from this value until @link tRight, the color is 1
+     * @param tRight from @link tLeft until this value, the color is 1
+     * 
+     * Between bLeft and tLeft, as well as tRight and bRight, the output value is a linear
+     * interpolation between 0 and 1.
+     * 
+     * <code>
+     *                      tLeft       tRight
+     *                        /-----------\
+     *                       /             \ 
+     *                      /               \
+     *              -------|-----------------|--------
+     *                    bLeft            bRight  
+     * </code>
+     * 
+     * @return color influence.
+     */
+    public float colorComponentAbsolute( float value, float bLeft, float bRight, float tLeft, float tRight ){
+        float output = 0;
+        // a gauche ou a droite du creneau
+        if( (value < bLeft) || (value >= bRight) ){
+            output = 0;
+        }
+        // sur le plateau haut
+        else if( (value >= tLeft) && (value < tRight) ){
+            output = 1;
+        }
+        // sur la pente gauche du creneau
+        else if( (value >= bLeft) && (value < tLeft) ){
+            output = (value-bLeft)/(tLeft-bLeft);
+        }
+        // sur la pente droite du creneau
+        else if( (value >= tRight) && (value < bRight) ){
+            output = (value-bRight)/(tRight-bRight);
+        }
+        return output;
+    }
+}","429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 26
+}
+]"
+TOJAVASECS,"public class TOJAVASECS {
+/**
+     * Converts the given postgresql seconds to java seconds.
+     * Reverse engineered by inserting varying dates to postgresql
+     * and tuning the formula until the java dates matched.
+     * See {@link #toPgSecs} for the reverse operation.
+     * 
+     * @param secs Postgresql seconds.
+     * @return Java seconds.
+     */
+    public static long toJavaSecs(long secs) {
+        // postgres epoc to java epoc
+        secs += 946684800L;
+
+        // Julian/Gregorian calendar cutoff point
+        if (secs < -12219292800L) { // October 4, 1582 -> October 15, 1582
+            secs += 86400 * 10;
+            if (secs < -14825808000L) { // 1500-02-28 -> 1500-03-01
+                int extraLeaps = (int) ((secs + 14825808000L) / 3155760000L);
+                extraLeaps--;
+                extraLeaps -= extraLeaps / 4;
+                secs += extraLeaps * 86400L;
+            }
+        }
+        return secs;
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class TOJAVASECSTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(42167219200L, TOJAVASECS.toJavaSecs(-2000000000L));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(62167219200L, TOJAVASECS.toJavaSecs(0L));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(62167305600L, TOJAVASECS.toJavaSecs(86400L));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(84257108000L, TOJAVASECS.toJavaSecs(2208988800L));
+    }
+}"
+NUMBEROFTRAILINGZEROS,"public class NUMBEROFTRAILINGZEROS {
+/**
+     * Returns the number of zero bits following the lowest-order (""rightmost"")
+     * one-bit in the two's complement binary representation of the specified
+     * {@code long} value.  Returns 64 if the specified value has no
+     * one-bits in its two's complement representation, in other words if it is
+     * equal to zero.
+     *
+     * @param i the value whose number of trailing zeros is to be computed
+     * @return the number of zero bits following the lowest-order (""rightmost"")
+     *     one-bit in the two's complement binary representation of the
+     *     specified {@code long} value, or 64 if the value is equal
+     *     to zero.
+     * @since 1.5
+     */
+    public static int numberOfTrailingZeros(long i) {
+        // HD, Figure 5-14
+        int x, y;
+        if (i == 0) return 64;
+        int n = 63;
+        y = (int)i; if (y != 0) { n = n -32; x = y; } else x = (int)(i>>>32);
+        y = x <<16; if (y != 0) { n = n -16; x = y; }
+        y = x << 8; if (y != 0) { n = n - 8; x = y; }
+        y = x << 4; if (y != 0) { n = n - 4; x = y; }
+        y = x << 2; if (y != 0) { n = n - 2; x = y; }
+        return n - ((x << 1) >>> 31);
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class NUMBEROFTRAILINGZEROSTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(64, NUMBEROFTRAILINGZEROS.numberOfTrailingZeros(0));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(0, NUMBEROFTRAILINGZEROS.numberOfTrailingZeros(1));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(0, NUMBEROFTRAILINGZEROS.numberOfTrailingZeros(3));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(0, NUMBEROFTRAILINGZEROS.numberOfTrailingZeros(-1));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(63, NUMBEROFTRAILINGZEROS.numberOfTrailingZeros(-9223372036854775808L));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(0, NUMBEROFTRAILINGZEROS.numberOfTrailingZeros(9223372036854775807L));
+    }
+}"
+ISVARIABLE,"public class ISVARIABLE {
+/**
+     * Returns true if ""arc"" identifies a scalar object.
+     */
+    public boolean isVariable(long arc) {
+
+        switch((int)arc) {
+            case 9:
+            case 8:
+            case 7:
+            case 6:
+            case 5:
+            case 4:
+            case 3:
+            case 11:
+            case 2:
+            case 10:
+            case 1:
+                return true;
+            default:
+                break;
+        }
+        return false;
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class ISVARIABLETest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(true, ISVARIABLE.isVariable(9));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(true, ISVARIABLE.isVariable(8));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(true, ISVARIABLE.isVariable(7));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(true, ISVARIABLE.isVariable(6));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(true, ISVARIABLE.isVariable(5));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(true, ISVARIABLE.isVariable(4));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(true, ISVARIABLE.isVariable(3));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(true, ISVARIABLE.isVariable(11));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals(true, ISVARIABLE.isVariable(2));
+    }
+
+    @Test
+    public void testCase10() {
+        Assert.assertEquals(true, ISVARIABLE.isVariable(10));
+    }
+
+    @Test
+    public void testCase11() {
+        Assert.assertEquals(true, ISVARIABLE.isVariable(1));
+    }
+
+    @Test
+    public void testCase12() {
+        Assert.assertEquals(false, ISVARIABLE.isVariable(0));
+    }
+}"
+DOUBLETOSORTABLELONG,"public class DOUBLETOSORTABLELONG {
+/**
+   * Converts a <code>double</code> value to a sortable signed <code>long</code>.
+   * The value is converted by getting their IEEE 754 floating-point &quot;double format&quot;
+   * bit layout and then some bits are swapped, to be able to compare the result as long.
+   * By this the precision is not reduced, but the value can easily used as a long.
+   * The sort order (including {@link Double#NaN}) is defined by
+   * {@link Double#compareTo}; {@code NaN} is greater than positive infinity.
+   * @see #sortableLongToDouble
+   */
+  public static long doubleToSortableLong(double val) {
+    long f = Double.doubleToLongBits(val);
+    if (f<0) f ^= 0x7fffffffffffffffL;
+    return f;
+  }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class DOUBLETOSORTABLELONGTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0L, DOUBLETOSORTABLELONG.doubleToSortableLong(0.0));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(-9223372036854775808L, DOUBLETOSORTABLELONG.doubleToSortableLong(Double.NaN));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(9223372036854775807L, DOUBLETOSORTABLELONG.doubleToSortableLong(Double.POSITIVE_INFINITY));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(-9223372036854775807L, DOUBLETOSORTABLELONG.doubleToSortableLong(Double.NEGATIVE_INFINITY));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(4607182418800017408L, DOUBLETOSORTABLELONG.doubleToSortableLong(1.0));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(-4607182418800017408L, DOUBLETOSORTABLELONG.doubleToSortableLong(-1.0));
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(1L, DOUBLETOSORTABLELONG.doubleToSortableLong(Double.MIN_VALUE));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(9223372036854775807L, DOUBLETOSORTABLELONG.doubleToSortableLong(Double.MAX_VALUE));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals(-0L, DOUBLETOSORTABLELONG.doubleToSortableLong(-0.0));
+    }
+}"
+FASTSUMWITHSTICKYBITBRANCHEDONLOW,"public class FASTSUMWITHSTICKYBITBRANCHEDONLOW {
+/**
+     * Compute the sum of two numbers {@code a} and {@code b} using
+     * Dekker's two-sum algorithm. The values are required to be ordered by magnitude
+     * {@code |a| >= |b|}. The result is adjusted to set the lowest bit as a sticky
+     * bit that summarises the magnitude of the round-off that were lost. The
+     * result is not the correctly rounded result; it is intended the result is to
+     * be used in an addition with a value with a greater magnitude exponent. This
+     * addition will have exact round-to-nearest, ties-to-even rounding taking account
+     * of bits lots in the previous sum.
+     *
+     * @param a First part of sum.
+     * @param b Second part of sum.
+     * @return <code>b - (sum - a)</code>
+     * @see <a href=""http://www-2.cs.cmu.edu/afs/cs/project/quake/public/papers/robust-arithmetic.ps"">
+     * Shewchuk (1997) Theorum 6</a>
+     */
+    public static double fastSumWithStickyBitBranchedOnLow(double a, double b) {
+        final double sum = a + b;
+        // bVirtual = sum - a
+        // b - bVirtual == b round-off
+        final double r = b - (sum - a);
+
+        // In floating-point arithmetic the sticky bit is the bit-wise OR
+        // of the rest of the binary bits that cannot be stored in the
+        // preliminary representation of the result:
+        //
+        // sgn | exp | V | N | .............. | L | G | R | S
+        //
+        // sgn : sign bit
+        // exp : exponent
+        // V : overflow for significand field
+        // N and L : most and least significant bits of the result
+        // G and R : the two bits beyond
+        // S : sticky bit, bitwise OR of all bits thereafter
+        //
+        // The sticky bit is a flag indicating if there is more magnitude beyond
+        // the last bits.
+        //
+        // Here the round-off is signed so we have to consider the
+        // sign of the sum and round-off together and either add the sticky or
+        // remove it. The final bit is thus used to push up the next addition using
+        // the sum to a higher value, or down to a lower value, when tie breaking for
+        // the correct round-to-nearest, ties-to-even result.
+        //
+        // One extra consideration: sum is already rounded. Since we are using the
+        // last bit to store a sticky bit then if the final bit is 1 then this was
+        // not created by a ties-to-even rounding and is already a sticky bit.
+
+        // Compute the sticky bit addition.
+        // This is only done when r is non-zero:
+        // sign sum   last bit sum    sign r    sticky
+        // x          1               x         +0
+        //
+        // 1          0               1         +1
+        // 1          0               0         -1
+        // 0          0               1         -1
+        // 0          0               0         +1
+        //
+        // Sign of sum and r is the sign-bit of sum or r
+
+        // In the majority of cases there is some round-off.
+        // Testing for non-zero allows the branch to assume the sticky bit magnitude
+        // is 1 (unless the final bit of hi is already set).
+        if (r != 0) {
+            // Bits will be lost.
+            final long hi = Double.doubleToRawLongBits(sum);
+            final long lo = Double.doubleToRawLongBits(r);
+
+            // Can only set a sticky bit if the bit is not already set.
+            // Flip the bits and extract the lowest bit. This is 1 if
+            // the sticky bit is not currently set. If already set then
+            // 'sticky' is zero and the rest of this execution path has
+            // no effect but we have eliminated the requirement to check the
+            // 50/50 branch:
+            // if ((hi & 0x1) == 0) {
+            //    // set sticky ...
+            // }
+            int sticky = ~((int) hi) & 0x1;
+
+            // The sign bit is created as + or - using the XOR of hi and lo.
+            // Signed shift will create a flag: -1 to negate, else 0.
+            final int fNegate = (int) ((hi ^ lo) >> 63);
+
+            // Conditionally negate a value without branching:
+            // http://graphics.stanford.edu/~seander/bithacks.html#ConditionalNegate
+            // (Logic updated since fNegate is already negative.)
+            // (1 ^  0) -  0 =  1 -  0 =  1
+            // (0 ^  0) -  0 =  0 -  0 =  0
+            // (1 ^ -1) - -1 = -2 - -1 = -1
+            // (0 ^ -1) - -1 = -1 - -1 =  0
+            sticky = (sticky ^ fNegate) - fNegate;
+
+            return Double.longBitsToDouble(hi + sticky);
+        }
+
+        return sum;
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class FASTSUMWITHSTICKYBITBRANCHEDONLOWTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(1.0, FASTSUMWITHSTICKYBITBRANCHEDONLOW.fastSumWithStickyBitBranchedOnLow(1.0, 0.0), 0.000001);
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(2.0, FASTSUMWITHSTICKYBITBRANCHEDONLOW.fastSumWithStickyBitBranchedOnLow(1.0, 1.0), 0.000001);
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(0.0, FASTSUMWITHSTICKYBITBRANCHEDONLOW.fastSumWithStickyBitBranchedOnLow(1.0, -1.0), 0.000001);
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(Double.POSITIVE_INFINITY, FASTSUMWITHSTICKYBITBRANCHEDONLOW.fastSumWithStickyBitBranchedOnLow(Double.MAX_VALUE, 1.0), 0.000001);
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(Double.POSITIVE_INFINITY, FASTSUMWITHSTICKYBITBRANCHEDONLOW.fastSumWithStickyBitBranchedOnLow(Double.MAX_VALUE, -1.0), 0.000001);
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(1.0, FASTSUMWITHSTICKYBITBRANCHEDONLOW.fastSumWithStickyBitBranchedOnLow(1.0, Double.MIN_VALUE), 0.000001);
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertEquals(1.0, FASTSUMWITHSTICKYBITBRANCHEDONLOW.fastSumWithStickyBitBranchedOnLow(1.0, -Double.MIN_VALUE), 0.000001);
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertEquals(1.0, FASTSUMWITHSTICKYBITBRANCHEDONLOW.fastSumWithStickyBitBranchedOnLow(0.0, 1.0), 0.000001);
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertEquals(-1.0, FASTSUMWITHSTICKYBITBRANCHEDONLOW.fastSumWithStickyBitBranchedOnLow(0.0, -1.0), 0.000001);
+    }
+
+    @Test
+    public void testCase10() {
+        Assert.assertEquals(0.0, FASTSUMWITHSTICKYBITBRANCHEDONLOW.fastSumWithStickyBitBranchedOnLow(-1.0, 1.0), 0.000001);
+    }
+}"
+HEXDIGITMSB0TOINT,"public class HEXDIGITMSB0TOINT {
+/**
+     * Converts a hexadecimal digit into an int using the Msb0 bit ordering.
+     *
+     * <p>
+     * '1' is converted to 8
+     * </p>
+     *
+     * @param hexDigit the hexadecimal digit to convert
+     * @return an int equals to {@code hexDigit}
+     * @throws IllegalArgumentException if {@code hexDigit} is not a hexadecimal digit
+     */
+    public static int hexDigitMsb0ToInt(final char hexDigit) {
+        switch (hexDigit) {
+        case '0':
+            return 0x0;
+        case '1':
+            return 0x8;
+        case '2':
+            return 0x4;
+        case '3':
+            return 0xC;
+        case '4':
+            return 0x2;
+        case '5':
+            return 0xA;
+        case '6':
+            return 0x6;
+        case '7':
+            return 0xE;
+        case '8':
+            return 0x1;
+        case '9':
+            return 0x9;
+        case 'a':// fall through
+        case 'A':
+            return 0x5;
+        case 'b':// fall through
+        case 'B':
+            return 0xD;
+        case 'c':// fall through
+        case 'C':
+            return 0x3;
+        case 'd':// fall through
+        case 'D':
+            return 0xB;
+        case 'e':// fall through
+        case 'E':
+            return 0x7;
+        case 'f':// fall through
+        case 'F':
+            return 0xF;
+        default:
+            throw new IllegalArgumentException(""Cannot interpret '"" + hexDigit + ""' as a hexadecimal digit"");
+        }
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class HEXDIGITMSB0TOINTTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0, HEXDIGITMSB0TOINT.hexDigitMsb0ToInt('0'));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(9, HEXDIGITMSB0TOINT.hexDigitMsb0ToInt('9'));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(10, HEXDIGITMSB0TOINT.hexDigitMsb0ToInt('a'));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(10, HEXDIGITMSB0TOINT.hexDigitMsb0ToInt('A'));
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(15, HEXDIGITMSB0TOINT.hexDigitMsb0ToInt('f'));
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(15, HEXDIGITMSB0TOINT.hexDigitMsb0ToInt('F'));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCase7() {
+        HEXDIGITMSB0TOINT.hexDigitMsb0ToInt('g');
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCase8() {
+        HEXDIGITMSB0TOINT.hexDigitMsb0ToInt('G');
+    }
+}"
+RINT,"public class RINT {
+/**
+     * Returns the {@code double} value that is closest in value
+     * to the argument and is equal to a mathematical integer. If two
+     * {@code double} values that are mathematical integers are
+     * equally close to the value of the argument, the result is the
+     * integer value that is even. Special cases:
+     * <ul><li>If the argument value is already equal to a mathematical
+     * integer, then the result is the same as the argument.
+     * <li>If the argument is NaN or an infinity or positive zero or negative
+     * zero, then the result is the same as the argument.</ul>
+     *
+     * @param   a   a value.
+     * @return  the closest floating-point value to {@code a} that is
+     *          equal to a mathematical integer.
+     * @author Joseph D. Darcy
+     */
+    public static double rint(double a) {
+        /*
+         * If the absolute value of a is not less than 2^52, it
+         * is either a finite integer (the double format does not have
+         * enough significand bits for a number that large to have any
+         * fractional portion), an infinity, or a NaN.  In any of
+         * these cases, rint of the argument is the argument.
+         *
+         * Otherwise, the sum (twoToThe52 + a ) will properly round
+         * away any fractional portion of a since ulp(twoToThe52) ==
+         * 1.0; subtracting out twoToThe52 from this sum will then be
+         * exact and leave the rounded integer portion of a.
+         *
+         * This method does *not* need to be declared strictfp to get
+         * fully reproducible results.  Whether or not a method is
+         * declared strictfp can only make a difference in the
+         * returned result if some operation would overflow or
+         * underflow with strictfp semantics.  The operation
+         * (twoToThe52 + a ) cannot overflow since large values of a
+         * are screened out; the add cannot underflow since twoToThe52
+         * is too large.  The subtraction ((twoToThe52 + a ) -
+         * twoToThe52) will be exact as discussed above and thus
+         * cannot overflow or meaningfully underflow.  Finally, the
+         * last multiply in the return statement is by plus or minus
+         * 1.0, which is exact too.
+         */
+        double twoToThe52 = (double)(1L << 52); // 2^52
+        double sign = Math.copySign(1.0, a); // preserve sign info
+        a = Math.abs(a);
+
+        if (a < twoToThe52) { // E_min <= ilogb(a) <= 51
+            a = ((twoToThe52 + a ) - twoToThe52);
+        }
+
+        return sign * a; // restore original sign
+    }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class RINTTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(0.0, RINT.rint(0.0), 0.000001);
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(1.0, RINT.rint(1.0), 0.000001);
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(2.0, RINT.rint(1.5), 0.000001);
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(2.0, RINT.rint(2.0), 0.000001);
+    }
+
+    @Test
+    public void testCase5() {
+        Assert.assertEquals(-1.0, RINT.rint(-1.0), 0.000001);
+    }
+
+    @Test
+    public void testCase6() {
+        Assert.assertEquals(-2.0, RINT.rint(-1.5), 0.000001);
+    }
+
+    @Test
+    public void testCase7() {
+        Assert.assertTrue(Double.isNaN(RINT.rint(Double.NaN)));
+    }
+
+    @Test
+    public void testCase8() {
+        Assert.assertTrue(Double.isInfinite(RINT.rint(Double.POSITIVE_INFINITY)));
+    }
+
+    @Test
+    public void testCase9() {
+        Assert.assertTrue(Double.isInfinite(RINT.rint(Double.NEGATIVE_INFINITY)));
+    }
+}"
+ISFORMATCHAR,"public class ISFORMATCHAR {
+/**
+   * Determines whether the given character is the beginning or end of a
+   * section with special formatting.
+   */
+  public static boolean isFormatChar(char ch) {
+    switch (ch) {
+      case '*': case '_': case '^':
+        return true;
+
+      default:
+        return false;
+    }
+  }
+}","import org.junit.Assert;
+import org.junit.Test;
+
+public class ISFORMATCHARTest {
+
+    @Test
+    public void testCase1() {
+        Assert.assertEquals(true, ISFORMATCHAR.isFormatChar('*'));
+    }
+
+    @Test
+    public void testCase2() {
+        Assert.assertEquals(true, ISFORMATCHAR.isFormatChar('_'));
+    }
+
+    @Test
+    public void testCase3() {
+        Assert.assertEquals(true, ISFORMATCHAR.isFormatChar('^'));
+    }
+
+    @Test
+    public void testCase4() {
+        Assert.assertEquals(false, ISFORMATCHAR.isFormatChar('a'));
+    }
+}"
+CALCULATEUNPINNEDSTEPSIZE,"public class CALCULATEUNPINNEDSTEPSIZE {
+/**
+     * If setting is less then 100kBytes take 1 kByte steps.
+     * If setting is less then 500kBytes take 5 kByte steps.
+     * if setting is larger take 10 kBytes steps.
+     * @param currLimitMax - current limit setting.
+     * @return - set size for next change.
+     */
+    public int calculateUnpinnedStepSize(int currLimitMax){
+        if(currLimitMax<102400){
+            return 1024;
+        }else if(currLimitMax<409600){
+            return 1024*5;
+        }else if(currLimitMax>=409600){
+            return 1024*10;
+        }
+        return 1024;
+    }
+}","429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 43
+}
+]"
+GETNEIGHBOR,"public class GETNEIGHBOR {
+/**
+	 * Return the value of the circular neighbor in the corresponding position
+	 * neigh to pixel
+	 */
+	public static int getNeighbor(int pixel, int neigh, int w)
+		{
+		switch (neigh)
+			{
+			case 0:
+				return pixel-w;
+			case 1:
+				return pixel-w+1;
+			case 2:
+				return pixel+1;
+			case 3:
+				return pixel+w+1;
+			case 4:
+				return pixel+w;
+			case 5:
+				return pixel+w-1;
+			case 6:
+				return pixel-1;
+			case 7:
+				return pixel-w-1;
+			default:
+				return -1;
+			}
+
+		}
+}","429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+}
+, links {
+  description: ""Learn more about Gemini API quotas""
+  url: ""https://ai.google.dev/gemini-api/docs/rate-limits""
+}
+, retry_delay {
+  seconds: 11
+}
+]"

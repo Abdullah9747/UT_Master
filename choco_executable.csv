@@ -1,0 +1,329 @@
+Unnamed: 0.1,Function,cyclomatic_complexity,javadoc_length,tokens,LOC,Unnamed: 0,doc_bin,loc_bin,group,class_name,SPF_Results,SPF_Time
+77,"public class SFEXACT {
+/**
+         * Calculates exact cases for the complementary probability
+         * {@code P[D_n^+ >= x]} the one-sided one-sample Kolmogorov-Smirnov distribution.
+         *
+         * <p>Exact cases handle x not in [0, 1]. It is assumed n is positive.
+         *
+         * @param x Statistic.
+         * @param n Sample size (assumed to be positive).
+         * @return \(P(D_n^+ &ge; x)\)
+         */
+        public static double sfExact(double x, int n) {
+            if (n * x * x >= 372.5 || x >= 1) {
+                // p would underflow, or x is out of the domain
+                return 0;
+            }
+            if (x <= 0) {
+                // edge-of, or out-of, the domain
+                return 1;
+            }
+            if (n == 1) {
+                return x;
+            }
+            // x <= 1/n
+            // [1] Equation (33)
+            final double nx = n * x;
+            if (nx <= 1) {
+                // 1 - x (1+x)^(n-1): here x may be small so use log1p
+                return 1 - x * Math.exp((n - 1) * Math.log1p(x));
+            }
+            // 1 - 1/n <= x < 1
+            // [1] Equation (16)
+            if (n - 1 <= nx) {
+                // (1-x)^n: here x > 0.5 and 1-x is exact
+                return Math.pow(1 - x, n);
+            }
+            return -1;
+        }
+}",7.0,3,30,12,,Long (21-40),Medium (11-20),Long (21-40) | Medium (11-20),SFEXACT,"Inputs: x_1_SYMREAL,n_2_SYMINT
+
+(9.64896763E-316,2147483647)  --> Return Value: 0.0
+(9.6489677E-316,2147483647)  --> Return Value: 0.0
+(1.0,1)  --> Return Value: 0.0
+(1.000001,1)  --> Return Value: 0.0
+(4.9E-324,1)  --> Return Value: 4.9E-324
+",1.4412851333618164
+204,"public class CHECKDOUBLEPRECISE {
+/**
+	 * Checks a double value is double precise. If value is 2.1, then return
+	 * true; if value is 2.1000000001 or 2.099999999999, then return false.
+	 * 
+	 * @param dValue
+	 * @return if precise
+	 */
+	public static boolean checkDoublePrecise( double dValue )
+	{
+		if ( dValue - (int) dValue == 0 )
+		{
+			return true;
+		}
+		String sValue = String.valueOf( dValue );
+		if ( sValue.length( ) < 8 )
+		{
+			return true;
+		}
+		int iPoint = sValue.indexOf( '.' );
+		int iZero = sValue.lastIndexOf( ""00000000"" ); //$NON-NLS-1$
+		if ( iZero >= iPoint )
+		{
+			return false;
+		}
+		int iNine = sValue.lastIndexOf( ""99999999"" ); //$NON-NLS-1$
+		if ( iNine >= iPoint )
+		{
+			return false;
+		}
+		return true;
+	}
+}",5.0,2,23,13,68.0,Long (21-40),Medium (11-20),Long (21-40) | Medium (11-20),CHECKDOUBLEPRECISE,"Inputs: dValue_1_SYMREAL
+
+(1.0)  --> Return Value: 1
+(1.0000009999999997)  --> Return Value: 1
+",1.3600237369537354
+564,"public class GETSTANDARDBOLDERFONTWEIGHT {
+/**
+     * Returns a bolder font-weight.
+     */
+    public static float getStandardBolderFontWeight(float f) {
+        // Round f to nearest 100...
+        int weight = ((int)((f+50)/100))*100;
+        switch (weight) {
+        case 100: return 600;
+        case 200: return 600;
+        case 300: return 600;
+        case 400: return 600;
+        case 500: return 600;
+        case 600: return 700;
+        case 700: return 800;
+        case 800: return 900;
+        case 900: return 900;
+        default:
+            throw new IllegalArgumentException(""Bad Font Weight: "" + f);
+        }
+    }
+}",2.0,1,4,22,428.0,Short (4-10),Long (21+),Short (4-10) | Long (21+),GETSTANDARDBOLDERFONTWEIGHT,"Inputs: f_1_SYMREAL
+
+(50.0f)  --> Return Value: 600.0
+(150.0f)  --> Return Value: 600.0
+(250.0f)  --> Return Value: 600.0
+(350.0f)  --> Return Value: 600.0
+(450.0f)  --> Return Value: 600.0
+(550.0f)  --> Return Value: 700.0
+(650.0f)  --> Return Value: 800.0
+(750.0f)  --> Return Value: 900.0
+(850.0f)  --> Return Value: 900.0
+",1.8843767642974851
+573,"public class GETBOLDERFONTWEIGHT {
+/**
+     * Returns a bolder font-weight.
+     */
+    public float getBolderFontWeight(float f) {
+        // Round f to nearest 100...
+        int weight = ((int)((f+50)/100))*100;
+        switch (weight) {
+        case 100: return 600;
+        case 200: return 600;
+        case 300: return 600;
+        case 400: return 600;
+        case 500: return 600;
+        case 600: return 700;
+        case 700: return 800;
+        case 800: return 900;
+        case 900: return 900;
+        default:
+            throw new IllegalArgumentException(""Bad Font Weight: "" + f);
+        }
+    }
+}",2.0,1,4,22,437.0,Short (4-10),Long (21+),Short (4-10) | Long (21+),GETBOLDERFONTWEIGHT,"Inputs: f_1_SYMREAL
+
+(50.0f)  --> Return Value: 600.0
+(150.0f)  --> Return Value: 600.0
+(250.0f)  --> Return Value: 600.0
+(350.0f)  --> Return Value: 600.0
+(450.0f)  --> Return Value: 600.0
+(550.0f)  --> Return Value: 700.0
+(650.0f)  --> Return Value: 800.0
+(750.0f)  --> Return Value: 900.0
+(850.0f)  --> Return Value: 900.0
+",1.661346435546875
+561,"public class GETLIGHTERFONTWEIGHT {
+/**
+         * Returns a lighter font-weight.
+         */
+        public float getLighterFontWeight(float f) {
+            // Round f to nearest 100...
+            int weight = ((int)((f+50)/100))*100;
+            switch (weight) {
+            case 100: return 100;
+            case 200: return 100;
+            case 300: return 200;
+            case 400: return 300;
+            case 500: return 400;
+            case 600: return 400;
+            case 700: return 400;
+            case 800: return 400;
+            case 900: return 400;
+            default:
+                throw new IllegalArgumentException(""Bad Font Weight: "" + f);
+            }
+        }
+}",2.0,1,4,22,425.0,Short (4-10),Long (21+),Short (4-10) | Long (21+),GETLIGHTERFONTWEIGHT,"Inputs: f_1_SYMREAL
+
+(50.0f)  --> Return Value: 100.0
+(150.0f)  --> Return Value: 100.0
+(250.0f)  --> Return Value: 200.0
+(350.0f)  --> Return Value: 300.0
+(450.0f)  --> Return Value: 400.0
+(550.0f)  --> Return Value: 400.0
+(650.0f)  --> Return Value: 400.0
+(750.0f)  --> Return Value: 400.0
+(850.0f)  --> Return Value: 400.0
+",1.3600854873657229
+788,"public class TOINT64 {
+/**
+     * JavaScript compliant number to int64 conversion
+     *
+     * @param num a number
+     * @return an int64
+     */
+    public static long toInt64(final double num) {
+        if (Double.isInfinite(num)) {
+            return 0L;
+        }
+        return (long)num;
+    }
+}",2.0,1,6,3,652.0,Short (4-10),Very Short (2-5),Short (4-10) | Very Short (2-5),TOINT64,"Inputs: num_1_SYMREAL
+
+(1.0)  --> Return Value: 2147483647
+",1.5672094821929932
+674,"public class HSBTORGB {
+/**
+     * Converts the components of a color, as specified by the HSB
+     * model, to an equivalent set of values for the default RGB model.
+     * <p>
+     * The <code>saturation</code> and <code>brightness</code> components
+     * should be floating-point values between zero and one
+     * (numbers in the range 0.0-1.0).  The <code>hue</code> component
+     * can be any floating-point number.  The floor of this number is
+     * subtracted from it to create a fraction between 0 and 1.  This
+     * fractional number is then multiplied by 360 to produce the hue
+     * angle in the HSB color model.
+     * <p>
+     * The integer that is returned by <code>HSBtoRGB</code> encodes the
+     * value of a color in bits 0-23 of an integer value that is the same
+     * format used by the method {@link #getRGB() getRGB}.
+     * This integer can be supplied as an argument to the
+     * <code>Color</code> constructor that takes a single integer argument.
+     * @param     hue   the hue component of the color
+     * @param     saturation   the saturation of the color
+     * @param     brightness   the brightness of the color
+     * @return    the RGB value of the color with the indicated hue,
+     *                            saturation, and brightness.
+     * @see       java.awt.Color#getRGB()
+     * @see       java.awt.Color#Color(int)
+     * @see       java.awt.image.ColorModel#getRGBdefault()
+     * @since     JDK1.0
+     */
+    public static int HSBtoRGB(float hue, float saturation, float brightness) {
+        int r = 0, g = 0, b = 0;
+        if (saturation == 0) {
+            r = g = b = (int) (brightness * 255.0f + 0.5f);
+        } else {
+            float h = (hue - (float)Math.floor(hue)) * 6.0f;
+            float f = h - (float)java.lang.Math.floor(h);
+            float p = brightness * (1.0f - saturation);
+            float q = brightness * (1.0f - saturation * f);
+            float t = brightness * (1.0f - (saturation * (1.0f - f)));
+            switch ((int) h) {
+            case 0:
+                r = (int) (brightness * 255.0f + 0.5f);
+                g = (int) (t * 255.0f + 0.5f);
+                b = (int) (p * 255.0f + 0.5f);
+                break;
+            case 1:
+                r = (int) (q * 255.0f + 0.5f);
+                g = (int) (brightness * 255.0f + 0.5f);
+                b = (int) (p * 255.0f + 0.5f);
+                break;
+            case 2:
+                r = (int) (p * 255.0f + 0.5f);
+                g = (int) (brightness * 255.0f + 0.5f);
+                b = (int) (t * 255.0f + 0.5f);
+                break;
+            case 3:
+                r = (int) (p * 255.0f + 0.5f);
+                g = (int) (q * 255.0f + 0.5f);
+                b = (int) (brightness * 255.0f + 0.5f);
+                break;
+            case 4:
+                r = (int) (t * 255.0f + 0.5f);
+                g = (int) (p * 255.0f + 0.5f);
+                b = (int) (brightness * 255.0f + 0.5f);
+                break;
+            case 5:
+                r = (int) (brightness * 255.0f + 0.5f);
+                g = (int) (p * 255.0f + 0.5f);
+                b = (int) (q * 255.0f + 0.5f);
+                break;
+            }
+        }
+        return 0xff000000 | (r << 16) | (g << 8) | (b << 0);
+    }
+}",3.0,17,139,41,538.0,Very Long (41+),Long (21+),Very Long (41+) | Long (21+),HSBTORGB,No path condition,61.41601753234863
+54,"public class SMALLESTCHANGE {
+/**
+     * Perform the smallest change to the value. This returns the next double value
+     * adjacent to d in the direction of infinity. Edge cases: if already infinity then
+     * return the next closest in the direction of negative infinity; if nan then return
+     * 0.
+     *
+     * @param x the x
+     * @return the new value
+     */
+    public static double smallestChange(double x) {
+        if (Double.isNaN(x)) {
+            return 0;
+        }
+        return x == Double.POSITIVE_INFINITY ? Math.nextDown(x) : Math.nextUp(x);
+    }
+}",2.0,4,42,3,,Very Long (41+),Very Short (2-5),Very Long (41+) | Very Short (2-5),SMALLESTCHANGE,No path condition,1.5445997714996338
+717,"public class NEXTDOWN {
+/**
+     * Returns the floating-point value adjacent to {@code d} in
+     * the direction of negative infinity.  This method is
+     * semantically equivalent to {@code nextAfter(d,
+     * Double.NEGATIVE_INFINITY)}; however, a
+     * {@code nextDown} implementation may run faster than its
+     * equivalent {@code nextAfter} call.
+     *
+     * <p>Special Cases:
+     * <ul>
+     * <li> If the argument is NaN, the result is NaN.
+     *
+     * <li> If the argument is negative infinity, the result is
+     * negative infinity.
+     *
+     * <li> If the argument is zero, the result is
+     * {@code -Double.MIN_VALUE}
+     *
+     * </ul>
+     *
+     * @param d  starting floating-point value
+     * @return The adjacent floating-point value closer to negative
+     * infinity.
+     * @since 1.8
+     */
+    public static double nextDown(double d) {
+        if (Double.isNaN(d) || d == Double.NEGATIVE_INFINITY)
+            return d;
+        else {
+            if (d == 0.0)
+                return -Double.MIN_VALUE;
+            else
+                return Double.longBitsToDouble(Double.doubleToRawLongBits(d) +
+                                               ((d > 0.0d)?-1L:+1L));
+        }
+    }
+}",4.0,15,75,4,581.0,Very Long (41+),Very Short (2-5),Very Long (41+) | Very Short (2-5),NEXTDOWN,No path condition,1.4768357276916504
