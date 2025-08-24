@@ -1,3 +1,4 @@
 *.pdb filter=lfs diff=lfs merge=lfs -text
 *.dll filter=lfs diff=lfs merge=lfs -text
+*.exe filter=lfs diff=lfs merge=lfs -text
 SPF/z3-4.14.0-x64-win/bin/** filter=lfs diff=lfs merge=lfs -text
