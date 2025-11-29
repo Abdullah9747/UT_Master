@@ -1,0 +1,21 @@
+FROM python:3.9
+WORKDIR /app
+
+# Install Docker CLI so that the driver container can run "docker exec" commands
+RUN apt-get update && apt-get install -y docker.io && rm -rf /var/lib/apt/lists/*
+
+# Copy Python requirements and install dependencies
+COPY UT_Master/requirements.txt /app/requirements.txt
+RUN pip install -r /app/requirements.txt
+
+ENV LD_LIBRARY_PATH=/app/UT_Master/SPF/z3/bin
+ENV CLASSPATH=/app/UT_Master/SPF/z3/bin/com.microsoft.z3.jar
+
+# Copy the entire project so that Driver.py, spf.py, jqf.py, and other files are available
+COPY UT_Master /app/UT_Master
+COPY . /app
+
+EXPOSE 8501:8501
+
+# The environment variables SPF_HOST and JQF_HOST can be set via docker-compose.
+CMD ["python", "-m", "streamlit", "run", "UT_Master/app.py", "--server.enableCORS=false"]

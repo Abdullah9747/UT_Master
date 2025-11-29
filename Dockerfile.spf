@@ -1,0 +1,10 @@
+FROM gradle:6.9-jdk8
+WORKDIR /app
+
+# Copy the SPF folder containing your pre-built jar files and resources
+COPY UT_Master/SPF /app/SPF
+
+ENV LD_LIBRARY_PATH=/app/SPF/z3/bin
+ENV CLASSPATH=/app/SPF/z3/bin/com.microsoft.z3.jar
+# Keep the container alive so that docker exec from the driver works
+CMD ["tail", "-f", "/dev/null"]

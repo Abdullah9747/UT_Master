@@ -1,0 +1,16 @@
+FROM maven:3.6.1-jdk-11
+WORKDIR /app
+
+# Copy the JQF Maven project from UT_Master/JQF and build it
+COPY UT_Master/JQF /app/JQF
+
+# Change the working directory to /app/JQF
+WORKDIR /app/JQF
+# Install dependencies
+RUN mvn clean install -DskipTests
+
+WORKDIR /app
+
+
+# Keep the container alive so that docker exec from the driver works
+CMD ["tail", "-f", "/dev/null"]

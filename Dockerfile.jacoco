@@ -1,0 +1,15 @@
+FROM maven:3.8.5-jdk-8
+WORKDIR /app
+
+# Install Python3 (if your automation script needs it)
+#RUN apt-get update && apt-get install -y python3 python3-pip
+
+# Copy the jacoco folder (with pom.xml and maven_automation.py) into the image
+COPY UT_Master/jacoco /app/jacoco
+
+# Optionally, build the Maven project and generate the JaCoCo report.
+# (You can remove this RUN line if you want to trigger the build later in your script)
+#RUN mvn -f /app/jacoco/pom.xml clean test jacoco:report
+
+# Keep the container running so that your driver can trigger the py script when needed.
+CMD ["tail", "-f", "/dev/null"]

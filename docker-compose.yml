@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  jqf:
+    build:
+      context: .
+      dockerfile: Dockerfile.jqf
+    container_name: jqf_container
+    volumes:
+      - jqf_data:/app/JQF
+  spf:
+    build:
+      context: .
+      dockerfile: Dockerfile.spf
+    container_name: spf_container
+    volumes:
+      - spf_data:/app/SPF
+    environment:
+      - LD_LIBRARY_PATH=/app/SPF/z3/bin:$LD_LIBRARY_PATH
+  jacoco:
+    build:
+      context: .
+      dockerfile: Dockerfile.jacoco
+    container_name: jacoco_container
+    volumes:
+      - jacoco_data:/app/jacoco
+  driver:
+    build:
+      context: .
+      dockerfile: Dockerfile.driver
+    container_name: driver_container
+    depends_on:
+      - spf
+      - jqf
+      - jacoco
+    volumes:
+      - /JQF/examples:/JQF/examples
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jqf_data:/app/JQF
+      - spf_data:/app/SPF
+      - jacoco_data:/app/jacoco
+    ports:
+      - "8501:8501"
+
+volumes:
+  jqf_data:
+  spf_data:
+  jacoco_data:

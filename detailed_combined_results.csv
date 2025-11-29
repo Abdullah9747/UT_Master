@@ -1,0 +1,535 @@
+Class_Name,Function1,Function,SPF_Results,SPF Results (Summary),SPF Time,JQF Valid,JQF Failures,JQF Time Valid,JQF Time Failure,Cyclomatic Complexity,LOC
+GETMASK,getMask,"public class GETMASK {
+/**
+     * Calculate bit mask for a given number of bits. The mask should enable to
+     * make a bitwise and to the given number of bits.
+     * @param numOfBits number of bits to calculate mask for.
+     * @return bit mask
+     */
+    public static int getMask(int numOfBits) {
+        int mask = 0x00;
+
+        switch (numOfBits) {
+        case 1:
+            mask = 0x01;
+            break;
+        case 2:
+            mask = 0x03;
+            break;
+        case 3:
+            mask = 0x07;
+            break;
+        case 4:
+            mask = 0x0F;
+            break;
+        case 5:
+            mask = 0x1F;
+            break;
+        case 6:
+            mask = 0x3F;
+            break;
+        case 7:
+            mask = 0x7F;
+            break;
+        case 8:
+            mask = 0xFF;
+            break;
+        }
+        return mask;
+    }
+}","Inputs: numOfBits_1_SYMINT
+
+(1)  --> Return Value: 1
+(2)  --> Return Value: 3
+(3)  --> Return Value: 7
+(4)  --> Return Value: 15
+(5)  --> Return Value: 31
+(6)  --> Return Value: 63
+(7)  --> Return Value: 127
+(8)  --> Return Value: 255
+(0)  --> Return Value: 0
+","9 test cases, 0 exceptions",1.394749879837036,"['[1994145609]', '[0]', '[5]', '[4]', '[2]']",[],"[0.8080000877380371, 0.8670001029968262, 7.33899998664856, 10.130000114440918, 49.74600005149841]",[],2.0,27
+INTTOHEXDIGITMSB0,intToHexDigitMsb0,"public class INTTOHEXDIGITMSB0 {
+/**
+     * Converts the 4 lsb of an int to a hexadecimal digit encoded using the Msb0 bit ordering.
+     *
+     * <p>
+     * 0 returns '0'
+     * </p>
+     * <p>
+     * 1 returns '8'
+     * </p>
+     * <p>
+     * 10 returns '5' and so on...
+     * </p>
+     *
+     * @param nibble the 4 bits to convert
+     * @return a hexadecimal digit representing the 4 lsb of {@code nibble}
+     * @throws IllegalArgumentException if {@code nibble < 0} or {@code nibble > 15}
+     */
+    public static char intToHexDigitMsb0(final int nibble) {
+        switch (nibble) {
+        case 0x0:
+            return '0';
+        case 0x1:
+            return '8';
+        case 0x2:
+            return '4';
+        case 0x3:
+            return 'c';
+        case 0x4:
+            return '2';
+        case 0x5:
+            return 'a';
+        case 0x6:
+            return '6';
+        case 0x7:
+            return 'e';
+        case 0x8:
+            return '1';
+        case 0x9:
+            return '9';
+        case 0xA:
+            return '5';
+        case 0xB:
+            return 'd';
+        case 0xC:
+            return '3';
+        case 0xD:
+            return 'b';
+        case 0xE:
+            return '7';
+        case 0xF:
+            return 'f';
+        default:
+            throw new IllegalArgumentException(""nibble value not between 0 and 15: "" + nibble);
+        }
+    }
+}","Inputs: nibble_1_SYMINT
+
+(0)  --> Return Value: 48
+(1)  --> Return Value: 56
+(2)  --> Return Value: 52
+(3)  --> Return Value: 99
+(4)  --> Return Value: 50
+(5)  --> Return Value: 97
+(6)  --> Return Value: 54
+(7)  --> Return Value: 101
+(8)  --> Return Value: 49
+(9)  --> Return Value: 57
+(10)  --> Return Value: 53
+(11)  --> Return Value: 100
+(12)  --> Return Value: 51
+(13)  --> Return Value: 98
+(14)  --> Return Value: 55
+(15)  --> Return Value: 102
+demo.Distance.distance(-1)  --> ""java.lang.IllegalArgumentException: nibble value not between 0 and 15: 0...""
+","17 test cases, 1 exceptions",1.5493741035461426,[],['[1912603126]'],[],[0.5710000991821289],2.0,35
+ISNUMERIC,isNumeric,"public class ISNUMERIC {
+/**
+     * Indicates whether the given SQL data type is a numberic type.
+     *
+     * @param type one of the constants from <code>java.sql.Types</code>
+     * @return <code>true</code> if the given type is <code>NUMERIC</code>,'
+     *         <code>DECIMAL</code>, <code>BIT</code>, <code>TINYINT</code>,
+     *         <code>SMALLINT</code>, <code>INTEGER</code>, <code>BIGINT</code>,
+     *         <code>REAL</code>, <code>DOUBLE</code>, or <code>FLOAT</code>;
+     *         <code>false</code> otherwise
+     */
+    public boolean isNumeric(int type) {
+        switch (type) {
+            case java.sql.Types.NUMERIC:
+            case java.sql.Types.DECIMAL:
+            case java.sql.Types.BIT:
+            case java.sql.Types.TINYINT:
+            case java.sql.Types.SMALLINT:
+            case java.sql.Types.INTEGER:
+            case java.sql.Types.BIGINT:
+            case java.sql.Types.REAL:
+            case java.sql.Types.DOUBLE:
+            case java.sql.Types.FLOAT:
+                return true;
+            default:
+                return false;
+        }
+    }
+}","Inputs: type_1_SYMINT
+
+(-7)  --> Return Value: 1
+(-6)  --> Return Value: 1
+(-5)  --> Return Value: 1
+(-4)  --> Return Value: 0
+(-3)  --> Return Value: 0
+(-2)  --> Return Value: 0
+(-1)  --> Return Value: 0
+(0)  --> Return Value: 0
+(1)  --> Return Value: 0
+(2)  --> Return Value: 1
+(3)  --> Return Value: 1
+(4)  --> Return Value: 1
+(5)  --> Return Value: 1
+(6)  --> Return Value: 1
+(7)  --> Return Value: 1
+(8)  --> Return Value: 1
+(-8)  --> Return Value: 0
+","17 test cases, 0 exceptions",1.491591453552246,"['[232817336]', '[0]', '[14]', '[1]', '[11]', '[12]', '[7]', '[6]']",[],"[0.0409998893737793, 0.1770000457763672, 3.9519999027252197, 8.760999917984009, 20.694999933242798, 28.046000003814697, 35.229000091552734, 55.89400005340576]",[],2.0,14
+GETEUROPEANDIGIT,getEuropeanDigit,"public class GETEUROPEANDIGIT {
+/**
+     * Getting the digit values of characters like 'A' - 'Z', normal,
+     * half-width and full-width. This method assumes that the other digit
+     * characters are checked by the calling method.
+     * @param ch character to test
+     * @return -1 if ch is not a character of the form 'A' - 'Z', otherwise
+     *         its corresponding digit will be returned.
+     */
+    public static int getEuropeanDigit(int ch) {
+        if ((ch > 0x7a && ch < 0xff21)
+            || ch < 0x41 || (ch > 0x5a && ch < 0x61)
+            || ch > 0xff5a || (ch > 0xff3a && ch < 0xff41)) {
+            return -1;
+        }
+        if (ch <= 0x7a) {
+            // ch >= 0x41 or ch < 0x61
+            return ch + 10 - ((ch <= 0x5a) ? 0x41 : 0x61);
+        }
+        // ch >= 0xff21
+        if (ch <= 0xff3a) {
+            return ch + 10 - 0xff21;
+        }
+        // ch >= 0xff41 && ch <= 0xff5a
+        return ch + 10 - 0xff41;
+    }
+}","Inputs: ch_1_SYMINT
+
+(123)  --> Return Value: -1
+(0)  --> Return Value: -1
+(65371)  --> Return Value: -1
+(65)  --> Return Value: 10
+(65313)  --> Return Value: 10
+(97)  --> Return Value: 10
+(91)  --> Return Value: -1
+(65339)  --> Return Value: -1
+(65345)  --> Return Value: 10
+","9 test cases, 0 exceptions",1.5581200122833252,"['[1593416713]', '[-1903241435]', '[39945]']",[],"[0.9489998817443848, 0.9920001029968262, 1.5090000629425049]",[],11.0,11
+USESAN,usesAn,"public class USESAN {
+/**
+   * tests if this word should have an ""a"" or an ""an""
+   * before it. char c is the first character of the word.
+   */
+  public static boolean usesAn(char c) {
+    boolean result = false;
+    switch(c) {
+      case 'a':
+      case 'A':
+      case 'e':
+      case 'E':
+      case 'i':
+      case 'I':
+      case 'o':
+      case 'O':
+      case 'h':
+      case 'H':
+        result = true;
+        break;
+      default:
+        result = false;
+        break;
+    }
+    return result;
+  }
+}","Inputs: c_1_SYMINT
+
+(65)  --> Return Value: 1
+(69)  --> Return Value: 1
+(72)  --> Return Value: 1
+(73)  --> Return Value: 1
+(79)  --> Return Value: 1
+(97)  --> Return Value: 1
+(101)  --> Return Value: 1
+(104)  --> Return Value: 1
+(105)  --> Return Value: 1
+(111)  --> Return Value: 1
+(0)  --> Return Value: 0
+","11 test cases, 0 exceptions",1.560373306274414,"['[ã²•]', '[E]', '[I]', '[H]', '[a]', '[O]']",[],"[0.4270000457763672, 14.723999977111816, 36.17400002479553, 40.35899996757507, 43.42899990081787, 47.073999881744385]",[],2.0,18
+COLORCOMPONENTABSOLUTE,colorComponentAbsolute,"public class COLORCOMPONENTABSOLUTE {
+/**
+     * Defines a simple function for a color.
+     * 
+     * @param value
+     * @param bLeft under this value, the color is 0
+     * @param bRight up to this value, the color is 0
+     * @param tLeft from this value until @link tRight, the color is 1
+     * @param tRight from @link tLeft until this value, the color is 1
+     * 
+     * Between bLeft and tLeft, as well as tRight and bRight, the output value is a linear
+     * interpolation between 0 and 1.
+     * 
+     * <code>
+     *                      tLeft       tRight
+     *                        /-----------\
+     *                       /             \ 
+     *                      /               \
+     *              -------|-----------------|--------
+     *                    bLeft            bRight  
+     * </code>
+     * 
+     * @return color influence.
+     */
+    public float colorComponentAbsolute( float value, float bLeft, float bRight, float tLeft, float tRight ){
+        float output = 0;
+        // a gauche ou a droite du creneau
+        if( (value < bLeft) || (value >= bRight) ){
+            output = 0;
+        }
+        // sur le plateau haut
+        else if( (value >= tLeft) && (value < tRight) ){
+            output = 1;
+        }
+        // sur la pente gauche du creneau
+        else if( (value >= bLeft) && (value < tLeft) ){
+            output = (value-bLeft)/(tLeft-bLeft);
+        }
+        // sur la pente droite du creneau
+        else if( (value >= tRight) && (value < bRight) ){
+            output = (value-bRight)/(tRight-bRight);
+        }
+        return output;
+    }
+}","Inputs: value_1_SYMREAL,bLeft_2_SYMREAL,bRight_3_SYMREAL,tLeft_4_SYMREAL,tRight_5_SYMREAL
+
+(0.0f,1.0f,-9223372036854775808(don't care),-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0.0
+(0.0f,0.0f,0.0f,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0.0
+(0.5f,0.5f,0.0f,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0.0
+(0.5f,0.0f,0.5f,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0.0
+(0.5f,0.0f,0.0f,-9223372036854775808(don't care),-9223372036854775808(don't care))  --> Return Value: 0.0
+demo.Distance.distance(0.0f,0.0f,1.0f,1.0f,-9223372036854775808(don't care))  --> ""java.lang.ArithmeticException: div by 0...""
+demo.Distance.distance(0.5f,0.0f,1.0f,1.0f,-9223372036854775808(don't care))  --> ""java.lang.ArithmeticException: div by 0...""
+(0.0f,0.0f,1.0f,0.0f,1.0f)  --> Return Value: 1.0
+demo.Distance.distance(0.0f,0.0f,1.0f,0.0f,0.0f)  --> ""java.lang.ArithmeticException: div by 0...""
+demo.Distance.distance(0.5f,0.5f,1.0f,0.5f,0.0f)  --> ""java.lang.ArithmeticException: div by 0...""
+(0.5f,0.5f,1.0f,0.0f,1.0f)  --> Return Value: 1.0
+demo.Distance.distance(0.5f,0.5f,1.0f,0.0f,0.5f)  --> ""java.lang.ArithmeticException: div by 0...""
+demo.Distance.distance(0.5f,0.5f,1.0f,0.0f,0.0f)  --> ""java.lang.ArithmeticException: div by 0...""
+(0.5f,0.0f,1.0f,0.5f,1.0f)  --> Return Value: 1.0
+demo.Distance.distance(0.5f,0.0f,1.0f,0.5f,0.5f)  --> ""java.lang.ArithmeticException: div by 0...""
+demo.Distance.distance(0.5f,0.0f,1.0f,0.5f,0.0f)  --> ""java.lang.ArithmeticException: div by 0...""
+(0.5f,0.0f,1.0f,0.0f,1.0f)  --> Return Value: 1.0
+demo.Distance.distance(0.5f,0.0f,1.0f,0.0f,0.5f)  --> ""java.lang.ArithmeticException: div by 0...""
+demo.Distance.distance(0.5f,0.0f,1.0f,0.0f,0.0f)  --> ""java.lang.ArithmeticException: div by 0...""
+","19 test cases, 10 exceptions",1.7956786155700684,"['[0.20089126, 0.90057516, 0.59151983, 0.7951877, 0.8842941]', '[0.99776626, 0.9203707, 0.03422326, 0.4619273, 0.54925454]', '[0.70955825, 0.1795479, 0.7939759, 0.81796944, 0.15713495]', '[0.56856704, 0.26478767, 0.90637493, 0.22982937, 0.5563394]', '[0.20089126, 0.16137838, 0.44442046, 0.044730008, 0.72527075]']",[],"[0.2850000858306885, 0.33299994468688965, 0.38000011444091797, 0.44899988174438477, 0.48000001907348633]",[],9.0,11
+TOJAVASECS,toJavaSecs,"public class TOJAVASECS {
+/**
+     * Converts the given postgresql seconds to java seconds.
+     * Reverse engineered by inserting varying dates to postgresql
+     * and tuning the formula until the java dates matched.
+     * See {@link #toPgSecs} for the reverse operation.
+     * 
+     * @param secs Postgresql seconds.
+     * @return Java seconds.
+     */
+    public static long toJavaSecs(long secs) {
+        // postgres epoc to java epoc
+        secs += 946684800L;
+
+        // Julian/Gregorian calendar cutoff point
+        if (secs < -12219292800L) { // October 4, 1582 -> October 15, 1582
+            secs += 86400 * 10;
+            if (secs < -14825808000L) { // 1500-02-28 -> 1500-03-01
+                int extraLeaps = (int) ((secs + 14825808000L) / 3155760000L);
+                extraLeaps--;
+                extraLeaps -= extraLeaps / 4;
+                secs += extraLeaps * 86400L;
+            }
+        }
+        return secs;
+    }
+}","Inputs: secs_1_SYMINT
+
+(-13165977601l)  --> Return Value: -12219292801
+(-13165977600l)  --> Return Value: -12219292800
+(0l)  --> Return Value: 946684800
+","3 test cases, 0 exceptions",1.477027177810669,"['[-8498624097974006656]', '[9095902087563549767]']",[],"[0.6600000858306885, 0.7030000686645508]",[],3.0,9
+TOPGSECS,toPgSecs,"public class TOPGSECS {
+/**
+     * Converts the given java seconds to postgresql seconds.
+     * See {@link #toJavaSecs} for the reverse operation.
+     * The conversion is valid for any year 100 BC onwards.
+     * 
+     * @param secs Postgresql seconds.
+     * @return Java seconds.
+     */
+     public static long toPgSecs(long secs) {
+        // java epoc to postgres epoc
+        secs -= 946684800L;
+
+        // Julian/Greagorian calendar cutoff point
+        if (secs < -13165977600L) { // October 15, 1582 -> October 4, 1582
+            secs -= 86400 * 10;
+            if (secs < -15773356800L) { // 1500-03-01 -> 1500-02-28
+                int years = (int) ((secs + 15773356800L) / -3155823050L);
+                years++;
+                years -= years/4;
+                secs += years * 86400;
+            }
+        }
+        
+        return secs;
+    }
+}","Inputs: secs_1_SYMINT
+
+(-12219292801l)  --> Return Value: -13165977601
+(-12219292800l)  --> Return Value: -13165977600
+(665609089l)  --> Return Value: -281075711
+","3 test cases, 0 exceptions",1.536367654800415,"['[6531203690080990914]', '[-3845089849785029059]']",[],"[0.7769999504089355, 0.8239998817443848]",[],3.0,9
+REVERSE,reverse,"public class REVERSE {
+/**
+     * Returns the value obtained by reversing the order of the bits in the
+     * two's complement binary representation of the specified {@code long}
+     * value.
+     *
+     * @param i the value to be reversed
+     * @return the value obtained by reversing order of the bits in the
+     *     specified {@code long} value.
+     * @since 1.5
+     */
+    public static long reverse(long i) {
+        // HD, Figure 7-1
+        i = (i & 0x5555555555555555L) << 1 | (i >>> 1) & 0x5555555555555555L;
+        i = (i & 0x3333333333333333L) << 2 | (i >>> 2) & 0x3333333333333333L;
+        i = (i & 0x0f0f0f0f0f0f0f0fL) << 4 | (i >>> 4) & 0x0f0f0f0f0f0f0f0fL;
+        i = (i & 0x00ff00ff00ff00ffL) << 8 | (i >>> 8) & 0x00ff00ff00ff00ffL;
+        i = (i << 48) | ((i & 0xffff0000L) << 16) |
+            ((i >>> 16) & 0xffff0000L) | (i >>> 48);
+        return i;
+    }
+}",No path condition,No path condition,1.5951330661773682,['[1602526665534058741]'],[],[0.16000008583068848],[],1.0,6
+NEXTHIGHESTPOWEROFTWO,nextHighestPowerOfTwo,"public class NEXTHIGHESTPOWEROFTWO {
+/** returns the next highest power of two, or the current value if it's already a power of two or zero*/
+  public static int nextHighestPowerOfTwo(int v) {
+    v--;
+    v |= v >> 1;
+    v |= v >> 2;
+    v |= v >> 4;
+    v |= v >> 8;
+    v |= v >> 16;
+    v++;
+    return v;
+  }
+}",No path condition,No path condition,1.5726799964904783,['[-73827611]'],[],[0.125],[],1.0,8
+BITCOUNT,bitCount,"public class BITCOUNT {
+/**
+     * Returns the number of one-bits in the two's complement binary
+     * representation of the specified {@code long} value.  This function is
+     * sometimes referred to as the <i>population count</i>.
+     *
+     * @param i the value whose bits are to be counted
+     * @return the number of one-bits in the two's complement binary
+     *     representation of the specified {@code long} value.
+     * @since 1.5
+     */
+     public static int bitCount(long i) {
+        // HD, Figure 5-14
+        i = i - ((i >>> 1) & 0x5555555555555555L);
+        i = (i & 0x3333333333333333L) + ((i >>> 2) & 0x3333333333333333L);
+        i = (i + (i >>> 4)) & 0x0f0f0f0f0f0f0f0fL;
+        i = i + (i >>> 8);
+        i = i + (i >>> 16);
+        i = i + (i >>> 32);
+        return (int)i & 0x7f;
+     }
+}",No path condition,No path condition,1.4939210414886477,['[6213434489718269007]'],[],[0.9440000057220459],[],1.0,7
+CALCULATEUNPINNEDSTEPSIZE,calculateUnpinnedStepSize,"public class CALCULATEUNPINNEDSTEPSIZE {
+/**
+     * If setting is less then 100kBytes take 1 kByte steps.
+     * If setting is less then 500kBytes take 5 kByte steps.
+     * if setting is larger take 10 kBytes steps.
+     * @param currLimitMax - current limit setting.
+     * @return - set size for next change.
+     */
+    public int calculateUnpinnedStepSize(int currLimitMax){
+        if(currLimitMax<102400){
+            return 1024;
+        }else if(currLimitMax<409600){
+            return 1024*5;
+        }else if(currLimitMax>=409600){
+            return 1024*10;
+        }
+        return 1024;
+    }
+}","Inputs: currLimitMax_1_SYMINT
+
+(0)  --> Return Value: 1024
+(102400)  --> Return Value: 5120
+(409600)  --> Return Value: 10240
+","3 test cases, 0 exceptions",1.5551095008850098,"['[-1708994244]', '[90599560]', '[302921]']",[],"[0.6050000190734863, 0.6480000019073486, 1.8320000171661377]",[],4.0,7
+DECODEHEXDIGIT,decodeHexDigit,"public class DECODEHEXDIGIT {
+/**
+     * Convert a character that represents a hexidecimal digit into an integer.
+     * If the character is not a hexidecimal digit, then -1 is returned.
+     * Both upper case and lower case hex digits are allowed.
+     * @param c the hexidecimal digit.
+     * @return the integer value of the hexidecimal digit.
+     */
+
+    public int decodeHexDigit(char c) {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        else if (c >= 'A' && c <= 'F') {
+            return c - 'A' + 10;
+        }
+        else if (c >= 'a' && c <= 'f') {
+            return c - 'a' + 10;
+        }
+        else {
+            return -1;
+        }
+    }
+}","Inputs: c_1_SYMINT
+
+(0)  --> Return Value: -1
+(48)  --> Return Value: 0
+(58)  --> Return Value: -1
+(65)  --> Return Value: 10
+(71)  --> Return Value: -1
+(97)  --> Return Value: 10
+(103)  --> Return Value: -1
+","7 test cases, 0 exceptions",1.419900894165039,"['[춠]', '[J]', '[\x00]', '[8]', '[F]', '[e]']",[],"[0.44099998474121094, 0.5360000133514404, 0.619999885559082, 3.2679998874664307, 3.5450000762939453, 9.772000074386597]",[],7.0,8
+COMPARE,compare,"public class COMPARE {
+/**
+     * Compares to {@code long} values numerically. This is the same functionality as provided in Java 7.
+     *
+     * @param x the first {@code long} to compare
+     * @param y the second {@code long} to compare
+     * @return the value {@code 0} if {@code x == y};
+     *         a value less than {@code 0} if {@code x < y}; and
+     *         a value greater than {@code 0} if {@code x > y}
+     * @since 3.4
+     */
+    public static int compare(final long x, final long y) {
+        if (x == y) {
+            return 0;
+        }
+        return x < y ? -1 : 1;
+    }
+}","Inputs: x_1_SYMINT,y_2_SYMINT
+
+(-1l,0l)  --> Return Value: 0
+(0l,0l)  --> Return Value: 0
+(0l,-1l)  --> Return Value: 0
+","3 test cases, 0 exceptions",1.5611417293548584,"['[0.8580642145852232, 0.2929983634658988]', '[0.0, 0.0]', '[0.05437772982182898, 0.5482594843991112]']",[],"[0.3840000629425049, 0.42600011825561523, 0.4330000877380371]",[],2.0,3
+TOCODEPOINT,,"public class TOCODEPOINT {
+/**
+     * Return the unicode code point represented by the char.
+     * A bit of a dummy method, since all it does is return the char,
+     * but as an int value.
+     * <p>
+     * This is not a public API.
+     * @param ch the char.
+     * @xsl.usage internal
+     */
+    static int toCodePoint(char ch) {
+        int codePoint = ch;
+        return codePoint;
+    }
+}",No path condition,No path condition,1.3937747478485107,['[æ“¥]'],[],[0.5659999847412109],[],1.0,2
